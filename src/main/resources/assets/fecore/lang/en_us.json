@@ -1,0 +1,10 @@
+{
+	"fecore.configgui.scrollSensitivity": "Scrolling Sensitivity",
+	"narrator.position.componentholder": "Component %d out of %d",
+	"narration.scrollbar.horizontal.title": "Horizontal scrollbar",
+	"narration.scrollbar.horizontal.usage.focused": "Press LEFT or RIGHT to scroll",
+	"narration.scrollbar.horizontal.usage.hovered": "Use your horizontal scrolling to scroll, if you have one and are not on MacOS",
+	"narration.scrollbar.vertical.title": "Vertical scrollbar",
+	"narration.scrollbar.vertical.usage.focused": "Press UP or DOWN to scroll",
+	"narration.scrollbar.vertical.usage.hovered": "Use your scroll wheel to scroll"
+}

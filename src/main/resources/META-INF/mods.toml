@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[40,)" #TODO
+license="MIT License"
+issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #TODO
+[[mods]] #mandatory
+modId="fecore"
+# The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
+# ${file.jarVersion} will substitute the value of the Implementation-Version as read from the mod's JAR file metadata
+# see the associated build.gradle script for how to populate this completely automatically during a build
+version="${file.jarVersion}" #mandatory
+displayName="FE Core"
+# A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
+#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+# A URL for the "homepage" for this mod, displayed in the mod UI
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+# A file name (in the root of the mod JAR) containing a logo for display
+logoFile="examplemod.png" #optional
+credits="FirEmerald"
+authors="FirEmerald"
+description='''
+Core dependency for FirEmerald's mods as of the great 1.18.2-ening.
+Contains helper code and implementations for more dynamic GUI, easier config handling, XML-based data loading, and entity selection shapes.
+'''
+[[dependencies.examplemod]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
