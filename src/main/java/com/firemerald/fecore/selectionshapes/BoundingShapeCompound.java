@@ -8,13 +8,13 @@ import org.apache.commons.lang3.mutable.MutableInt;
 
 import com.firemerald.fecore.betterscreens.components.Button;
 import com.firemerald.fecore.betterscreens.components.IComponent;
-import com.firemerald.fecore.util.Vec3d;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class BoundingShapeCompound extends BoundingShape
 {
@@ -60,7 +60,7 @@ public abstract class BoundingShapeCompound extends BoundingShape
 	}
 
 	@Override
-	public void addGuiElements(Vec3d pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width)
+	public void addGuiElements(Vec3 pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width)
 	{
 		int offX = (width - 300) >> 1;
 		MutableInt y = new MutableInt(0);
@@ -68,13 +68,13 @@ public abstract class BoundingShapeCompound extends BoundingShape
 		{
 			final int j = i;
 			addElement.accept(new ButtonConfigureShape(offX, y.getValue(), 200, 20, gui::openShape, () -> shapes.get(j), shape -> shapes.set(j, shape)));
-			addElement.accept(new Button(offX + 200, y.getValue(), 100, 20, new TranslatableComponent("gui.shape.remove"), () -> {
+			addElement.accept(new Button(offX + 200, y.getValue(), 100, 20, new TranslatableComponent("fecore.shapesgui.compound.remove"), () -> {
 				shapes.remove(j);
 				gui.updateGuiButtonsList();
 				}));
 			y.add(20);
 		}
-		addElement.accept(new Button(offX + 50, y.getValue(), 200, 20, new TranslatableComponent("gui.shape.add"), () -> {
+		addElement.accept(new Button(offX + 50, y.getValue(), 200, 20, new TranslatableComponent("fecore.shapesgui.compound.add"), () -> {
 			shapes.add(new BoundingShapeSphere());
 			gui.updateGuiButtonsList();
 		}));

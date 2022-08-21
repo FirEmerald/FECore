@@ -5,10 +5,10 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 import com.firemerald.fecore.betterscreens.components.IComponent;
-import com.firemerald.fecore.util.Vec3d;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 public class BoundingShapeAll extends BoundingShape
 {
@@ -25,5 +25,5 @@ public class BoundingShapeAll extends BoundingShape
 	}
 
 	@Override
-	public void addGuiElements(Vec3d pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width) {}
+	public void addGuiElements(Vec3 pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width) {}
 }

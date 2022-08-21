@@ -10,7 +10,6 @@ import com.firemerald.fecore.betterscreens.components.Button;
 import com.firemerald.fecore.betterscreens.components.IComponent;
 import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
 import com.firemerald.fecore.betterscreens.components.text.DoubleField;
-import com.firemerald.fecore.util.Vec3d;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
@@ -25,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -117,20 +117,21 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
 	}
 
 	@Override
-	public void addGuiElements(Vec3d pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width)
+	public void addGuiElements(Vec3 pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width)
 	{
 		int offX = (width - 200) >> 1;
 		final DoubleField
 		posX = new DoubleField(font, offX, 20, 67, 20, x, new TranslatableComponent("fecore.shapesgui.position.x"), (DoubleConsumer) (val -> x = val)),
 		posY = new DoubleField(font, offX + 67, 20, 66, 20, y, new TranslatableComponent("fecore.shapesgui.position.y"), (DoubleConsumer) (val -> y = val)),
 		posZ = new DoubleField(font, offX + 133, 20, 67, 20, z, new TranslatableComponent("fecore.shapesgui.position.z"), (DoubleConsumer) (val -> z = val));
+		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Language.getInstance().getOrDefault("fecore.shapesgui.position")));
 		addElement.accept(new Button(offX + 100, 0, 100, 20, new TranslatableComponent(isRelative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
 			if (isRelative)
 			{
 				isRelative = false;
-				x += pos.x();
-				y += pos.y();
-				z += pos.z();
+				x += pos.x;
+				y += pos.y;
+				z += pos.z;
 				posX.setDouble(x);
 				posY.setDouble(y);
 				posZ.setDouble(z);
@@ -138,9 +139,9 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
 			}
 			else
 			{
-				x -= pos.x();
-				y -= pos.y();
-				z -= pos.z();
+				x -= pos.x;
+				y -= pos.y;
+				z -= pos.z;
 				posX.setDouble(x);
 				posY.setDouble(y);
 				posZ.setDouble(z);
@@ -148,7 +149,6 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
 				button.displayString = new TranslatableComponent("fecore.shapesgui.operator.relative");
 			}
 		}));
-		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Language.getInstance().getOrDefault("fecore.shapesgui.position")));
 		addElement.accept(posX);
 		addElement.accept(posY);
 		addElement.accept(posZ);
@@ -166,7 +166,7 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
 			x = blockPos.getX() + .5;
 			y = blockPos.getY() + .5;
 			z = blockPos.getZ() + .5;
-			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.set", new Vec3d(x, y, z).toString()), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.set", new Vec3(x, y, z).toString()), Util.NIL_UUID);
 			player.sendMessage(new TranslatableComponent("fecore.shapetool.size.x.selected"), Util.NIL_UUID);
 			return 1;
 		}
@@ -223,7 +223,7 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
 	public void addInformation(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
 		tooltip.add(new TranslatableComponent(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.position", new Vec3d(x, y, z)));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.size", new Vec3d(sizeX, sizeY, sizeZ)));
+		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.position", new Vec3(x, y, z)));
+		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.size", new Vec3(sizeX, sizeY, sizeZ)));
 	}
 }

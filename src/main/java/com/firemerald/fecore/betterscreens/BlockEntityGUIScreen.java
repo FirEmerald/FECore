@@ -4,9 +4,9 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
-public abstract class GuiTileEntityGui extends BetterScreen
+public abstract class BlockEntityGUIScreen extends BetterScreen
 {
-	public GuiTileEntityGui(Component title)
+	public BlockEntityGUIScreen(Component title)
 	{
 		super(title);
 	}

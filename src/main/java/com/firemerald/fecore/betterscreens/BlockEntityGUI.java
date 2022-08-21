@@ -1,7 +1,7 @@
 package com.firemerald.fecore.betterscreens;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -15,10 +15,10 @@ public abstract class BlockEntityGUI extends BlockEntity
 		super(type, pos, state);
 	}
 
-	public abstract void read(ByteBuf buf);
+	public abstract void read(FriendlyByteBuf buf);
 
-	public abstract void write(ByteBuf buf);
+	public abstract void write(FriendlyByteBuf buf);
 
 	@OnlyIn(Dist.CLIENT)
-	public abstract GuiTileEntityGui getScreen();
+	public abstract BlockEntityGUIScreen getScreen();
 }

@@ -19,14 +19,16 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.firemerald.fecore.networking.FECoreNetwork;
+
 import java.util.stream.Collectors;
 
-@Mod("fecore")
+@Mod(FECoreMod.MOD_ID)
 public class FECoreMod
 {
+	public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LoggerFactory.getLogger("FECore");
     
-    //TODO server safe
     static final ForgeConfigSpec clientSpec;
     public static final ConfigClient CLIENT;
     static {
@@ -55,6 +57,7 @@ public class FECoreMod
 
     private void setup(final FMLCommonSetupEvent event)
     {
+    	FECoreNetwork.init();
         // some preinit code
         LOGGER.info("HELLO FROM PREINIT");
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());

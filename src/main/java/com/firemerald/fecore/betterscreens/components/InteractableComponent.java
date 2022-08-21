@@ -42,7 +42,6 @@ public abstract class InteractableComponent extends Component implements IIntera
 	@Override
 	public NarratableEntry.NarrationPriority narrationPriority()
 	{
-		System.out.println("test 2: " + focused);
 		return this.focused ? NarratableEntry.NarrationPriority.FOCUSED : super.narrationPriority();
 	}
 }

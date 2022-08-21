@@ -23,6 +23,17 @@ public class ComponentPane extends ComponentHolder
 		super(parent, x1, y1, x2, y2);
 		this.setMargin(margin);
 	}
+	
+	@Override
+	public int getComponentOffsetX()
+	{
+		return super.getComponentOffsetX() + margin;
+	}
+
+	public int getComponentOffsetY()
+	{
+		return super.getComponentOffsetY() + margin;
+	}
 
 	public void setSize(int x1, int y1, int x2, int y2)
 	{

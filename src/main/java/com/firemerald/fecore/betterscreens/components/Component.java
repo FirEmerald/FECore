@@ -112,7 +112,6 @@ public abstract class Component extends GuiComponent implements IComponent
 	@Override
 	public NarratableEntry.NarrationPriority narrationPriority()
 	{
-		System.out.println("test 1: " + hovered);
 		return this.isHovered() ? NarratableEntry.NarrationPriority.HOVERED : NarratableEntry.NarrationPriority.NONE;
 	}
 }

@@ -86,6 +86,7 @@ public class GuiPopupSelector extends PopupScreen
 			eY = Math.min(height, y1 + h * numVals);
 		}
 		pane.setSize(x1, sY, x2, eY);
+		this.addRenderableWidget(pane);
 	}
 
 	public void cancel()

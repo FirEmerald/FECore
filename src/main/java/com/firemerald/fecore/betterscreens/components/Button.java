@@ -57,6 +57,12 @@ public class Button extends InteractableComponent
     {
     	return setAction(onClickFunction.apply(this));
     }
+    
+    @Override
+	public boolean changeFocus(boolean initial)
+	{
+    	return enabled ? super.changeFocus(initial) : false;
+	}
 
     /**
      * Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over

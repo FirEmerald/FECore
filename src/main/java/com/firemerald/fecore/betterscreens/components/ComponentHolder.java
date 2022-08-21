@@ -45,6 +45,17 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 		super(parent, x1, y1, x2, y2);
 	}
 	
+	@Override
+	public int getComponentOffsetX()
+	{
+		return IComponentHolderComponent.super.getComponentOffsetX() + x1;
+	}
+
+	public int getComponentOffsetY()
+	{
+		return IComponentHolderComponent.super.getComponentOffsetY() + y1;
+	}
+	
 	public void addComponent(IComponent component)
 	{
 		components.add(component);
@@ -158,10 +169,15 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	public boolean onMouseClicked(double mx, double my, int button)
 	{
 		final double x = adjX(mx), y = adjY(my);
-		Optional<IInteractableComponent> clicked = interactables.stream().filter(c -> c.isMouseOver(x, y) && c.mouseClicked(x, y, button)).findFirst();
-		if (clicked.isPresent())
+		IInteractableComponent clicked = null;
+		for (IInteractableComponent c : interactables) if (c.mouseClicked(x, y, button))
 		{
-			this.setFocused(clicked.get());
+			clicked = c;
+			break;
+		}
+		if (clicked != null)
+		{
+			this.setFocused(clicked);
 			if (button == 0) this.setDragging(true);
 			return true;
 		}

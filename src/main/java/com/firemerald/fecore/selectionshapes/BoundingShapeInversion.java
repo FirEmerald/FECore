@@ -3,12 +3,12 @@ package com.firemerald.fecore.selectionshapes;
 import java.util.function.Consumer;
 
 import com.firemerald.fecore.betterscreens.components.IComponent;
-import com.firemerald.fecore.util.Vec3d;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 
 public class BoundingShapeInversion extends BoundingShape
 {
@@ -57,7 +57,7 @@ public class BoundingShapeInversion extends BoundingShape
 	}
 
 	@Override
-	public void addGuiElements(Vec3d pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width)
+	public void addGuiElements(Vec3 pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width)
 	{
 		int offX = (width - 200) >> 1;
 		addElement.accept(new ButtonConfigureShape(offX, 0, 200, 20, gui::openShape, () -> shape, shape -> this.shape = shape));

@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.firemerald.fecore.betterscreens.components.IComponent;
-import com.firemerald.fecore.util.Vec3d;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.locale.Language;
@@ -22,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -136,6 +136,20 @@ public abstract class BoundingShape
 		return shape;
 	}
 
+	public static BoundingShape constructFromNBTOptional(CompoundTag tag)
+	{
+		if (tag.contains("id", 8))
+		{
+			BoundingShape shape = BoundingShape.construct(tag.getString("id"));
+			if (shape != null)
+			{
+				shape.loadFromNBT(tag);
+				return shape;
+			}
+		}
+		return null;
+	}
+
 	public void loadFromNBT(CompoundTag tag) {}
 
 	public void saveToBuffer(FriendlyByteBuf buf)
@@ -153,7 +167,7 @@ public abstract class BoundingShape
 	public void loadFromBuffer(FriendlyByteBuf buf) {}
 
 	@OnlyIn(Dist.CLIENT)
-	public abstract void addGuiElements(Vec3d pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width);
+	public abstract void addGuiElements(Vec3 pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width);
 
 	public static BoundingShape copy(BoundingShape shape)
 	{
