@@ -10,6 +10,7 @@ import com.firemerald.fecore.betterscreens.components.Button;
 import com.firemerald.fecore.betterscreens.components.IComponent;
 import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
 import com.firemerald.fecore.betterscreens.components.text.DoubleField;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
@@ -28,7 +29,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
+public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable implements IRenderableBoundingShape
 {
 	public boolean isRelative = true;
 	public double x = 0, y = 0, z = 0, sizeX = 20, sizeY = 20, sizeZ = 20;
@@ -161,6 +162,13 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
 	@Override
 	public int addPosition(Player player, BlockPos blockPos, int num)
 	{
+		if (isRelative)
+		{
+			isRelative = false;
+			x += player.position().x;
+			y += player.position().y;
+			z += player.position().z;
+		}
 		if (num == 0)
 		{
 			x = blockPos.getX() + .5;
@@ -225,5 +233,27 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable
 		tooltip.add(new TranslatableComponent(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.position", new Vec3(x, y, z)));
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.size", new Vec3(sizeX, sizeY, sizeZ)));
+	}
+
+	@Override
+	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
+	{
+		float x1, y1, z1;
+		if (this.isRelative)
+		{
+			x1 = (float) (x + pos.x);
+			y1 = (float) (y + pos.y);
+			z1 = (float) (z + pos.z);
+		}
+		else
+		{
+			x1 = (float) x;
+			y1 = (float) y;
+			z1 = (float) z;
+		}
+		float x2 = (float) (x1 + sizeX);
+		float y2 = (float) (x1 + sizeY);
+		float z2 = (float) (x1 + sizeZ);
+		IRenderableBoundingShape.renderCube(pose.last().pose(), pose.last().normal(), x1, y1, z1, x2, y2, z2, .5f, .5f, 1f, .5f);
 	}
 }

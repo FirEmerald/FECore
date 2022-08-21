@@ -10,6 +10,7 @@ import com.firemerald.fecore.betterscreens.components.Button;
 import com.firemerald.fecore.betterscreens.components.IComponent;
 import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
 import com.firemerald.fecore.betterscreens.components.text.DoubleField;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
@@ -28,7 +29,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class BoundingShapeSphere extends BoundingShapeConfigurable
+public class BoundingShapeSphere extends BoundingShapeConfigurable implements IRenderableBoundingShape
 {
 	public boolean isRelative = true;
 	public double x = .5, y = .5, z = .5, r = 10;
@@ -153,6 +154,13 @@ public class BoundingShapeSphere extends BoundingShapeConfigurable
 	@Override
 	public int addPosition(Player player, BlockPos blockPos, int num)
 	{
+		if (isRelative)
+		{
+			isRelative = false;
+			x += player.position().x;
+			y += player.position().y;
+			z += player.position().z;
+		}
 		if (num == 0)
 		{
 			x = blockPos.getX() + .5;
@@ -196,5 +204,24 @@ public class BoundingShapeSphere extends BoundingShapeConfigurable
 		tooltip.add(new TranslatableComponent(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.position", new Vec3(x, y, z)));
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.radius", r));
+	}
+
+	@Override
+	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
+	{
+		float x, y, z;
+		if (this.isRelative)
+		{
+			x = (float) (this.x + pos.x);
+			y = (float) (this.y + pos.y);
+			z = (float) (this.z + pos.z);
+		}
+		else
+		{
+			x = (float) this.x;
+			y = (float) this.y;
+			z = (float) this.z;
+		}
+		IRenderableBoundingShape.renderSphere(pose.last().pose(), pose.last().normal(), x, y, z, (float) r, .5f, .5f, 1f, .5f);
 	}
 }

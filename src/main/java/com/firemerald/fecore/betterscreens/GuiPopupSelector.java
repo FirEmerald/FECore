@@ -12,6 +12,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TextComponent;
 
 public class GuiPopupSelector extends PopupScreen
@@ -106,6 +107,7 @@ public class GuiPopupSelector extends PopupScreen
 	@Override
 	public void renderBackground(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
 	{
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		Matrix4f mat = pose.last().pose();
 		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();

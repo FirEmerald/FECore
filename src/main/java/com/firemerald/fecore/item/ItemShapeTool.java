@@ -45,13 +45,13 @@ public class ItemShapeTool extends Item
 	//shift-right-click on block = default action
 	@SuppressWarnings("resource")
 	@Override
-	public InteractionResult useOn(UseOnContext context)
+	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
 		Player player = context.getPlayer();
 		if (player.isCrouching()) return InteractionResult.PASS;
 		else if (!context.getLevel().isClientSide)
 		{
-			ItemStack stack = context.getItemInHand();
+			//ItemStack stack = context.getItemInHand();
 			LazyOptional<IShapeTool> toolOpt = stack.getCapability(FECoreCapabilities.SHAPE_TOOL);
 			toolOpt.ifPresent(tool -> {
 				BoundingShapeConfigurable shape;
@@ -73,26 +73,13 @@ public class ItemShapeTool extends Item
 						player.sendMessage(new TranslatableComponent("fecore.shapetool.new", new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
 					}
 				}
-				if (player.isCrouching())
-				{
-					if (!isNew)
-					{
-						List<BoundingShapeConfigurable> shapes = BoundingShape.getConfigurableShapeList(shape);
-						int index = shapes.indexOf(shape);
-						int newIndex = (index + 1) % shapes.size();
-						if (index != newIndex)
-						{
-							shape = shapes.get(newIndex);
-							isNew = true;
-							player.sendMessage(new TranslatableComponent("fecore.shapetool.mode", new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
-						}
-					}
-				}
-				else if (!isNew) posIndex = shape.addPosition(player, context.getClickedPos(), posIndex);
 				if (isNew) tool.setShape(shape);
-				else tool.setConfigurationIndex(posIndex);
+				else
+				{
+					posIndex = shape.addPosition(player, context.getClickedPos(), posIndex);
+					tool.setConfigurationIndex(posIndex);
+				}
 			});
-			
 		}
 		return InteractionResult.SUCCESS;
 	}
@@ -191,6 +178,7 @@ public class ItemShapeTool extends Item
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.remove_pos"));
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.change_mode"));
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.use_block"));
+		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.open_gui"));
 		BoundingShape shape = getShape(stack);
 		if (shape instanceof BoundingShapeConfigurable) ((BoundingShapeConfigurable) shape).addInformation(stack, worldIn, tooltip, flagIn);
     }
