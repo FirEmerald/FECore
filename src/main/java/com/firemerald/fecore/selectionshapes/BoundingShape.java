@@ -39,6 +39,7 @@ public abstract class BoundingShape
 		register("boxPositions", BoundingShapeBoxPositions.class, BoundingShapeBoxPositions::new);
 		register("cylinder", BoundingShapeCylinder.class, BoundingShapeCylinder::new);
 		register("sphere", BoundingShapeSphere.class, BoundingShapeSphere::new);
+		register("polygon", BoundingShapePolygon.class, BoundingShapePolygon::new);
 		register("addition", BoundingShapeAddition.class, BoundingShapeAddition::new);
 		register("intersection", BoundingShapeIntersection.class, BoundingShapeIntersection::new);
 		register("inversion", BoundingShapeInversion.class, BoundingShapeInversion::new);
