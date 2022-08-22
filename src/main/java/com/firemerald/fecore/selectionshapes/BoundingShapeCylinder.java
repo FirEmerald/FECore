@@ -10,12 +10,12 @@ import com.firemerald.fecore.betterscreens.components.Button;
 import com.firemerald.fecore.betterscreens.components.IComponent;
 import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
 import com.firemerald.fecore.betterscreens.components.text.DoubleField;
+import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
-import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -122,7 +122,7 @@ public class BoundingShapeCylinder extends BoundingShapeConfigurable implements 
 		posZ = new DoubleField(font, offX + 133, 20, 67, 20, z, new TranslatableComponent("fecore.shapesgui.position.z"), (DoubleConsumer) (val -> z = val)),
 		radius = new DoubleField(font, offX + 100, 40, 100, 20, r, new TranslatableComponent("fecore.shapesgui.radius"), (DoubleConsumer) (val -> r = val)),
 		height = new DoubleField(font, offX + 100, 60, 100, 20, h, new TranslatableComponent("fecore.shapesgui.height"), (DoubleConsumer) (val -> h = val));
-		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Language.getInstance().getOrDefault("fecore.shapesgui.position")));
+		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Translator.translate("fecore.shapesgui.position")));
 		addElement.accept(new Button(offX + 100, 0, 100, 20, new TranslatableComponent(isRelative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
 			if (isRelative)
 			{
@@ -150,9 +150,9 @@ public class BoundingShapeCylinder extends BoundingShapeConfigurable implements 
 		addElement.accept(posX);
 		addElement.accept(posY);
 		addElement.accept(posZ);
-		addElement.accept(new FloatingText(offX, 40, offX + 100, 60, font, Language.getInstance().getOrDefault("fecore.shapesgui.radius")));
+		addElement.accept(new FloatingText(offX, 40, offX + 100, 60, font, Translator.translate("fecore.shapesgui.radius")));
 		addElement.accept(radius);
-		addElement.accept(new FloatingText(offX, 60, offX + 100, 80, font, Language.getInstance().getOrDefault("fecore.shapesgui.height")));
+		addElement.accept(new FloatingText(offX, 60, offX + 100, 80, font, Translator.translate("fecore.shapesgui.height")));
 		addElement.accept(height);
 
 	}

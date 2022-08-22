@@ -27,7 +27,7 @@ public class ForgeBusEventHandler
     		if (scrollX != 0) ((IBetterScreen) event.getScreen()).mouseScrolledX(event.getMouseX(), event.getMouseY(), (minecraft.options.discreteMouseScroll ? Math.signum(scrollX) : scrollX) * minecraft.options.mouseWheelSensitivity);
     	}
 	}
-	
+
 	@SubscribeEvent
 	public static void onAttachCapabilitiesItemStack(AttachCapabilitiesEvent<ItemStack> event)
 	{

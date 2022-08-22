@@ -14,14 +14,14 @@ displayName="FE Core"
 # A URL for the "homepage" for this mod, displayed in the mod UI
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="examplemod.png" #optional
+logoFile="logo.png" #optional
 credits="FirEmerald"
 authors="FirEmerald"
 description='''
 Core dependency for FirEmerald's mods as of the great 1.18.2-ening.
-Contains helper code and implementations for more dynamic GUI, easier config handling, XML-based data loading, and entity selection shapes.
+Contains helper code and implementations for more dynamic GUI, XML-based data loading, and entity selection shapes.
 '''
-[[dependencies.examplemod]]
+[[dependencies.fecore]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.18.2,1.19)"

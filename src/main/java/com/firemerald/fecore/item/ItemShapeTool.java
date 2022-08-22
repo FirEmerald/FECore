@@ -48,7 +48,7 @@ public class ItemShapeTool extends Item
 	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
 	{
 		Player player = context.getPlayer();
-		if (player.isCrouching()) return InteractionResult.PASS;
+		if (player.isShiftKeyDown()) return InteractionResult.PASS;
 		else if (!context.getLevel().isClientSide)
 		{
 			//ItemStack stack = context.getItemInHand();
@@ -63,6 +63,7 @@ public class ItemShapeTool extends Item
 				{
 					isNew = true;
 					shape = new BoundingShapeBoxPositions();
+					((BoundingShapeBoxPositions) shape).isRelative = false;
 					posIndex = 0;
 					if (s != null) //was invalid shape
 					{
@@ -103,6 +104,7 @@ public class ItemShapeTool extends Item
 				{
 					isNew = true;
 					shape = new BoundingShapeBoxPositions();
+					((BoundingShapeBoxPositions) shape).isRelative = false;
 					posIndex = 0;
 					if (s != null) //was invalid shape
 					{
@@ -113,7 +115,7 @@ public class ItemShapeTool extends Item
 						player.sendMessage(new TranslatableComponent("fecore.shapetool.new", new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
 					}
 				}
-				if (player.isCrouching())
+				if (player.isShiftKeyDown())
 				{
 					if (!isNew)
 					{

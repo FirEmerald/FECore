@@ -6,7 +6,7 @@ import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 public class ConfigClient
 {
 	public final DoubleValue scrollSensitivity;
-	
+
 	public ConfigClient(ForgeConfigSpec.Builder builder)
 	{
         builder.comment("Client only settings").push("client");

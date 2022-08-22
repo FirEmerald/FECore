@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 import com.firemerald.fecore.betterscreens.IComponentHolder;
 import com.firemerald.fecore.betterscreens.ScissorUtil;
-import com.firemerald.fecore.util.ReadOnlyList;
+import com.firemerald.fecore.util.ReadOnlyListView;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -29,9 +29,9 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	private boolean dragging;
 	protected IInteractableComponent focused;
 	private final List<IComponent> components = Lists.newArrayList();
-	public final ReadOnlyList<IComponent> componentsList = new ReadOnlyList<>(components);
+	public final ReadOnlyListView<IComponent> componentsList = new ReadOnlyListView<>(components);
 	private final List<IInteractableComponent> interactables = Lists.newArrayList();
-	public final ReadOnlyList<IInteractableComponent> interactablesList = new ReadOnlyList<>(interactables);
+	public final ReadOnlyListView<IInteractableComponent> interactablesList = new ReadOnlyListView<>(interactables);
 	@Nullable
 	private NarratableEntry lastNarratable;
 

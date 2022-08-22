@@ -9,11 +9,11 @@ import com.firemerald.fecore.betterscreens.components.scrolling.FullyScrollableC
 import com.firemerald.fecore.betterscreens.components.scrolling.HorizontalScrollBar;
 import com.firemerald.fecore.betterscreens.components.scrolling.VerticalScrollBar;
 import com.firemerald.fecore.betterscreens.components.text.*;
+import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -43,7 +43,7 @@ public class ConfigScreenTest extends BetterScreen
 	final FloatingText loremIpsum8;
 	final FloatingText scrollSensitivityLabel;
 	final DoubleField scrollSensitivity;
-	
+
 	@SuppressWarnings("resource")
 	protected ConfigScreenTest(Screen previous)
 	{
@@ -87,7 +87,7 @@ public class ConfigScreenTest extends BetterScreen
 		this.loremIpsum6 = new FloatingText(0, 240, 420, 260, Minecraft.getInstance().font, "fugiat nulla pariatur. Excepteur sint occaecat cupidatat non");
 		this.loremIpsum7 = new FloatingText(0, 260, 420, 280, Minecraft.getInstance().font, "proident, sunt in culpa qui officia deserunt mollit anim id est");
 		this.loremIpsum8 = new FloatingText(0, 280, 420, 300, Minecraft.getInstance().font, "laborum.");
-		this.scrollSensitivityLabel = new FloatingText(0, 300, 200, 320, Minecraft.getInstance().font, Language.getInstance().getOrDefault("fecore.configgui.scrollSensitivity"), EnumTextAlignment.RIGHT);
+		this.scrollSensitivityLabel = new FloatingText(0, 300, 200, 320, Minecraft.getInstance().font, Translator.translate("fecore.configgui.scrollSensitivity"), EnumTextAlignment.RIGHT);
 		this.scrollSensitivity = new DoubleField(Minecraft.getInstance().font, 200, 300, 200, 20, FECoreMod.CLIENT.scrollSensitivity.get(), 0, Double.POSITIVE_INFINITY, new TextComponent("Scrolling sensitivity"), v -> {FECoreMod.CLIENT.scrollSensitivity.set(v);});
 		compundTagField.setMaxLength(Integer.MAX_VALUE);
 		pane.setScrollBar(vertScroll);
@@ -128,7 +128,7 @@ public class ConfigScreenTest extends BetterScreen
     {
        this.minecraft.setScreen(previous);
     }
-	
+
 	@Override
 	public void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover)
 	{

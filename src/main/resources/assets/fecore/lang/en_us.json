@@ -1,4 +1,5 @@
 {
+	"fecore.configgui": "FECore Configuration",
 	"fecore.configgui.scrollSensitivity": "Scrolling Sensitivity",
 	"narrator.position.componentholder": "Component %d out of %d",
 	"narration.scrollbar.horizontal.title": "Horizontal scrollbar",

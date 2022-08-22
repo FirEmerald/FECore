@@ -47,7 +47,11 @@ public class ShapeToolClickedPacket extends ServerPacket
 		if (cap.isPresent())
 		{
 			BoundingShape shape = cap.resolve().get().getShape();
-			if (shape == null) shape = new BoundingShapeBoxPositions();
+			if (shape == null)
+			{
+				shape = new BoundingShapeBoxPositions();
+				((BoundingShapeBoxPositions) shape).isRelative = false;
+			}
 			FECoreNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new ShapeToolScreenPacket(player.position(), hand, shape));
 		}
 	}

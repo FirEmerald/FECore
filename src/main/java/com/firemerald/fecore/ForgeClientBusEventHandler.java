@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeClientBusEventHandler
-{	
+{
 	@SuppressWarnings("resource")
 	@SubscribeEvent
 	public static void onClick(ClickInputEvent event)
@@ -47,7 +47,7 @@ public class ForgeClientBusEventHandler
 			}
 		}
 	}
-	
+
 
 	@SubscribeEvent
 	public static void onRenderLevelLast(RenderLevelStageEvent event)

@@ -10,12 +10,12 @@ import com.firemerald.fecore.betterscreens.components.Button;
 import com.firemerald.fecore.betterscreens.components.IComponent;
 import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
 import com.firemerald.fecore.betterscreens.components.text.DoubleField;
+import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
-import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -134,7 +134,7 @@ public class BoundingShapeBoxPositions extends BoundingShapeConfigurable impleme
 		posX2 = new DoubleField(font, offX, 60, 67, 20, x2, new TranslatableComponent("fecore.shapesgui.position.2.x"), (DoubleConsumer) (val -> x2 = val)),
 		posY2 = new DoubleField(font, offX + 67, 60, 66, 20, y2, new TranslatableComponent("fecore.shapesgui.position.2.y"), (DoubleConsumer) (val -> y2 = val)),
 		posZ2 = new DoubleField(font, offX + 133, 60, 67, 20, z2, new TranslatableComponent("fecore.shapesgui.position.2.z"), (DoubleConsumer) (val -> z2 = val));
-		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Language.getInstance().getOrDefault("fecore.shapesgui.position.1")));
+		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Translator.translate("fecore.shapesgui.position.1")));
 		addElement.accept(new Button(offX + 100, 0, 100, 20, new TranslatableComponent(isRelative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
 			if (isRelative)
 			{
@@ -174,7 +174,7 @@ public class BoundingShapeBoxPositions extends BoundingShapeConfigurable impleme
 		addElement.accept(posX1);
 		addElement.accept(posY1);
 		addElement.accept(posZ1);
-		addElement.accept(new FloatingText(offX, 40, offX + 200, 60, font, Language.getInstance().getOrDefault("fecore.shapesgui.position.2")));
+		addElement.accept(new FloatingText(offX, 40, offX + 200, 60, font, Translator.translate("fecore.shapesgui.position.2")));
 		addElement.accept(posX2);
 		addElement.accept(posY2);
 		addElement.accept(posZ2);

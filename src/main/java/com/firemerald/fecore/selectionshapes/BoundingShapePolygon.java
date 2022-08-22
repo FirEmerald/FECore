@@ -12,6 +12,7 @@ import com.firemerald.fecore.betterscreens.components.IComponent;
 import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
 import com.firemerald.fecore.betterscreens.components.text.FloatField;
 import com.firemerald.fecore.util.Constants;
+import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 
@@ -20,7 +21,6 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
-import net.minecraft.locale.Language;
 import net.minecraft.nbt.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -199,7 +199,7 @@ public class BoundingShapePolygon extends BoundingShapeConfigurable implements I
 	public void addGuiElements(Vec3 pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width)
 	{
 		int offX = (width - 200) >> 1;
-		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Language.getInstance().getOrDefault("fecore.shapesgui.position")));
+		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Translator.translate("fecore.shapesgui.position")));
 		addElement.accept(new Button(offX + 100, 0, 100, 20, new TranslatableComponent(isRelative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
 			if (isRelative)
 			{
@@ -233,7 +233,7 @@ public class BoundingShapePolygon extends BoundingShapeConfigurable implements I
 		{
 			final int index = i;
 			Vector3f posi = positions[i];
-			addElement.accept(new FloatingText(offX, y, offX + 100, y + 20, font, Language.getInstance().getOrDefault("fecore.shapesgui.point.index").formatted(index)));
+			addElement.accept(new FloatingText(offX, y, offX + 100, y + 20, font, Translator.format("fecore.shapesgui.point.index", index)));
 			addElement.accept(new Button(offX + 100, y, 100, 20, new TranslatableComponent("fecore.shapesgui.point.remove"), null).setAction(button -> () -> {
 				Vector3f[] old = BoundingShapePolygon.this.positions;
 				BoundingShapePolygon.this.positions = new Vector3f[old.length - 1];
@@ -275,13 +275,6 @@ public class BoundingShapePolygon extends BoundingShapeConfigurable implements I
 			BoundingShapePolygon.this.positions[old.length] = old.length > 0 ? old[old.length - 1].copy() : new Vector3f();
 			gui.updateGuiButtonsList();
 		}));
-		/*
-		addElement.accept(new FloatingText(offX, 40, offX + 100, 60, font, Language.getInstance().getOrDefault("fecore.shapesgui.radius")));
-		addElement.accept(radius);
-		addElement.accept(new FloatingText(offX, 60, offX + 100, 80, font, Language.getInstance().getOrDefault("fecore.shapesgui.height")));
-		addElement.accept(height);
-		*/
-
 	}
 
 	@Override

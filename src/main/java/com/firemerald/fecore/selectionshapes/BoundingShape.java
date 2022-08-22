@@ -14,9 +14,9 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.firemerald.fecore.betterscreens.components.IComponent;
+import com.firemerald.fecore.util.Translator;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -49,6 +49,11 @@ public abstract class BoundingShape
 			box.isRelative = false;
 			return box;
 		});
+		registerConfigurable(BoundingShapeBoxOffsets.class, () -> {
+			BoundingShapeBoxOffsets box = new BoundingShapeBoxOffsets();
+			box.isRelative = false;
+			return box;
+		});
 		registerConfigurable(BoundingShapeSphere.class, () -> {
 			BoundingShapeSphere sphere = new BoundingShapeSphere();
 			sphere.isRelative = false;
@@ -59,10 +64,10 @@ public abstract class BoundingShape
 			cylinder.isRelative = false;
 			return cylinder;
 		});
-		registerConfigurable(BoundingShapeBoxOffsets.class, () -> {
-			BoundingShapeBoxOffsets box = new BoundingShapeBoxOffsets();
-			box.isRelative = false;
-			return box;
+		registerConfigurable(BoundingShapePolygon.class, () -> {
+			BoundingShapePolygon polygon = new BoundingShapePolygon();
+			polygon.isRelative = false;
+			return polygon;
 		});
 	}
 
@@ -119,7 +124,7 @@ public abstract class BoundingShape
 	@OnlyIn(Dist.CLIENT)
 	public String getLocalizedName()
 	{
-		return Language.getInstance().getOrDefault(getUnlocalizedName());
+		return Translator.translate(getUnlocalizedName());
 	}
 
 	public abstract boolean isWithin(@Nullable Entity entity, double posX, double posY, double posZ, double testerX, double testerY, double testerZ);

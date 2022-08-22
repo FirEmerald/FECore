@@ -10,12 +10,12 @@ import com.firemerald.fecore.betterscreens.components.Button;
 import com.firemerald.fecore.betterscreens.components.IComponent;
 import com.firemerald.fecore.betterscreens.components.decoration.FloatingText;
 import com.firemerald.fecore.betterscreens.components.text.DoubleField;
+import com.firemerald.fecore.util.Translator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
-import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -125,7 +125,7 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable implement
 		posX = new DoubleField(font, offX, 20, 67, 20, x, new TranslatableComponent("fecore.shapesgui.position.x"), (DoubleConsumer) (val -> x = val)),
 		posY = new DoubleField(font, offX + 67, 20, 66, 20, y, new TranslatableComponent("fecore.shapesgui.position.y"), (DoubleConsumer) (val -> y = val)),
 		posZ = new DoubleField(font, offX + 133, 20, 67, 20, z, new TranslatableComponent("fecore.shapesgui.position.z"), (DoubleConsumer) (val -> z = val));
-		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Language.getInstance().getOrDefault("fecore.shapesgui.position")));
+		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Translator.translate("fecore.shapesgui.position")));
 		addElement.accept(new Button(offX + 100, 0, 100, 20, new TranslatableComponent(isRelative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
 			if (isRelative)
 			{
@@ -153,7 +153,7 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable implement
 		addElement.accept(posX);
 		addElement.accept(posY);
 		addElement.accept(posZ);
-		addElement.accept(new FloatingText(offX, 40, offX + 200, 60, font, Language.getInstance().getOrDefault("fecore.shapesgui.size")));
+		addElement.accept(new FloatingText(offX, 40, offX + 200, 60, font, Translator.translate("fecore.shapesgui.size")));
 		addElement.accept(new DoubleField(font, offX, 60, 67, 20, sizeX, new TranslatableComponent("fecore.shapesgui.size.x"), (DoubleConsumer) (val -> sizeX = val)));
 		addElement.accept(new DoubleField(font, offX + 67, 60, 66, 20, sizeY, new TranslatableComponent("fecore.shapesgui.size.y"), (DoubleConsumer) (val -> sizeY = val)));
 		addElement.accept(new DoubleField(font, offX + 133, 60, 67, 20, sizeZ, new TranslatableComponent("fecore.shapesgui.size.z"), (DoubleConsumer) (val -> sizeZ = val)));
@@ -252,8 +252,8 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable implement
 			z1 = (float) z;
 		}
 		float x2 = (float) (x1 + sizeX);
-		float y2 = (float) (x1 + sizeY);
-		float z2 = (float) (x1 + sizeZ);
+		float y2 = (float) (y1 + sizeY);
+		float z2 = (float) (z1 + sizeZ);
 		IRenderableBoundingShape.renderCube(pose.last().pose(), pose.last().normal(), x1, y1, z1, x2, y2, z2, .5f, .5f, 1f, .5f);
 	}
 }

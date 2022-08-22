@@ -1,9 +1,19 @@
 package com.firemerald.fecore;
 
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.firemerald.fecore.item.FECoreItems;
+import com.firemerald.fecore.networking.FECoreNetwork;
+
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.client.ConfigGuiHandler.ConfigGuiFactory;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -12,23 +22,14 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.firemerald.fecore.networking.FECoreNetwork;
-
-import java.util.stream.Collectors;
 
 @Mod(FECoreMod.MOD_ID)
 public class FECoreMod
 {
 	public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LoggerFactory.getLogger("FECore");
-    
+
     static final ForgeConfigSpec clientSpec;
     public static final ConfigClient CLIENT;
     static {
@@ -48,11 +49,13 @@ public class FECoreMod
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-        
+
         ModLoadingContext.get().registerExtensionPoint(ConfigGuiFactory.class, () -> new ConfigGuiFactory((mc, prev) -> {
-        	return new ConfigScreenTest(prev);
+        	return new ModConfigScreen(prev);
         }));
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
+        
+        FECoreItems.registerItems(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     private void setup(final FMLCommonSetupEvent event)
