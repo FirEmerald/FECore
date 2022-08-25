@@ -76,17 +76,18 @@ public abstract class Component extends GuiComponent implements IComponent
 	{
 		return holder;
 	}
-	
+
 	public boolean isVisible()
 	{
 		return visible;
 	}
-	
+
 	public void setVisible(boolean visible)
 	{
 		if (!(this.visible = visible)) hovered = false;
 	}
-	
+
+	@Override
 	public void render(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
 	{
 		if (this.isVisible())
@@ -96,19 +97,19 @@ public abstract class Component extends GuiComponent implements IComponent
 		}
 		else this.hovered = false;
 	}
-	
+
 	public abstract void doRender(PoseStack pose, int mx, int my, float partialTicks, boolean canHover);
-	
+
 	public boolean isHovered()
 	{
 		return hovered;
 	}
-	
+
 	public void setHovered(boolean hovered)
 	{
 		this.hovered = hovered;
 	}
-	
+
 	@Override
 	public NarratableEntry.NarrationPriority narrationPriority()
 	{

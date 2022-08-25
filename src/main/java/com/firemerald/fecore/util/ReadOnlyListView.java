@@ -10,30 +10,30 @@ import java.util.stream.Stream;
 public class ReadOnlyListView<E> implements List<E>
 {
 	public final List<E> list;
-	
+
 	public ReadOnlyListView(List<E> list)
 	{
 		this.list = list;
 	}
-	
+
 	@Override
 	public Stream<E> stream()
 	{
 		return list.stream();
 	}
-	
+
 	@Override
 	public Stream<E> parallelStream()
 	{
 		return list.parallelStream();
 	}
-	
+
 	@Override
 	public void forEach(Consumer<? super E> action)
 	{
 		list.forEach(action);
 	}
-	
+
 	@Override
 	public int size()
 	{

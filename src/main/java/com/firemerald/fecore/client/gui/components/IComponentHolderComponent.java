@@ -10,6 +10,7 @@ public interface IComponentHolderComponent extends IComponentHolder, IComponent
 		return this.getHolder() != null ? this.getHolder().getComponentOffsetX() : 0;
 	}
 
+	@Override
 	public default int getComponentOffsetY()
 	{
 		return this.getHolder() != null ? this.getHolder().getComponentOffsetY() : 0;

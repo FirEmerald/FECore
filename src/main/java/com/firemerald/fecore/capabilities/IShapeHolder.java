@@ -16,12 +16,12 @@ public interface IShapeHolder extends ICapabilitySerializable<CompoundTag>
 {
 	public static final ResourceLocation NAME = new ResourceLocation(FECoreMod.MOD_ID, "shape_holder");
 	public static final Capability<IShapeHolder> CAP = CapabilityManager.get(new CapabilityToken<>(){});
-	
+
 	public static LazyOptional<IShapeHolder> get(ICapabilityProvider obj)
 	{
 		return obj.getCapability(CAP);
 	}
-	
+
 	public static LazyOptional<IShapeHolder> get(ICapabilityProvider obj, @Nullable Direction side)
 	{
 		return obj.getCapability(CAP, side);
@@ -31,18 +31,18 @@ public interface IShapeHolder extends ICapabilitySerializable<CompoundTag>
 	{
 		return get(obj).resolve().orElse(null);
 	}
-	
+
 	public static IShapeHolder getOrNull(ICapabilityProvider obj, @Nullable Direction side)
 	{
 		return get(obj, side).resolve().orElse(null);
 	}
-	
+
 	public abstract BoundingShape getShape();
 
 	public abstract boolean canAcceptShape(BoundingShape shape);
 
 	public abstract void setShape(BoundingShape shape);
-	
+
 	public static class Impl implements IShapeHolder
 	{
 	    private final LazyOptional<IShapeHolder> holder = LazyOptional.of(() -> this);
@@ -79,7 +79,7 @@ public interface IShapeHolder extends ICapabilitySerializable<CompoundTag>
 		{
 			this.shape = shape;
 		}
-		
+
 	    @Override
 	    @Nonnull
 	    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing)

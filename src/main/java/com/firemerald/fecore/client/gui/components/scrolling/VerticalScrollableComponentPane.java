@@ -52,14 +52,16 @@ public class VerticalScrollableComponentPane extends ComponentPane implements IV
 		else if (scrollY > scrollSizeY) scrollY = scrollSizeY;
 		if (verticalScrollBar != null) verticalScrollBar.setMaxScroll();
 	}
-	
+
+	@Override
 	public void preRender(PoseStack pose)
 	{
 		this.setScissor(margin, margin, (x2 - x1) - (margin << 1), (y2 - y1) - (margin << 1));
 		pose.pushPose();
 		pose.translate(ex1, ey1 - scrollY, 0);
 	}
-	
+
+	@Override
 	public double adjY(double y)
 	{
 		return y - ey1 + scrollY;

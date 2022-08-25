@@ -153,7 +153,7 @@ public class HorizontalScrollBar extends InteractableComponent
 		}
 		else return false;
 	}
-	
+
 	@Override
 	public boolean changeFocus(boolean focused)
 	{

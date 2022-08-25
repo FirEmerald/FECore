@@ -27,7 +27,7 @@ public class FECoreUtil
                 {
                     @Override
 					public void connect() throws IOException {}
-                    
+
                     @Override
 					public InputStream getInputStream() throws IOException
                     {

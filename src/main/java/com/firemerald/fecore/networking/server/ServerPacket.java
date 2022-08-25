@@ -18,6 +18,6 @@ public abstract class ServerPacket extends PacketBase
 			context.setPacketHandled(true);
 		}
 	}
-	
+
 	public abstract void handleServer(NetworkEvent.Context ctx);
 }

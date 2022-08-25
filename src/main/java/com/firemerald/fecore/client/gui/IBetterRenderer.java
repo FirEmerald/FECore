@@ -7,7 +7,7 @@ import net.minecraft.client.gui.components.Widget;
 public interface IBetterRenderer extends Widget
 {
 	public abstract void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover);
-	
+
 	@Override
 	public default void render(PoseStack pose, int mx, int my, float partialTick)
 	{

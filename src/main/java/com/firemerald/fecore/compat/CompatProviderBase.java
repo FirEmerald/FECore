@@ -33,12 +33,14 @@ public abstract class CompatProviderBase implements ICompatProvider
 		this.modId = modId;
 		this.version = v -> minVersion.compareTo(v) >= 0 && v.compareTo(maxVersion) >= 0;
 	}
-	
+
+	@Override
 	public String getModID()
 	{
 		return modId;
 	}
-	
+
+	@Override
 	public boolean isValidVersion(ArtifactVersion version)
 	{
 		return this.version.test(version);
@@ -56,6 +58,6 @@ public abstract class CompatProviderBase implements ICompatProvider
 		isPresent = true;
 		registerEventHandlers();
 	}
-	
+
 	public abstract void registerEventHandlers();
 }

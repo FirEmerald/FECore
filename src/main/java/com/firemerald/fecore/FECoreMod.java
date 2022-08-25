@@ -60,7 +60,7 @@ public class FECoreMod
     	NETWORK.registerServerPacket(ShapeToolSetPacket.class, ShapeToolSetPacket::new);
     	NETWORK.registerServerPacket(ShapeToolClickedPacket.class, ShapeToolClickedPacket::new);
     }
-    
+
 	public void registerCaps(RegisterCapabilitiesEvent event)
 	{
 		event.register(IShapeHolder.class);

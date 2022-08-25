@@ -25,7 +25,7 @@ public class Constants
 
 	public static final Vec2[] CIRCLE_MESH_CACHE = new Vec2[CIRCLE_SEGMENTS + 1];
 	public static final Vector3f[][] SPHERE_MESH_CACHE = new Vector3f[HALF_CIRCLE_SEGMENTS - 1][CIRCLE_SEGMENTS + 1];
-	
+
 	static
 	{
 		for (int i = 0; i <= CIRCLE_SEGMENTS; ++i)

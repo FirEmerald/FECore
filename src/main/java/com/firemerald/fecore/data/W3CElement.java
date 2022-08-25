@@ -15,7 +15,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.firemerald.fecore.data.attributes.*;
+import com.firemerald.fecore.data.attributes.AttributeDouble;
+import com.firemerald.fecore.data.attributes.AttributeLong;
+import com.firemerald.fecore.data.attributes.AttributeString;
+import com.firemerald.fecore.data.attributes.IAttribute;
 
 public class W3CElement extends AbstractElement
 {

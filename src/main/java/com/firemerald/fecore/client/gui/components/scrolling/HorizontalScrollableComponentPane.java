@@ -52,14 +52,16 @@ public class HorizontalScrollableComponentPane extends ComponentPane implements 
 		else if (scrollX > scrollSizeX) scrollX = scrollSizeX;
 		if (horizontalScrollBar != null) horizontalScrollBar.setMaxScroll();
 	}
-	
+
+	@Override
 	public void preRender(PoseStack pose)
 	{
 		this.setScissor(margin, margin, (x2 - x1) - (margin << 1), (y2 - y1) - (margin << 1));
 		pose.pushPose();
 		pose.translate(ex1 - scrollX, ey1, 0);
 	}
-	
+
+	@Override
 	public double adjX(double x)
 	{
 		return x - ex1 + scrollX;

@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-
 import com.firemerald.fecore.data.BinaryFormat;
 import com.firemerald.fecore.data.FileUtil;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 public class AttributeFloat implements IAttribute
 {

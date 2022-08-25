@@ -9,7 +9,7 @@ public interface IInteractableComponent extends GuiEventListener, IComponent
 	{
 		return mouseScrolledY(mx, my, scroll) != scroll;
 	}
-	
+
 	/**
 	 * @param mx Mouse X
 	 * @param my Mouse Y
@@ -31,7 +31,7 @@ public interface IInteractableComponent extends GuiEventListener, IComponent
 	{
 		return scroll;
 	}
-	
+
 	@Override
 	default boolean mouseClicked(double mx, double my, int button)
 	{
@@ -42,9 +42,9 @@ public interface IInteractableComponent extends GuiEventListener, IComponent
 	{
 		return false;
 	}
-	
+
 	public boolean isFocused();
-	
+
 	public void setFocused(boolean focused);
 
 	@Override

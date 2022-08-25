@@ -70,13 +70,14 @@ public class TextField extends EditBox implements IInteractableComponent
 		this.width = x2 - x1 - 2;
 		this.height = y2 - y1 - 2;
 	}
-	
+
 	@Override
 	public boolean isFocused()
 	{
 		return super.isFocused();
 	}
-	
+
+	@Override
 	public void setFocused(boolean focused)
 	{
 		super.setFocused(focused);

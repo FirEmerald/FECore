@@ -53,11 +53,11 @@ public class ToggleButton extends Button
     {
     	return this.state ? super.getHoverState(mouseOver) : !mouseOver && this.focused ? 2 : 0;
     }
-    
+
     @Override
     public int getTextColor(boolean isHovered)
     {
-    	return (this.state || !this.focused) ? super.getTextColor(isHovered) : 
+    	return (this.state || !this.focused) ? super.getTextColor(isHovered) :
     		isHovered ? 0xFFFFA0 : 0xA0A0A0;
     }
 }

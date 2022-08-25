@@ -3,9 +3,9 @@ package com.firemerald.fecore.client.gui.components.scrolling;
 public interface IVerticalScrollable extends IScrollableBase
 {
 	public double getHeight();
-	
+
 	public double getFullHeight();
-	
+
 	public double getMaxVerticalScroll();
 
 	public double getVerticalScroll();

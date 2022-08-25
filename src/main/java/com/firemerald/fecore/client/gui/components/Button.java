@@ -57,7 +57,7 @@ public class Button extends InteractableComponent
     {
     	return setAction(onClickFunction.apply(this));
     }
-    
+
     @Override
 	public boolean changeFocus(boolean initial)
 	{
@@ -134,12 +134,12 @@ public class Button extends InteractableComponent
     		}
     	}
     }
-    
+
     protected MutableComponent createNarrationMessage()
     {
         return AbstractWidget.wrapDefaultNarrationMessage(displayString);
     }
-    
+
     public int getTextColor(boolean isHovered)
     {
         if (packedFGColour != 0) return packedFGColour;
@@ -164,7 +164,8 @@ public class Button extends InteractableComponent
         else return false;
     }
 
-    public boolean keyPressed(int key, int scancode, int mods)
+    @Override
+	public boolean keyPressed(int key, int scancode, int mods)
     {
        if (this.enabled && this.isVisible())
        {

@@ -1,10 +1,6 @@
 package com.firemerald.fecore.data;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,13 +13,13 @@ import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.data.attributes.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.internal.LazilyParsedNumber;
-import com.firemerald.fecore.FECoreMod;
-import com.firemerald.fecore.data.attributes.*;
 
 public class Element extends AbstractElement
 {

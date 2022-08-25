@@ -32,7 +32,7 @@ public class ItemShapeTool extends Item
 	{
 		super(new Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS));
 	}
-	
+
 	@Override
 	public boolean doesSneakBypassUse(ItemStack stack, LevelReader level, BlockPos pos, Player player)
 	{
@@ -129,11 +129,11 @@ public class ItemShapeTool extends Item
 				if (isNew) tool.setShape(shape);
 				else tool.setConfigurationIndex(posIndex);
 			});
-			
+
 		}
 		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 	}
-	
+
 	/*
 	//TODO we need a better method
 	@Override
@@ -154,7 +154,7 @@ public class ItemShapeTool extends Item
         return true;
     }
     */
-	
+
 	public static BoundingShape getShape(ItemStack stack)
 	{
 		return IShapeHolder.get(stack).map(IShapeHolder::getShape).orElse(null);

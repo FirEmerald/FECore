@@ -153,7 +153,7 @@ public class VerticalScrollBar extends InteractableComponent
 		}
 		else return false;
 	}
-	
+
 	@Override
 	public boolean changeFocus(boolean focused)
 	{

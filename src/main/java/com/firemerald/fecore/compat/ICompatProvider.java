@@ -7,7 +7,7 @@ import net.minecraftforge.forgespi.language.IModInfo;
 public interface ICompatProvider
 {
 	public String getModID();
-	
+
 	public boolean isValidVersion(ArtifactVersion version);
 
 	default public boolean isValid(IModInfo modInfo)

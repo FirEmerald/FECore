@@ -54,6 +54,6 @@ public abstract class PopupScreen extends BetterScreen
 		super.render(pose, mx, my, partialTicks, canHover);
 		pose.popPose();
 	}
-	
+
 	public void renderBackground(PoseStack pose, int mx, int my, float partialTicks, boolean canHover) {}
 }

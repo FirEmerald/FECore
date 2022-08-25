@@ -21,7 +21,10 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NumericTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -103,7 +106,7 @@ public class BoundingShapePolygon extends BoundingShapeConfigurable implements I
 		}
 		tag.put("points", points);
 	}
-	
+
 	public void updateCachedHeight()
 	{
 		if (positions.length > 0)
@@ -349,8 +352,8 @@ public class BoundingShapePolygon extends BoundingShapeConfigurable implements I
 		else
 		{
 			x = 0;
-			y1 = (float) this.y1;
-			y2 = (float) this.y2;
+			y1 = this.y1;
+			y2 = this.y2;
 			z = 0;
 		}
 		IRenderableBoundingShape.renderPolygon(pose.last().pose(), pose.last().normal(), y1, y2, x, z, positions, .5f, .5f, 1f, .5f);

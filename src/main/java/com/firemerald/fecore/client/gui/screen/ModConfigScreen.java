@@ -5,7 +5,7 @@ import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
-import com.firemerald.fecore.client.gui.components.text.*;
+import com.firemerald.fecore.client.gui.components.text.DoubleField;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;

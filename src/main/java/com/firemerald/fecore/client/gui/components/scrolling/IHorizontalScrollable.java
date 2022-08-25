@@ -5,7 +5,7 @@ public interface IHorizontalScrollable extends IScrollableBase
 	public double getWidth();
 
 	public double getFullWidth();
-	
+
 	public double getMaxHorizontalScroll();
 
 	public double getHorizontalScroll();

@@ -150,7 +150,6 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
 		updateGuiButtonsList();
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public void init()
 	{
@@ -201,6 +200,7 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
         else return super.keyPressed(key, scancode, mods);
     }
 
+	@Override
 	public boolean shouldCloseOnEsc()
 	{
 		return false;
@@ -243,6 +243,6 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
 		t.end();
 		RenderSystem.disableBlend();
 		RenderSystem.enableTexture();
-		
+
 	}
 }

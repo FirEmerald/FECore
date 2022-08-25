@@ -44,24 +44,25 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	{
 		super(parent, x1, y1, x2, y2);
 	}
-	
+
 	@Override
 	public int getComponentOffsetX()
 	{
 		return IComponentHolderComponent.super.getComponentOffsetX() + x1;
 	}
 
+	@Override
 	public int getComponentOffsetY()
 	{
 		return IComponentHolderComponent.super.getComponentOffsetY() + y1;
 	}
-	
+
 	public void addComponent(IComponent component)
 	{
 		components.add(component);
 		onComponentAdded(component);
 	}
-	
+
 	public void addComponentBefore(IComponent component, IComponent before)
 	{
 		int index = components.indexOf(before);
@@ -69,7 +70,7 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 		components.add(index, component);
 		onComponentAdded(component);
 	}
-	
+
 	public void addComponentAfter(IComponent component, IComponent after)
 	{
 		int index = components.lastIndexOf(after);
@@ -78,7 +79,7 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 		components.add(index, component);
 		onComponentAdded(component);
 	}
-	
+
 	protected void onComponentAdded(IComponent component)
 	{
 		component.setHolder(this);
@@ -90,19 +91,19 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	{
 		components.remove(component);
 		component.setHolder(null);
-		if (component instanceof IInteractableComponent) interactables.remove((IInteractableComponent) component);
+		if (component instanceof IInteractableComponent) interactables.remove(component);
 		updateComponentSize();
 	}
-	
+
 	protected void clearWidgets()
 	{
 		this.components.clear();
 		this.interactables.clear();
 		updateComponentSize();
 	}
-	
+
 	public void updateComponentSize() {}
-	
+
 	@Override
 	public boolean isActive()
 	{
@@ -125,47 +126,48 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 		this.components.forEach(c -> c.render(pose, x, y, partialticks, canHoverComponents));
 		postRender(pose);
 	}
-	
+
 	public boolean canHoverComponents(int mx, int my)
 	{
 		return this.isMouseOver(mx, my);
 	}
-	
+
 	public void preRender(PoseStack pose)
 	{
 		this.setScissor(0, 0, x2 - x1, y2 - y1);
 		pose.pushPose();
 		pose.translate(x1, y1, 0);
 	}
-	
+
 	public void postRender(PoseStack pose)
 	{
 		pose.popPose();
 		ScissorUtil.popScissor();
 	}
-	
+
 	public double adjX(double x)
 	{
 		return x - x1;
 	}
-	
+
 	public double adjY(double y)
 	{
 		return y - y1;
 	}
-	
+
 	public Optional<IComponent> getComponentAt(double x, double y)
 	{
 		final double xx = adjX(x), yy = adjY(y);
 		return components.stream().filter(c -> c.isMouseOver(xx, yy)).findFirst();
 	}
-	
+
 	public Optional<IInteractableComponent> getInteractableAt(double x, double y)
 	{
 		final double xx = adjX(x), yy = adjY(y);
 		return interactables.stream().filter(c -> c.isMouseOver(xx, yy)).findFirst();
 	}
-	
+
+	@Override
 	public boolean onMouseClicked(double mx, double my, int button)
 	{
 		final double x = adjX(mx), y = adjY(my);
@@ -187,14 +189,16 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 			return false;
 		}
 	}
-	
+
+	@Override
 	public boolean mouseReleased(double mx, double my, int button)
 	{
 		final double x = adjX(mx), y = adjY(my);
 		this.setDragging(false);
 		return this.getFocused() != null && this.getFocused().mouseReleased(x, y, button);
 	}
-	
+
+	@Override
 	public boolean mouseDragged(double mx, double my, int button, double dx, double dy)
 	{
 		final double x = adjX(mx), y = adjY(my);
@@ -205,12 +209,12 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	{
 		return dragging;
 	}
-	
+
 	public void setDragging(boolean dragging)
 	{
 		this.dragging = dragging;
 	}
-	
+
 	@Override
 	public double mouseScrolledX(double mx, double my, double scroll)
 	{
@@ -219,7 +223,7 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 		if (at.isPresent()) return at.get().mouseScrolledX(x, y, scroll);
 		else return scroll;
 	}
-	
+
 	@Override
 	public double mouseScrolledY(double mx, double my, double scroll)
 	{
@@ -229,16 +233,19 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 		else return scroll;
 	}
 
+	@Override
 	public boolean keyPressed(int key, int scancode, int mods)
 	{
 		return this.getFocused() != null && this.getFocused().keyPressed(key, scancode, mods);
 	}
 
+	@Override
 	public boolean keyReleased(int key, int scancode, int mods)
 	{
 		return this.getFocused() != null && this.getFocused().keyReleased(key, scancode, mods);
 	}
 
+	@Override
 	public boolean charTyped(char chr, int mods)
 	{
 		return this.getFocused() != null && this.getFocused().charTyped(chr, mods);
@@ -270,6 +277,7 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 		this.setFocused(focused);
 	}
 
+	@Override
 	public boolean changeFocus(boolean initial)
 	{
 		IInteractableComponent guieventlistener = this.getFocused();
@@ -302,7 +310,7 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 			return false;
 		}
 	}
-	
+
 	@Override
 	public void tick()
 	{
@@ -313,11 +321,11 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	public void setFocused(boolean focused)
 	{
 		super.setFocused(focused);
-		if (!focused) setFocused(null); 
+		if (!focused) setFocused(null);
 	}
-	
+
 	public void ensureInView(IInteractableComponent component) {}
-	
+
 	@Override
 	public void updateNarration(NarrationElementOutput output)
 	{

@@ -16,7 +16,7 @@ public abstract class BlockEntityGUI extends BlockEntity
 	{
 		super(type, pos, state);
 	}
-	
+
 	public void readInternal(FriendlyByteBuf buf)
 	{
 		this.read(buf);

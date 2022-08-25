@@ -22,7 +22,7 @@ public interface IComponent extends NarratableEntry, IBetterRenderer
 	{
 		return getHolder() == null ? 0 : getHolder().getComponentOffsetY();
 	}
-	
+
 	public abstract int getX1();
 
 	public abstract int getY1();
@@ -77,11 +77,11 @@ public interface IComponent extends NarratableEntry, IBetterRenderer
 		int y1 = this.getTrueY1() + offY1;
 		ScissorUtil.pushScissor(x1, y1, x1 + w, y1 + h);
 	}
-	
+
 	public default boolean isMouseOver(double x, double y)
 	{
 		return (x >= getX1() && y >= getY1() && x < getX2() && y < getY2());
 	}
-	
+
 	public default void tick() {}
 }

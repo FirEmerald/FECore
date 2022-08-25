@@ -1,10 +1,6 @@
 package com.firemerald.fecore.data;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,12 +20,12 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 public class ResourceLoader
 {
 	public static final LevelResource MAP_DATA_DIR = new LevelResource("data");
-	   
+
 	public static MinecraftServer getServer()
 	{
 		return ServerLifecycleHooks.getCurrentServer();
 	}
-	
+
 	public static InputStream getResource(ResourceLocation resource, String subfolder) throws IOException
 	{
 		try //get from world

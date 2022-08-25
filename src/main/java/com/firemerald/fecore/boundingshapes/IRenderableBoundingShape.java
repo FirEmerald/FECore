@@ -21,7 +21,7 @@ public interface IRenderableBoundingShape
 {
 	@OnlyIn(Dist.CLIENT)
 	public abstract void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick);
-	
+
 	public static void renderCube(Matrix4f m, Matrix3f n, float x1, float y1, float z1, float x2, float y2, float z2, float r, float g, float b, float a)
 	{
 		if (x1 > x2)
@@ -61,7 +61,7 @@ public interface IRenderableBoundingShape
 		builder.vertex(m, x1, y2, z1).color(r, g, b, a).normal(n, 0, 0, -1).endVertex();
 		builder.vertex(m, x1, y1, z1).color(r, g, b, a).normal(n, 0, 0, -1).endVertex();
 
-		
+
 		builder.vertex(m, x1, y1, z2).color(r, g, b, a).normal(n, 0, 0, 1).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).normal(n, 0, 0, 1).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).normal(n, 0, 0, 1).endVertex();
@@ -70,14 +70,14 @@ public interface IRenderableBoundingShape
 		builder.vertex(m, x1, y2, z2).color(r, g, b, a).normal(n, 0, 0, 1).endVertex();
 		builder.vertex(m, x1, y2, z2).color(r, g, b, a).normal(n, 0, 0, 1).endVertex();
 		builder.vertex(m, x1, y1, z2).color(r, g, b, a).normal(n, 0, 0, 1).endVertex();
-		
+
 		tesselator.end();
 		*/
 
-		
+
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		
+
 		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
@@ -87,22 +87,22 @@ public interface IRenderableBoundingShape
 		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
@@ -113,27 +113,27 @@ public interface IRenderableBoundingShape
 		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
-		
+
 		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
 		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
 		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
@@ -141,7 +141,7 @@ public interface IRenderableBoundingShape
 
 		tesselator.end();
 	}
-	
+
 	public static void renderCylinder(Matrix4f m, Matrix3f n, float x, float y, float z, float rad, float h, float r, float g, float b, float a)
 	{
 		float y2;
@@ -156,7 +156,7 @@ public interface IRenderableBoundingShape
 		BufferBuilder builder = tesselator.getBuilder();
 		RenderSystem.disableTexture();
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		
+
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		builder.vertex(m, x, y, z).color(r, g, b, a).endVertex();
 		for (int i = Constants.CIRCLE_MESH_CACHE.length - 1; i >= 0; --i)
@@ -168,9 +168,7 @@ public interface IRenderableBoundingShape
 		}
 		tesselator.end();
 		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
-		for (int i = 0; i < Constants.CIRCLE_MESH_CACHE.length; ++i)
-		{
-			Vec2 v = Constants.CIRCLE_MESH_CACHE[i];
+		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			float curX = x + rad * v.x;
 			float curZ = z + rad * v.y;
 			builder.vertex(m, curX, y2, curZ).color(r, g, b, a).endVertex();
@@ -179,9 +177,7 @@ public interface IRenderableBoundingShape
 		tesselator.end();
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		builder.vertex(m, x, y2, z).color(r, g, b, a).endVertex();
-		for (int i = 0; i < Constants.CIRCLE_MESH_CACHE.length; ++i)
-		{
-			Vec2 v = Constants.CIRCLE_MESH_CACHE[i];
+		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			float curX = x + rad * v.x;
 			float curZ = z + rad * v.y;
 			builder.vertex(m, curX, y2, curZ).color(r, g, b, a).endVertex();
@@ -190,18 +186,14 @@ public interface IRenderableBoundingShape
 
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		builder.vertex(m, x, y, z).color(r, g, b, a).endVertex();
-		for (int i = 0; i < Constants.CIRCLE_MESH_CACHE.length; ++i)
-		{
-			Vec2 v = Constants.CIRCLE_MESH_CACHE[i];
+		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			float curX = x + rad * v.x;
 			float curZ = z + rad * v.y;
 			builder.vertex(m, curX, y, curZ).color(r, g, b, a).endVertex();
 		}
 		tesselator.end();
 		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
-		for (int i = 0; i < Constants.CIRCLE_MESH_CACHE.length; ++i)
-		{
-			Vec2 v = Constants.CIRCLE_MESH_CACHE[i];
+		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			float curX = x + rad * v.x;
 			float curZ = z + rad * v.y;
 			builder.vertex(m, curX, y, curZ).color(r, g, b, a).endVertex();
@@ -219,14 +211,14 @@ public interface IRenderableBoundingShape
 		}
 		tesselator.end();
 	}
-	
+
 	public static void renderSphere(Matrix4f m, Matrix3f n, float x, float y, float z, float rad, float r, float g, float b, float a)
 	{
 		Tesselator tesselator = Tesselator.getInstance();
 		BufferBuilder builder = tesselator.getBuilder();
 		RenderSystem.disableTexture();
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		Vector3f[] cache1 = Constants.SPHERE_MESH_CACHE[0]; 
+		Vector3f[] cache1 = Constants.SPHERE_MESH_CACHE[0];
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		builder.vertex(m, x, y - rad, z).color(r, g, b, a).endVertex();
 		for (int i = cache1.length - 1; i >= 0; --i)
@@ -260,23 +252,19 @@ public interface IRenderableBoundingShape
 		}
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		builder.vertex(m, x, y + rad, z).color(r, g, b, a).endVertex();
-		for (int i = 0; i < cache1.length; ++i)
-		{
-			Vector3f v = cache1[i];
+		for (Vector3f v : cache1) {
 			float curX = x + rad * v.x();
 			float curY = y + rad * v.y();
 			float curZ = z + rad * v.z();
 			builder.vertex(m, curX, curY, curZ).color(r, g, b, a).endVertex();
 		}
 		tesselator.end();
-		
 
-		cache1 = Constants.SPHERE_MESH_CACHE[0]; 
+
+		cache1 = Constants.SPHERE_MESH_CACHE[0];
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		builder.vertex(m, x, y - rad, z).color(r, g, b, a).endVertex();
-		for (int i = 0; i < cache1.length; ++i)
-		{
-			Vector3f v = cache1[i];
+		for (Vector3f v : cache1) {
 			float curX = x + rad * v.x();
 			float curY = y + rad * v.y();
 			float curZ = z + rad * v.z();
@@ -315,7 +303,7 @@ public interface IRenderableBoundingShape
 		}
 		tesselator.end();
 	}
-	
+
 	public static void renderPolygon(Matrix4f m, Matrix3f n, float y1, float y2, float x, float z, Vector3f[] points, float r, float g, float b, float a)
 	{
 		if (points.length < 3) return;
@@ -329,7 +317,7 @@ public interface IRenderableBoundingShape
 		BufferBuilder builder = tesselator.getBuilder();
 		RenderSystem.disableTexture();
 		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		
+
 		Vector3f v;
 		float curX, curZ;
 
@@ -342,16 +330,15 @@ public interface IRenderableBoundingShape
 			builder.vertex(m, curX, y1, curZ).color(r, g, b, a).endVertex();
 		}
 		tesselator.end();
-		
+
 		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		v = points[points.length - 1];
 		curX = x + v.x();
 		curZ = z + v.z();
 		builder.vertex(m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		builder.vertex(m, curX, y1, curZ).color(r, g, b, a).endVertex();
-		for (int i = 0; i < points.length; ++i)
-		{
-			v = points[i];
+		for (Vector3f point : points) {
+			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
 			builder.vertex(m, curX, y2, curZ).color(r, g, b, a).endVertex();
@@ -360,35 +347,32 @@ public interface IRenderableBoundingShape
 		tesselator.end();
 
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		for (int i = 0; i < points.length; ++i)
-		{
-			v = points[i];
+		for (Vector3f point : points) {
+			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
 			builder.vertex(m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		}
 		tesselator.end();
-		
+
 
 		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		for (int i = 0; i < points.length; ++i)
-		{
-			v = points[i];
+		for (Vector3f point : points) {
+			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
 			builder.vertex(m, curX, y1, curZ).color(r, g, b, a).endVertex();
 		}
 		tesselator.end();
-		
+
 		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		v = points[points.length - 1];
 		curX = x + v.x();
 		curZ = z + v.z();
 		builder.vertex(m, curX, y1, curZ).color(r, g, b, a).endVertex();
 		builder.vertex(m, curX, y2, curZ).color(r, g, b, a).endVertex();
-		for (int i = 0; i < points.length; ++i)
-		{
-			v = points[i];
+		for (Vector3f point : points) {
+			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
 			builder.vertex(m, curX, y1, curZ).color(r, g, b, a).endVertex();

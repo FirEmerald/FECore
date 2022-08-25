@@ -10,7 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public abstract class InteractableComponent extends Component implements IInteractableComponent
 {
 	public boolean focused = false;
-	
+
 	public InteractableComponent(int x1, int y1, int x2, int y2)
 	{
 		super(x1, y1, x2, y2);
@@ -38,7 +38,7 @@ public abstract class InteractableComponent extends Component implements IIntera
 	{
 		this.focused = focused;
 	}
-	
+
 	@Override
 	public NarratableEntry.NarrationPriority narrationPriority()
 	{

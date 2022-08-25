@@ -23,7 +23,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 	{
 		super(container, inventory, title);
 	}
-	
+
 	@Override
 	public void render(PoseStack pose, int mx, int my, float partialTick)
 	{
@@ -81,7 +81,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 		renderables.add(index, component);
 		return this.addWidgetBefore(component, beforeWidget);
 	}
-	
+
 	@Override
 	public <T extends Widget> T addRenderableOnlyBefore(T component, Widget before)
 	{
@@ -90,7 +90,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 		renderables.add(index, component);
 		return component;
 	}
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public <T extends GuiEventListener & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addWidgetBefore(T component, U before)
@@ -113,7 +113,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 		renderables.add(index, component);
 		return this.addWidgetAfter(component, afterWidget);
 	}
-	
+
 	@Override
 	public <T extends Widget> T addRenderableOnlyAfter(T component, Widget after)
 	{
@@ -123,7 +123,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 		renderables.add(index, component);
 		return component;
 	}
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public <T extends GuiEventListener & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addWidgetAfter(T component, U after)

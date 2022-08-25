@@ -6,14 +6,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
+import com.firemerald.fecore.data.Element.NumberedAttribute;
+import com.firemerald.fecore.data.Element.NumberedElement;
+import com.firemerald.fecore.data.attributes.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
-import com.firemerald.fecore.data.Element.NumberedAttribute;
-import com.firemerald.fecore.data.Element.NumberedElement;
-import com.firemerald.fecore.data.attributes.*;
 
 public abstract class AbstractElement
 {

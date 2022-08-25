@@ -8,6 +8,6 @@ import net.minecraftforge.network.NetworkEvent;
 public abstract class PacketBase
 {
 	public abstract void write(FriendlyByteBuf buf);
-	
+
 	public abstract void handle(Supplier<NetworkEvent.Context> ctx);
 }

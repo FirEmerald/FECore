@@ -20,7 +20,7 @@ public abstract class ClientPacket extends PacketBase
 			context.setPacketHandled(true);
 		}
 	}
-	
+
 	@OnlyIn(Dist.CLIENT)
 	public abstract void handleClient(NetworkEvent.Context ctx);
 }

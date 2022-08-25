@@ -21,13 +21,13 @@ public class BetterScreen extends Screen implements IBetterScreen
 	{
 		super(title);
 	}
-	
+
 	@Override
 	public void render(PoseStack pose, int mx, int my, float partialTick)
 	{
 		render(pose, mx, my, partialTick, true);
 	}
-	
+
 	@Override
 	public void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover)
 	{
@@ -94,7 +94,7 @@ public class BetterScreen extends Screen implements IBetterScreen
 		renderables.add(index, component);
 		return this.addWidgetBefore(component, beforeWidget);
 	}
-	
+
 	@Override
 	public <T extends Widget> T addRenderableOnlyBefore(T component, Widget before)
 	{
@@ -103,7 +103,7 @@ public class BetterScreen extends Screen implements IBetterScreen
 		renderables.add(index, component);
 		return component;
 	}
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public <T extends GuiEventListener & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addWidgetBefore(T component, U before)
@@ -126,7 +126,7 @@ public class BetterScreen extends Screen implements IBetterScreen
 		renderables.add(index, component);
 		return this.addWidgetAfter(component, afterWidget);
 	}
-	
+
 	@Override
 	public <T extends Widget> T addRenderableOnlyAfter(T component, Widget after)
 	{
@@ -136,7 +136,7 @@ public class BetterScreen extends Screen implements IBetterScreen
 		renderables.add(index, component);
 		return component;
 	}
-	
+
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public <T extends GuiEventListener & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addWidgetAfter(T component, U after)
