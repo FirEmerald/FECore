@@ -4,12 +4,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.firemerald.fecore.capabilities.FECoreCapabilities;
+import com.firemerald.fecore.boundingshapes.BoundingShape;
+import com.firemerald.fecore.boundingshapes.BoundingShapeBoxPositions;
+import com.firemerald.fecore.boundingshapes.BoundingShapeConfigurable;
 import com.firemerald.fecore.capabilities.IShapeHolder;
 import com.firemerald.fecore.capabilities.IShapeTool;
-import com.firemerald.fecore.selectionshapes.BoundingShape;
-import com.firemerald.fecore.selectionshapes.BoundingShapeBoxPositions;
-import com.firemerald.fecore.selectionshapes.BoundingShapeConfigurable;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -26,7 +25,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class ItemShapeTool extends Item
 {
@@ -51,9 +49,7 @@ public class ItemShapeTool extends Item
 		if (player.isShiftKeyDown()) return InteractionResult.PASS;
 		else if (!context.getLevel().isClientSide)
 		{
-			//ItemStack stack = context.getItemInHand();
-			LazyOptional<IShapeTool> toolOpt = stack.getCapability(FECoreCapabilities.SHAPE_TOOL);
-			toolOpt.ifPresent(tool -> {
+			IShapeTool.get(stack).ifPresent(tool -> {
 				BoundingShapeConfigurable shape;
 				int posIndex = tool.getConfigurationIndex();
 				BoundingShape s = tool.getShape();
@@ -93,8 +89,7 @@ public class ItemShapeTool extends Item
 		ItemStack stack = player.getItemInHand(hand);
 		if (!level.isClientSide)
 		{
-			LazyOptional<IShapeTool> toolOpt = stack.getCapability(FECoreCapabilities.SHAPE_TOOL);
-			toolOpt.ifPresent(tool -> {
+			IShapeTool.get(stack).ifPresent(tool -> {
 				BoundingShapeConfigurable shape;
 				int posIndex = tool.getConfigurationIndex();
 				BoundingShape s = tool.getShape();
@@ -162,8 +157,7 @@ public class ItemShapeTool extends Item
 	
 	public static BoundingShape getShape(ItemStack stack)
 	{
-		LazyOptional<IShapeHolder> cap = stack.getCapability(FECoreCapabilities.SHAPE_HOLDER);
-		return cap.isPresent() ? cap.resolve().get().getShape() : null;
+		return IShapeHolder.get(stack).map(IShapeHolder::getShape).orElse(null);
 	}
 
     @Override

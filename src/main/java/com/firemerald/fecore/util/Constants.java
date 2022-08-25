@@ -1,16 +1,12 @@
 package com.firemerald.fecore.util;
 
-import com.firemerald.fecore.FECoreMod;
 import com.mojang.math.Vector3f;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 
 public class Constants
 {
-	public static final ResourceLocation SHAPE_HOLDER_CAP_NAME = new ResourceLocation(FECoreMod.MOD_ID, "shape_holder");
-	public static final ResourceLocation SHAPE_TOOL_CAP_NAME = new ResourceLocation(FECoreMod.MOD_ID, "shape_tool");
 	public static final double
 	PI = Math.PI,
 	TAU = 2 * PI,

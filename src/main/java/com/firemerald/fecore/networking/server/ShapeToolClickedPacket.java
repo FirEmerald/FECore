@@ -1,11 +1,10 @@
 package com.firemerald.fecore.networking.server;
 
-import com.firemerald.fecore.capabilities.FECoreCapabilities;
+import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.boundingshapes.BoundingShape;
+import com.firemerald.fecore.boundingshapes.BoundingShapeBoxPositions;
 import com.firemerald.fecore.capabilities.IShapeHolder;
-import com.firemerald.fecore.networking.FECoreNetwork;
 import com.firemerald.fecore.networking.client.ShapeToolScreenPacket;
-import com.firemerald.fecore.selectionshapes.BoundingShape;
-import com.firemerald.fecore.selectionshapes.BoundingShapeBoxPositions;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,7 +14,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class ShapeToolClickedPacket extends ServerPacket
 {
@@ -43,7 +41,7 @@ public class ShapeToolClickedPacket extends ServerPacket
 	{
 		final ServerPlayer player = ctx.getSender();
 		ItemStack stack = player.getItemInHand(hand);
-		LazyOptional<IShapeHolder> cap = stack.getCapability(FECoreCapabilities.SHAPE_HOLDER);
+		LazyOptional<IShapeHolder> cap = IShapeHolder.get(stack);
 		if (cap.isPresent())
 		{
 			BoundingShape shape = cap.resolve().get().getShape();
@@ -52,7 +50,7 @@ public class ShapeToolClickedPacket extends ServerPacket
 				shape = new BoundingShapeBoxPositions();
 				((BoundingShapeBoxPositions) shape).isRelative = false;
 			}
-			FECoreNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new ShapeToolScreenPacket(player.position(), hand, shape));
+			FECoreMod.NETWORK.sendTo(new ShapeToolScreenPacket(player.position(), hand, shape), player);
 		}
 	}
 }

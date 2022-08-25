@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.firemerald.fecore.betterscreens.IScrollValuesHolder;
+import com.firemerald.fecore.client.gui.IScrollValuesHolder;
 
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -16,7 +16,7 @@ public class MixinMouseHandler implements IScrollValuesHolder
 {
 	double scrollX, scrollY;
 
-	@Inject(method = {"onScroll", "m_91526_"}, at = @At("HEAD"))
+	@Inject(method = "onScroll", at = @At("HEAD"))
 	public void onScrollPre(long window, double scrollX, double scrollY, CallbackInfo ci)
 	{
 		if (window == Minecraft.getInstance().getWindow().getWindow())

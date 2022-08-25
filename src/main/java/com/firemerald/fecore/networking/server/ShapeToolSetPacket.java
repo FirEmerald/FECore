@@ -1,8 +1,7 @@
 package com.firemerald.fecore.networking.server;
 
-import com.firemerald.fecore.capabilities.FECoreCapabilities;
+import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.capabilities.IShapeHolder;
-import com.firemerald.fecore.selectionshapes.BoundingShape;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
@@ -10,7 +9,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.NetworkEvent;
 
 public class ShapeToolSetPacket extends ServerPacket
@@ -48,12 +46,9 @@ public class ShapeToolSetPacket extends ServerPacket
 	    		ItemStack held = player.getItemInHand(hand);
 	    		if (!held.isEmpty())
 	    		{
-	    			LazyOptional<IShapeHolder> cap = held.getCapability(FECoreCapabilities.SHAPE_HOLDER);
-	    			if (cap.isPresent())
-	    			{
-	    				IShapeHolder holder = cap.resolve().get();
+	    			IShapeHolder.get(held).ifPresent(holder -> {
 	    				if (holder.canAcceptShape(shape)) holder.setShape(shape);
-	    			}
+	    			});
 	    		}
 			});
 		}

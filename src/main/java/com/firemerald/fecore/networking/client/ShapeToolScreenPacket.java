@@ -1,9 +1,9 @@
 package com.firemerald.fecore.networking.client;
 
-import com.firemerald.fecore.networking.FECoreNetwork;
+import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.boundingshapes.BoundingShape;
+import com.firemerald.fecore.client.gui.screen.ShapesScreen;
 import com.firemerald.fecore.networking.server.ShapeToolSetPacket;
-import com.firemerald.fecore.selectionshapes.BoundingShape;
-import com.firemerald.fecore.selectionshapes.GuiShapes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -47,6 +47,6 @@ public class ShapeToolScreenPacket extends ClientPacket
 	@OnlyIn(Dist.CLIENT)
 	public void handleClient(NetworkEvent.Context ctx)
 	{
-		if (shape != null) ctx.enqueueWork(() -> Minecraft.getInstance().setScreen(new GuiShapes(pos, shape, s -> FECoreNetwork.INSTANCE.sendToServer(new ShapeToolSetPacket(hand, s)))));
+		if (shape != null) ctx.enqueueWork(() -> Minecraft.getInstance().setScreen(new ShapesScreen(pos, shape, s -> FECoreMod.NETWORK.sendToServer(new ShapeToolSetPacket(hand, s)))));
 	}
 }
