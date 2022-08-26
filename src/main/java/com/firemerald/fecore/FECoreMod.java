@@ -17,6 +17,8 @@ import com.firemerald.fecore.networking.server.ShapeToolClickedPacket;
 import com.firemerald.fecore.networking.server.ShapeToolSetPacket;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ConfigGuiHandler.ConfigGuiFactory;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -25,6 +27,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(FECoreMod.MOD_ID)
 public class FECoreMod
@@ -45,11 +48,17 @@ public class FECoreMod
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerCaps);
-        ModLoadingContext.get().registerExtensionPoint(ConfigGuiFactory.class, () -> new ConfigGuiFactory((mc, prev) -> {
-        	return new ModConfigScreen(prev);
-        }));
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
+    	ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
         FECoreItems.registerItems(FMLJavaModLoadingContext.get().getModEventBus());
+        if (FMLEnvironment.dist.isClient()) doClientStuff();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void doClientStuff()
+    {
+    	ModLoadingContext.get().registerExtensionPoint(ConfigGuiFactory.class, () -> new ConfigGuiFactory((mc, prev) -> {
+    		return new ModConfigScreen(prev);
+    	}));
     }
 
     private void setup(final FMLCommonSetupEvent event)

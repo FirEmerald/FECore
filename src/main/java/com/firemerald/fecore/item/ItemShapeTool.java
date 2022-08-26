@@ -12,6 +12,7 @@ import com.firemerald.fecore.capabilities.IShapeTool;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
@@ -25,8 +26,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
-public class ItemShapeTool extends Item
+public class ItemShapeTool extends Item implements ICapSynchronizedItem<IShapeTool>
 {
 	public ItemShapeTool()
 	{
@@ -134,30 +137,10 @@ public class ItemShapeTool extends Item
 		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
 	}
 
-	/*
-	//TODO we need a better method
-	@Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity)
-    {
-		if (entity instanceof ServerPlayer)
-		{
-			LazyOptional<IShapeHolder> cap = stack.getCapability(FECoreCapabilities.SHAPE_HOLDER);
-			if (cap.isPresent())
-			{
-				IShapeHolder holder = cap.resolve().get();
-				BoundingShape shape = holder.getShape();
-				if (shape == null) shape = new BoundingShapeBoxPositions();
-				ServerPlayer player = (ServerPlayer) entity;
-				FECoreNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new ShapeToolScreenPacket(player.position(), player.getMainHandItem() == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, shape));
-			}
-		}
-        return true;
-    }
-    */
-
 	public static BoundingShape getShape(ItemStack stack)
 	{
-		return IShapeHolder.get(stack).map(IShapeHolder::getShape).orElse(null);
+		IShapeHolder holder = IShapeHolder.get(stack).orElse(null);
+		return holder == null ? null : holder.getShape();
 	}
 
     @Override
@@ -178,4 +161,30 @@ public class ItemShapeTool extends Item
 		BoundingShape shape = getShape(stack);
 		if (shape instanceof BoundingShapeConfigurable) ((BoundingShapeConfigurable) shape).addInformation(stack, worldIn, tooltip, flagIn);
     }
+	
+	@Override
+	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt)
+	{
+		IShapeTool cap = new IShapeTool.Impl();
+		if (nbt != null) cap.deserializeNBT(nbt);
+		return cap;
+	}
+
+	@Override
+	public LazyOptional<IShapeTool> getCap(ItemStack stack)
+	{
+		return IShapeTool.get(stack);
+	}
+
+	@Override
+	public CompoundTag writeCap(IShapeTool cap, ItemStack stack)
+	{
+		return cap.serializeNBT();
+	}
+
+	@Override
+	public void readCap(IShapeTool cap, ItemStack stack, CompoundTag tag)
+	{
+		cap.deserializeNBT(tag);
+	}
 }
