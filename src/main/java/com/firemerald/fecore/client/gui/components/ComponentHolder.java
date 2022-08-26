@@ -261,12 +261,12 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	{
 		if (this.focused != focused)
 		{
-			if (this.focused != null) this.focused.setFocused(false);
+			if (this.focused != null) this.focused.setIsFocused(false);
 			this.focused = focused;
 			if (focused != null)
 			{
-				this.setFocused(true);
-				focused.setFocused(true);
+				this.setIsFocused(true);
+				focused.setIsFocused(true);
 				this.ensureInView(focused);
 			}
 		}
@@ -306,7 +306,7 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 					return true;
 				}
 			}
-			this.setFocused(false);
+			this.setIsFocused(false);
 			return false;
 		}
 	}
@@ -318,9 +318,9 @@ public class ComponentHolder extends InteractableComponent implements IComponent
 	}
 
 	@Override
-	public void setFocused(boolean focused)
+	public void setIsFocused(boolean focused)
 	{
-		super.setFocused(focused);
+		super.setIsFocused(focused);
 		if (!focused) setFocused(null);
 	}
 

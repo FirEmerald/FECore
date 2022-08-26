@@ -78,8 +78,8 @@ public class TextField extends EditBox implements IInteractableComponent
 	}
 
 	@Override
-	public void setFocused(boolean focused)
+	public void setIsFocused(boolean focused)
 	{
-		super.setFocused(focused);
+		this.setFocused(focused);
 	}
 }

@@ -45,13 +45,13 @@ public interface IInteractableComponent extends GuiEventListener, IComponent
 
 	public boolean isFocused();
 
-	public void setFocused(boolean focused);
+	public void setIsFocused(boolean focused);
 
 	@Override
 	default boolean changeFocus(boolean initial)
 	{
 		boolean focused = !this.isFocused();
-		this.setFocused(focused);
+		this.setIsFocused(focused);
 		return focused;
 	}
 

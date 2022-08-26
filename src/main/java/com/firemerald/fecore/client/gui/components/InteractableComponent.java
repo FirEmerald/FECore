@@ -34,7 +34,7 @@ public abstract class InteractableComponent extends Component implements IIntera
 	}
 
 	@Override
-	public void setFocused(boolean focused)
+	public void setIsFocused(boolean focused)
 	{
 		this.focused = focused;
 	}

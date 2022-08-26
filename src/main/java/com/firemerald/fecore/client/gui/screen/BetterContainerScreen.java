@@ -67,9 +67,9 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 		GuiEventListener old = this.getFocused();
 		if (old != focused)
 		{
-			if (old instanceof IInteractableComponent) ((IInteractableComponent) old).setFocused(false);
+			if (old instanceof IInteractableComponent) ((IInteractableComponent) old).setIsFocused(false);
 			super.setFocused(focused);
-			if (focused instanceof IInteractableComponent) ((IInteractableComponent) focused).setFocused(true);
+			if (focused instanceof IInteractableComponent) ((IInteractableComponent) focused).setIsFocused(true);
 		}
 	}
 

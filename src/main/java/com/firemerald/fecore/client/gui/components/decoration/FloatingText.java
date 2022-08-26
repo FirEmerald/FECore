@@ -251,13 +251,13 @@ public class FloatingText extends InteractableComponent
 	}
 
 	@Override
-	public void setFocused(boolean focused)
+	public void setIsFocused(boolean focused)
 	{
 		if (!focused)
 		{
-			super.setFocused(false);
+			super.setIsFocused(false);
 			selStart = selEnd = 0;
 		}
-		else super.setFocused(true);
+		else super.setIsFocused(true);
 	}
 }
