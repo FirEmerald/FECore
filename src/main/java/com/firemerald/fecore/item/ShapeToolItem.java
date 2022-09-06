@@ -29,9 +29,9 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class ItemShapeTool extends Item implements ICapSynchronizedItem<IShapeTool>
+public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTool>
 {
-	public ItemShapeTool()
+	public ShapeToolItem()
 	{
 		super(new Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS));
 	}

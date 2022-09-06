@@ -1,6 +1,5 @@
 package com.firemerald.fecore;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +7,7 @@ import com.firemerald.fecore.capabilities.IShapeHolder;
 import com.firemerald.fecore.capabilities.IShapeTool;
 import com.firemerald.fecore.client.ConfigClient;
 import com.firemerald.fecore.client.gui.screen.ModConfigScreen;
+import com.firemerald.fecore.init.FECoreBlocks;
 import com.firemerald.fecore.init.FECoreItems;
 import com.firemerald.fecore.networking.SimpleNetwork;
 import com.firemerald.fecore.networking.client.BlockEntityGUIPacket;
@@ -20,11 +20,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ConfigGuiHandler.ConfigGuiFactory;
-import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -32,23 +30,17 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 @Mod(FECoreMod.MOD_ID)
 public class FECoreMod
 {
+	public static final boolean TEST_MODE = true;
 	public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LoggerFactory.getLogger("FECore");
     public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(MOD_ID, "main"), "1");
-
-    static final ForgeConfigSpec clientSpec;
-    public static final ConfigClient CLIENT;
-    static {
-        final Pair<ConfigClient, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ConfigClient::new);
-        clientSpec = specPair.getRight();
-        CLIENT = specPair.getLeft();
-    }
 
     public FECoreMod()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerCaps);
-    	ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientSpec);
+        new ConfigClient(ModLoadingContext.get());
+        FECoreBlocks.registerBlocks(FMLJavaModLoadingContext.get().getModEventBus());
         FECoreItems.registerItems(FMLJavaModLoadingContext.get().getModEventBus());
         if (FMLEnvironment.dist.isClient()) doClientStuff();
     }

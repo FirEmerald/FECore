@@ -2,7 +2,7 @@ package com.firemerald.fecore.client.gui.components.scrolling;
 
 import java.util.function.DoubleConsumer;
 
-import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.client.ConfigClient;
 
 public interface IScrollableBase
 {
@@ -10,7 +10,7 @@ public interface IScrollableBase
 	{
 		if (scrollAmount != 0)
 		{
-			final double scrollSensitivity = FECoreMod.CLIENT.scrollSensitivity.get();
+			final double scrollSensitivity = ConfigClient.instance().scrollSensitivity.get();
 			double toScroll;
 			if (scrollAmount > 0)
 			{

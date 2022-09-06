@@ -1,6 +1,7 @@
 package com.firemerald.fecore.client.gui.screen;
 
 import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.client.ConfigClient;
 import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
 import com.firemerald.fecore.client.gui.components.Button;
@@ -47,7 +48,7 @@ public class ConfigScreenTest extends BetterScreen
 	@SuppressWarnings("resource")
 	public ConfigScreenTest(Screen previous)
 	{
-		super(new TextComponent("Config Test"));
+		super(new TextComponent("ConfigBase Test"));
 		this.previous = previous;
 		this.pane = new FullyScrollableComponentPane(0, 0, 100, 100);
 		this.vertScroll = new VerticalScrollBar(100, 0, 110, 100, pane);
@@ -88,7 +89,8 @@ public class ConfigScreenTest extends BetterScreen
 		this.loremIpsum7 = new FloatingText(0, 260, 420, 280, Minecraft.getInstance().font, "proident, sunt in culpa qui officia deserunt mollit anim id est");
 		this.loremIpsum8 = new FloatingText(0, 280, 420, 300, Minecraft.getInstance().font, "laborum.");
 		this.scrollSensitivityLabel = new FloatingText(0, 300, 200, 320, Minecraft.getInstance().font, Translator.translate("fecore.configgui.scrollSensitivity"), EnumTextAlignment.RIGHT);
-		this.scrollSensitivity = new DoubleField(Minecraft.getInstance().font, 200, 300, 200, 20, FECoreMod.CLIENT.scrollSensitivity.get(), 0, Double.POSITIVE_INFINITY, new TextComponent("Scrolling sensitivity"), v -> {FECoreMod.CLIENT.scrollSensitivity.set(v);});
+		ConfigClient clientConfig = ConfigClient.instance();
+		this.scrollSensitivity = new DoubleField(Minecraft.getInstance().font, 200, 300, 200, 20, clientConfig.scrollSensitivity.get(), 0, Double.POSITIVE_INFINITY, new TextComponent("Scrolling sensitivity"), clientConfig.scrollSensitivity::set);
 		compundTagField.setMaxLength(Integer.MAX_VALUE);
 		pane.setScrollBar(vertScroll);
 		pane.setScrollBar(horScroll);

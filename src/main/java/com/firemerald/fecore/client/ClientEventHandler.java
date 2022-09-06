@@ -1,21 +1,24 @@
 package com.firemerald.fecore.client;
 
 import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.block.ICustomBlockHighlight;
 import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.boundingshapes.IRenderableBoundingShape;
 import com.firemerald.fecore.client.gui.IBetterScreen;
 import com.firemerald.fecore.client.gui.IScrollValuesHolder;
 import com.firemerald.fecore.init.FECoreItems;
-import com.firemerald.fecore.item.ItemShapeTool;
+import com.firemerald.fecore.item.ShapeToolItem;
 import com.firemerald.fecore.networking.server.ShapeToolClickedPacket;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.DrawSelectionEvent.HighlightBlock;
 import net.minecraftforge.client.event.InputEvent.ClickInputEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -74,7 +77,7 @@ public class ClientEventHandler
 			ItemStack stack = player.getMainHandItem();
 			if (stack.getItem() == FECoreItems.SHAPE_TOOL)
 			{
-				BoundingShape shape = ItemShapeTool.getShape(stack);
+				BoundingShape shape = ShapeToolItem.getShape(stack);
 				if (shape instanceof IRenderableBoundingShape)
 				{
 					Vec3 pos = event.getCamera().getPosition();
@@ -90,7 +93,7 @@ public class ClientEventHandler
 				stack = player.getOffhandItem();
 				if (stack.getItem() == FECoreItems.SHAPE_TOOL)
 				{
-					BoundingShape shape = ItemShapeTool.getShape(stack);
+					BoundingShape shape = ShapeToolItem.getShape(stack);
 					if (shape instanceof IRenderableBoundingShape)
 					{
 						Vec3 pos = event.getCamera().getPosition();
@@ -102,6 +105,20 @@ public class ClientEventHandler
 					}
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onHighlightBlock(HighlightBlock event)
+	{
+		@SuppressWarnings("resource")
+		Player player = Minecraft.getInstance().player;
+		ItemStack stack = player.getMainHandItem();
+		if (stack.isEmpty()) stack = player.getOffhandItem();
+		if (stack.getItem() instanceof ICustomBlockHighlight)
+		{
+			IBlockHighlight highlight = ((ICustomBlockHighlight) stack.getItem()).getBlockHighlight(player, event.getTarget());
+			if (highlight != null) highlight.render(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.LINES), player, event.getTarget(), event.getCamera(), event.getPartialTicks());
 		}
 	}
 }

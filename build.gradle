@@ -148,6 +148,11 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+	
+	maven {
+        name 'DVS1 Maven FS'
+        url 'https://dvs1.progwml6.com/files/maven'
+    }
 }
 
 dependencies {
@@ -170,6 +175,9 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+	
+	runtimeOnly fg.deobf("slimeknights.mantle:Mantle:1.18.2-1.9.28")
+    runtimeOnly fg.deobf("slimeknights.tconstruct:TConstruct:1.18.2-3.5.1.36")
 }
 
 mixin {
@@ -183,7 +191,7 @@ jar {
         attributes([
                 "Specification-Title"     : "fecore",
                 "Specification-Vendor"    : "FirEmerald",
-                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Specification-Version"   : "1.1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
                 "Implementation-Vendor"   : "FirEmerald",
