@@ -16,7 +16,7 @@ public class MixinMouseHandler implements IScrollValuesHolder
 	double scrollX, scrollY;
 
 	@Inject(method = "onScroll", at = @At("HEAD"))
-	public void onScrollPre(long window, double scrollX, double scrollY, CallbackInfo ci)
+	private void onScrollPre(long window, double scrollX, double scrollY, CallbackInfo ci)
 	{
 		if (window == Minecraft.getInstance().getWindow().getWindow())
 		{

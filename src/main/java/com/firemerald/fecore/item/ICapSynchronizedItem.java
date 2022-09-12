@@ -12,7 +12,7 @@ public interface ICapSynchronizedItem<T> extends IForgeItem
 {
 	@Nonnull
 	public abstract LazyOptional<T> getCap(ItemStack stack);
-	
+
 	@Override
 	@Nonnull
     public default CompoundTag getShareTag(ItemStack stack)
@@ -38,8 +38,8 @@ public interface ICapSynchronizedItem<T> extends IForgeItem
 			if (capsTag != null && capsTag.contains("Parent", 10)) readCap(holder, stack, capsTag.getCompound("Parent"));
 		});
     }
-	
+
 	public CompoundTag writeCap(T cap, ItemStack stack);
-	
+
 	public void readCap(T cap, ItemStack stack, CompoundTag tag);
 }

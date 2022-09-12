@@ -7,7 +7,6 @@ import com.firemerald.fecore.capabilities.IShapeHolder;
 import com.firemerald.fecore.capabilities.IShapeTool;
 import com.firemerald.fecore.client.ConfigClient;
 import com.firemerald.fecore.client.gui.screen.ModConfigScreen;
-import com.firemerald.fecore.init.FECoreBlocks;
 import com.firemerald.fecore.init.FECoreItems;
 import com.firemerald.fecore.networking.SimpleNetwork;
 import com.firemerald.fecore.networking.client.BlockEntityGUIPacket;
@@ -30,7 +29,6 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 @Mod(FECoreMod.MOD_ID)
 public class FECoreMod
 {
-	public static final boolean TEST_MODE = true;
 	public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LoggerFactory.getLogger("FECore");
     public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(MOD_ID, "main"), "1");
@@ -40,7 +38,6 @@ public class FECoreMod
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerCaps);
         new ConfigClient(ModLoadingContext.get());
-        FECoreBlocks.registerBlocks(FMLJavaModLoadingContext.get().getModEventBus());
         FECoreItems.registerItems(FMLJavaModLoadingContext.get().getModEventBus());
         if (FMLEnvironment.dist.isClient()) doClientStuff();
     }

@@ -25,7 +25,7 @@ public interface IBlockHighlight
 		Quaternion.fromXYZDegrees(new Vector3f(0, -90, 0)), //WEST
 		Quaternion.fromXYZDegrees(new Vector3f(0, 90, 0)), //EAST
 	};
-	
+
 	public static final IBlockHighlight
 	SLAB = (pose, vertexConsumer, player, result, partial) -> {
 		Matrix4f poseMat = pose.last().pose();

@@ -15,14 +15,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.DrawSelectionEvent.HighlightBlock;
 import net.minecraftforge.client.event.InputEvent.ClickInputEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -40,7 +42,7 @@ public class ClientEventHandler
     		if (scrollX != 0) ((IBetterScreen) event.getScreen()).mouseScrolledX(event.getMouseX(), event.getMouseY(), (minecraft.options.discreteMouseScroll ? Math.signum(scrollX) : scrollX) * minecraft.options.mouseWheelSensitivity);
     	}
 	}
-    
+
 	@SuppressWarnings("resource")
 	@SubscribeEvent
 	public static void onClick(ClickInputEvent event)
@@ -107,7 +109,7 @@ public class ClientEventHandler
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void onHighlightBlock(HighlightBlock event)
 	{
@@ -119,6 +121,15 @@ public class ClientEventHandler
 		{
 			IBlockHighlight highlight = ((ICustomBlockHighlight) stack.getItem()).getBlockHighlight(player, event.getTarget());
 			if (highlight != null) highlight.render(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.LINES), player, event.getTarget(), event.getCamera(), event.getPartialTicks());
+		}
+		else if (stack.getItem() instanceof BlockItem)
+		{
+			Block block = ((BlockItem) stack.getItem()).getBlock();
+			if (block instanceof ICustomBlockHighlight)
+			{
+				IBlockHighlight highlight = ((ICustomBlockHighlight) block).getBlockHighlight(player, event.getTarget());
+				if (highlight != null) highlight.render(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.LINES), player, event.getTarget(), event.getCamera(), event.getPartialTicks());
+			}
 		}
 	}
 }

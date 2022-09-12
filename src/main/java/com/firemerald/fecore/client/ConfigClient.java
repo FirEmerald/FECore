@@ -9,12 +9,12 @@ import net.minecraftforge.fml.config.ModConfig.Type;
 public class ConfigClient extends ConfigBase
 {
 	private static ConfigClient instance;
-	
+
 	public static ConfigClient instance()
 	{
 		return instance;
 	}
-	
+
 	public ConfigClient(ModLoadingContext context)
 	{
 		super(context, Type.CLIENT);

@@ -161,7 +161,7 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 		BoundingShape shape = getShape(stack);
 		if (shape instanceof BoundingShapeConfigurable) ((BoundingShapeConfigurable) shape).addInformation(stack, worldIn, tooltip, flagIn);
     }
-	
+
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt)
 	{

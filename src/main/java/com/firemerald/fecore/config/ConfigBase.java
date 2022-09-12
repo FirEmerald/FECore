@@ -1,6 +1,8 @@
 package com.firemerald.fecore.config;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Stack;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -17,22 +19,22 @@ public abstract class ConfigBase
 	private ForgeConfigSpec.Builder builder;
 	public final String name;
 	public final ForgeConfigSpec spec;
-	
+
 	public ConfigBase(ModLoadingContext context, ModConfig.Type type)
 	{
 		this(context, type, false);
 	}
-	
+
 	public ConfigBase(ModLoadingContext context, ModConfig.Type type, boolean subfolder)
 	{
 		this(context, type.extension(), type, subfolder);
 	}
-	
+
 	public ConfigBase(ModLoadingContext context, String name, ModConfig.Type type)
 	{
 		this(context, name, type, false);
 	}
-	
+
 	public ConfigBase(ModLoadingContext context, String name, ModConfig.Type type, boolean subfolder)
 	{
 		this.name = name;
@@ -44,24 +46,24 @@ public abstract class ConfigBase
 		finishBuilding();
 		context.registerConfig(type, spec, context.getActiveNamespace() + (subfolder ? "/" : "-") + name + ".toml");
 	}
-	
+
 	public abstract void build();
-	
+
 	public final void assertBuilding()
 	{
 		if (!isBuilding) throw new IllegalStateException("Config is not building!");
 	}
-	
+
 	public String getCurrentKey()
 	{
 		return currentKey;
 	}
-	
+
 	public String getKey(String name)
 	{
 		return currentKey + "." + name;
 	}
-	
+
 	protected void beginSection(String name, String... comment)
 	{
 		assertBuilding();
@@ -72,7 +74,7 @@ public abstract class ConfigBase
 		.translation(currentKey)
 		.push(name);
 	}
-	
+
 	protected void endBeginSection(String name, String... comment)
 	{
 		assertBuilding();
@@ -86,7 +88,7 @@ public abstract class ConfigBase
 		.translation(currentKey)
 		.push(name);
 	}
-	
+
 	protected void endSection()
 	{
 		assertBuilding();
@@ -95,7 +97,7 @@ public abstract class ConfigBase
 		currentKey = currentKey.substring(0, currentKey.length() - old.length() - 1);
 		builder.pop();
 	}
-	
+
 	private void finishBuilding()
 	{
 		assertBuilding();
@@ -104,7 +106,7 @@ public abstract class ConfigBase
 		this.currentPath = null;
 		this.currentKey = null;
 	}
-	
+
 	protected String[] append(String[] comment, String append)
 	{
 		String[] newComment = new String[comment.length + 1];
@@ -112,12 +114,12 @@ public abstract class ConfigBase
 		newComment[comment.length] = append;
 		return newComment;
 	}
-	
+
 	protected BooleanValue define(String name, boolean def, String... comment)
 	{
 		return define(name, () -> def, comment);
 	}
-	
+
 	protected BooleanValue define(String name, Supplier<Boolean> def, String... comment)
 	{
 		assertBuilding();
@@ -126,12 +128,12 @@ public abstract class ConfigBase
 				.translation(getKey(name))
 				.define(name, def);
 	}
-	
+
 	protected IntValue define(String name, int def, int min, int max, String... comment)
 	{
 		return define(name, () -> def, min, max, comment);
 	}
-	
+
 	protected IntValue define(String name, Supplier<Integer> def, int min, int max, String... comment)
 	{
 		assertBuilding();
@@ -140,12 +142,12 @@ public abstract class ConfigBase
 				.translation(getKey(name))
 				.defineInRange(name, def, min, max);
 	}
-	
+
 	protected LongValue define(String name, long def, long min, long max, String... comment)
 	{
 		return define(name, () -> def, min, max, comment);
 	}
-	
+
 	protected LongValue define(String name, Supplier<Long> def, long min, long max, String... comment)
 	{
 		assertBuilding();
@@ -154,12 +156,12 @@ public abstract class ConfigBase
 				.translation(getKey(name))
 				.defineInRange(name, def, min, max);
 	}
-	
+
 	protected DoubleValue define(String name, double def, double min, double max, String... comment)
 	{
 		return define(name, () -> def, min, max, comment);
 	}
-	
+
 	protected DoubleValue define(String name, Supplier<Double> def, double min, double max, String... comment)
 	{
 		assertBuilding();
@@ -168,12 +170,12 @@ public abstract class ConfigBase
 				.translation(getKey(name))
 				.defineInRange(name, def, min, max);
 	}
-	
+
 	protected <E extends Enum<E>> EnumValue<E> define(String name, E def, E[] values, String... comment)
 	{
 		return define(name, (Supplier<E>) () -> def, values, comment);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	protected <E extends Enum<E>> EnumValue<E> define(String name, Supplier<E> def, E[] values, String... comment)
 	{
@@ -184,12 +186,12 @@ public abstract class ConfigBase
 				.translation(getKey(name))
 				.defineEnum(name, def, collection::contains, (Class<E>) values.getClass().componentType());
 	}
-	
+
 	protected <E extends Enum<E>> EnumValue<E> define(String name, E def, Class<E> clazz, String... comment)
 	{
 		return define(name, (Supplier<E>) () -> def, clazz, comment);
 	}
-	
+
 	protected <E extends Enum<E>> EnumValue<E> define(String name, Supplier<E> def, Class<E> clazz, String... comment)
 	{
 		assertBuilding();

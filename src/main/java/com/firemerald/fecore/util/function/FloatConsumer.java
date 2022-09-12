@@ -10,9 +10,9 @@ public interface FloatConsumer
     default FloatConsumer andThen(FloatConsumer after)
     {
         Objects.requireNonNull(after);
-        return v -> { 
-        	accept(v); 
-        	after.accept(v); 
+        return v -> {
+        	accept(v);
+        	after.accept(v);
         	};
     }
 }
