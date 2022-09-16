@@ -19,7 +19,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -31,9 +30,9 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTool>
 {
-	public ShapeToolItem()
+	public ShapeToolItem(Properties properties)
 	{
-		super(new Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS));
+		super(properties);
 	}
 
 	@Override

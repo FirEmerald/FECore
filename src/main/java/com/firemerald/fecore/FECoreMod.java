@@ -8,6 +8,7 @@ import com.firemerald.fecore.capabilities.IShapeTool;
 import com.firemerald.fecore.client.ConfigClient;
 import com.firemerald.fecore.client.gui.screen.ModConfigScreen;
 import com.firemerald.fecore.init.FECoreItems;
+import com.firemerald.fecore.init.registry.DeferredObjectRegistry;
 import com.firemerald.fecore.networking.SimpleNetwork;
 import com.firemerald.fecore.networking.client.BlockEntityGUIPacket;
 import com.firemerald.fecore.networking.client.ShapeToolScreenPacket;
@@ -32,14 +33,17 @@ public class FECoreMod
 	public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LoggerFactory.getLogger("FECore");
     public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(MOD_ID, "main"), "1");
+    
+    public static final DeferredObjectRegistry REGISTRY = new DeferredObjectRegistry(MOD_ID);
 
     public FECoreMod()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerCaps);
         new ConfigClient(ModLoadingContext.get());
-        FECoreItems.registerItems(FMLJavaModLoadingContext.get().getModEventBus());
+        FECoreItems.init();
         if (FMLEnvironment.dist.isClient()) doClientStuff();
+        REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     @OnlyIn(Dist.CLIENT)

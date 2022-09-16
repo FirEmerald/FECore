@@ -54,13 +54,13 @@ public class ClientEventHandler
 			if (stack.isEmpty())
 			{
 				stack = player.getOffhandItem();
-				if (stack.getItem() == FECoreItems.SHAPE_TOOL)
+				if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
 				{
 					FECoreMod.NETWORK.sendToServer(new ShapeToolClickedPacket(InteractionHand.OFF_HAND));
 					event.setCanceled(true);
 				}
 			}
-			else if (stack.getItem() == FECoreItems.SHAPE_TOOL)
+			else if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
 			{
 				FECoreMod.NETWORK.sendToServer(new ShapeToolClickedPacket(InteractionHand.MAIN_HAND));
 				event.setCanceled(true);
@@ -77,7 +77,7 @@ public class ClientEventHandler
 			@SuppressWarnings("resource")
 			Player player = Minecraft.getInstance().player;
 			ItemStack stack = player.getMainHandItem();
-			if (stack.getItem() == FECoreItems.SHAPE_TOOL)
+			if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
 			{
 				BoundingShape shape = ShapeToolItem.getShape(stack);
 				if (shape instanceof IRenderableBoundingShape)
@@ -93,7 +93,7 @@ public class ClientEventHandler
 			else
 			{
 				stack = player.getOffhandItem();
-				if (stack.getItem() == FECoreItems.SHAPE_TOOL)
+				if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
 				{
 					BoundingShape shape = ShapeToolItem.getShape(stack);
 					if (shape instanceof IRenderableBoundingShape)

@@ -1,19 +1,21 @@
 package com.firemerald.fecore.compat;
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
+import java.util.Optional;
 
-import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
 
 public interface ICompatProvider
 {
+	public default void init()
+	{
+		Optional<? extends ModContainer> opt = ModList.get().getModContainerById(getModID());
+		if (opt.isPresent() && isValid(opt.get())) setPresent();
+	}
+	
 	public String getModID();
 
-	public boolean isValidVersion(ArtifactVersion version);
-
-	default public boolean isValid(IModInfo modInfo)
-	{
-		return modInfo.getModId().equals(getModID()) && isValidVersion(modInfo.getVersion());
-	}
+	public boolean isValid(ModContainer modContainer);
 
 	public boolean isPresent();
 

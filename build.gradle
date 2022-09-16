@@ -19,7 +19,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
 
-version = '1.1'
+version = '1.2'
 group = 'com.firemerald.fecore' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'fecore'
 
@@ -191,7 +191,7 @@ jar {
         attributes([
                 "Specification-Title"     : "fecore",
                 "Specification-Vendor"    : "FirEmerald",
-                "Specification-Version"   : "1.1", // We are version 1 of ourselves
+                "Specification-Version"   : project.version,
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
                 "Implementation-Vendor"   : "FirEmerald",

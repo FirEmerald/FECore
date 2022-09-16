@@ -4,6 +4,8 @@ import java.util.function.Predicate;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 
+import net.minecraftforge.fml.ModContainer;
+
 public abstract class CompatProviderBase implements ICompatProvider
 {
 	public final String modId;
@@ -41,9 +43,9 @@ public abstract class CompatProviderBase implements ICompatProvider
 	}
 
 	@Override
-	public boolean isValidVersion(ArtifactVersion version)
+	public boolean isValid(ModContainer modContainer)
 	{
-		return this.version.test(version);
+		return this.version.test(modContainer.getModInfo().getVersion());
 	}
 
 	@Override
@@ -56,8 +58,8 @@ public abstract class CompatProviderBase implements ICompatProvider
 	public void setPresent()
 	{
 		isPresent = true;
-		registerEventHandlers();
+		initialize();
 	}
 
-	public abstract void registerEventHandlers();
+	public abstract void initialize();
 }
