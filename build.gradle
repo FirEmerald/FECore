@@ -19,9 +19,9 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
 
-version = '1.2'
+version = project.fecore_version
 group = 'com.firemerald.fecore' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'fecore'
+archivesBaseName = 'FECore-' + project.minecraft_version
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -41,7 +41,7 @@ minecraft {
     //
     // Use non-default mappings at your own risk. They may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'official', version: project.minecraft_version
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg') // Currently, this location cannot be changed from the default.
 
@@ -175,9 +175,6 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-	
-	runtimeOnly fg.deobf("slimeknights.mantle:Mantle:1.18.2-1.9.28")
-    runtimeOnly fg.deobf("slimeknights.tconstruct:TConstruct:1.18.2-3.5.1.36")
 }
 
 mixin {

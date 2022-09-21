@@ -12,7 +12,7 @@ public interface ICompatProvider
 		Optional<? extends ModContainer> opt = ModList.get().getModContainerById(getModID());
 		if (opt.isPresent() && isValid(opt.get())) setPresent();
 	}
-	
+
 	public String getModID();
 
 	public boolean isValid(ModContainer modContainer);

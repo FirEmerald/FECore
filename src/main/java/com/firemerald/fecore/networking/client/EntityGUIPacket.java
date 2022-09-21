@@ -6,35 +6,34 @@ import com.firemerald.fecore.util.INetworkedGUIEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkEvent;
 
-public class BlockEntityGUIPacket<T extends BlockEntity & INetworkedGUIEntity<T>> extends ClientPacket
+public class EntityGUIPacket<T extends Entity & INetworkedGUIEntity<T>> extends ClientPacket
 {
-	private final BlockPos position;
+	private final int entityId;
 	private final FriendlyByteBuf data;
 
-	public BlockEntityGUIPacket(T tile)
+	public EntityGUIPacket(T entity)
 	{
-		this.position = tile.getBlockPos();
+		this.entityId = entity.getId();
 		this.data = new FriendlyByteBuf(Unpooled.buffer(0));
-		tile.write(data);
+		entity.write(data);
 	}
 
-	public BlockEntityGUIPacket(FriendlyByteBuf buf)
+	public EntityGUIPacket(FriendlyByteBuf buf)
 	{
-		position = buf.readBlockPos();
+		entityId = buf.readVarInt();
 		data = SimpleNetwork.readBuffer(buf);
 	}
 
 	@Override
 	public void write(FriendlyByteBuf buf)
 	{
-		buf.writeBlockPos(position);
+		buf.writeVarInt(entityId);
 		SimpleNetwork.writeBuffer(buf, data);
 	}
 
@@ -46,11 +45,11 @@ public class BlockEntityGUIPacket<T extends BlockEntity & INetworkedGUIEntity<T>
 		ctx.enqueueWork(() -> {
 			if (Minecraft.getInstance().level != null)
 			{
-				BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(position);
-				if (blockEntity instanceof INetworkedGUIEntity)
+				Entity entity = Minecraft.getInstance().level.getEntity(entityId);
+				if (entity instanceof INetworkedGUIEntity)
 				{
 					@SuppressWarnings("unchecked")
-					NetworkedGUIScreen gui = ((T) blockEntity).getScreen();
+					NetworkedGUIScreen gui = ((T) entity).getScreen();
 					int index = data.readerIndex();
 					gui.read(data);
 					data.readerIndex(index);

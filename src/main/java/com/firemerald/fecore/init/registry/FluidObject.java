@@ -20,9 +20,9 @@ public class FluidObject<S extends Fluid, F extends Fluid, B extends Block, I ex
 {
 	public final TagKey<Fluid> localTag;
 	public final TagKey<Fluid> forgeTag;
-	private final Supplier<S> stillFluid;
-	private final Supplier<F> flowingFluid;
-	
+	public final Supplier<S> stillFluid;
+	public final Supplier<F> flowingFluid;
+
 	public FluidObject(ResourceLocation id, String forgeName, Supplier<S> stillFluid, Supplier<F> flowingFluid, Supplier<B> block, Supplier<I> item)
 	{
 		super(id, block, item);
@@ -36,7 +36,7 @@ public class FluidObject<S extends Fluid, F extends Fluid, B extends Block, I ex
 	{
 		return Objects.requireNonNull(stillFluid.get(), "FluidObject missing still fluid");
 	}
-	
+
 	public boolean isStillFluid(Fluid fluid)
 	{
 		return fluid != Fluids.EMPTY && fluid == getStillFluid();
@@ -46,12 +46,12 @@ public class FluidObject<S extends Fluid, F extends Fluid, B extends Block, I ex
 	{
 		return Objects.requireNonNull(flowingFluid.get(), "FluidObject missing flowing fluid");
 	}
-	
+
 	public boolean isFlowingFluid(Fluid fluid)
 	{
 		return fluid != Fluids.EMPTY && fluid == getFlowingFluid();
 	}
-	
+
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void setRenderLayer(RenderType layer)

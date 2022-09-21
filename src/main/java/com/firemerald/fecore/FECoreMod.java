@@ -11,8 +11,10 @@ import com.firemerald.fecore.init.FECoreItems;
 import com.firemerald.fecore.init.registry.DeferredObjectRegistry;
 import com.firemerald.fecore.networking.SimpleNetwork;
 import com.firemerald.fecore.networking.client.BlockEntityGUIPacket;
+import com.firemerald.fecore.networking.client.EntityGUIPacket;
 import com.firemerald.fecore.networking.client.ShapeToolScreenPacket;
 import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
+import com.firemerald.fecore.networking.server.EntityGUIClosedPacket;
 import com.firemerald.fecore.networking.server.ShapeToolClickedPacket;
 import com.firemerald.fecore.networking.server.ShapeToolSetPacket;
 
@@ -32,8 +34,8 @@ public class FECoreMod
 {
 	public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LoggerFactory.getLogger("FECore");
-    public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(MOD_ID, "main"), "1");
-    
+    public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(MOD_ID, "main"), "2");
+
     public static final DeferredObjectRegistry REGISTRY = new DeferredObjectRegistry(MOD_ID);
 
     public FECoreMod()
@@ -57,8 +59,10 @@ public class FECoreMod
     private void setup(final FMLCommonSetupEvent event)
     {
     	NETWORK.registerServerPacket(BlockEntityGUIClosedPacket.class, BlockEntityGUIClosedPacket::new);
+    	NETWORK.registerServerPacket(EntityGUIClosedPacket.class, EntityGUIClosedPacket::new);
     	NETWORK.registerClientPacket(ShapeToolScreenPacket.class, ShapeToolScreenPacket::new);
     	NETWORK.registerClientPacket(BlockEntityGUIPacket.class, BlockEntityGUIPacket::new);
+    	NETWORK.registerClientPacket(EntityGUIPacket.class, EntityGUIPacket::new);
     	NETWORK.registerServerPacket(ShapeToolSetPacket.class, ShapeToolSetPacket::new);
     	NETWORK.registerServerPacket(ShapeToolClickedPacket.class, ShapeToolClickedPacket::new);
     }

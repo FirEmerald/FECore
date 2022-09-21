@@ -31,7 +31,7 @@ public class DeferredObjectRegistry
 	public final DeferredDeferredRegister<BlockEntityType<?>> blockEntityRegistry;
 	public final DeferredDeferredRegister<Block> blockRegistry;
 	public final DeferredDeferredRegister<Item> itemRegistry;
-	
+
 	public DeferredObjectRegistry(String modId)
 	{
 		this.modId = modId;
@@ -40,7 +40,7 @@ public class DeferredObjectRegistry
 		blockRegistry = new DeferredDeferredRegister<>(ForgeRegistries.BLOCKS, modId);
 		itemRegistry = new DeferredDeferredRegister<>(ForgeRegistries.ITEMS, modId);
 	}
-	
+
 	public void register(IEventBus bus)
 	{
 		fluidRegistry.register(bus);
@@ -48,7 +48,7 @@ public class DeferredObjectRegistry
 		blockRegistry.register(bus);
 		itemRegistry.register(bus);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <S extends Fluid, F extends Fluid, B extends Block, I extends Item> FluidObject<S, F, B, I> registerFluid(String name, String forgeName, BiFunction<Supplier<S>, Supplier<F>, Properties> fluidProperties, Function<Properties, S> still, Function<Properties, F> flowing, Function<Supplier<S>, B> block, Function<Supplier<S>, I> bucket)
 	{
@@ -83,7 +83,7 @@ public class DeferredObjectRegistry
 
 	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, BucketItem> registerFluid(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
 	{
-		return registerFluid(name, forgeName, 
+		return registerFluid(name, forgeName,
 				(still, flowing) -> {
 					Properties props = new Properties(still, flowing, attributes);
 					properties.accept(props);
@@ -102,7 +102,7 @@ public class DeferredObjectRegistry
 
 	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, BucketItem> registerFluid(String name, String forgeName, FluidAttributes.Builder attributes, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
 	{
-		return registerFluid(name, forgeName, 
+		return registerFluid(name, forgeName,
 				(still, flowing) -> new Properties(still, flowing, attributes),
 				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
 				(still) -> new LiquidBlock(still, blockProperties),
@@ -117,7 +117,7 @@ public class DeferredObjectRegistry
 
 	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties)
 	{
-		return registerFluid(name, forgeName, 
+		return registerFluid(name, forgeName,
 				(still, flowing) -> {
 					Properties props = new Properties(still, flowing, attributes);
 					properties.accept(props);
@@ -136,7 +136,7 @@ public class DeferredObjectRegistry
 
 	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, String forgeName, FluidAttributes.Builder attributes, BlockBehaviour.Properties blockProperties)
 	{
-		return registerFluid(name, forgeName, 
+		return registerFluid(name, forgeName,
 				(still, flowing) -> new Properties(still, flowing, attributes),
 				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
 				(still) -> new LiquidBlock(still, blockProperties),
@@ -151,14 +151,14 @@ public class DeferredObjectRegistry
 
 	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties)
 	{
-		return registerFluid(name, forgeName, 
+		return registerFluid(name, forgeName,
 				(still, flowing) -> {
 					Properties props = new Properties(still, flowing, attributes);
 					properties.accept(props);
 					return props;
 				},
 				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				null, 
+				null,
 				null
 				);
 	}
@@ -170,10 +170,10 @@ public class DeferredObjectRegistry
 
 	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes)
 	{
-		return registerFluid(name, forgeName, 
+		return registerFluid(name, forgeName,
 				(still, flowing) -> new Properties(still, flowing, attributes),
 				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				null, 
+				null,
 				null
 				);
 	}
@@ -182,7 +182,7 @@ public class DeferredObjectRegistry
 	{
 		return registerFluidNoBlock(name, name, attributes);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <E extends BlockEntity, B extends Block, I extends Item> BlockEntityObject<E, B, I> registerBlockEntity(String name, Supplier<B> block, Function<Supplier<B>, I> item, BlockEntitySupplier<E> blockEntity, Type<?> dataFixerType)
 	{
@@ -190,7 +190,7 @@ public class DeferredObjectRegistry
 		Supplier<I> itemSup;
 		if (item != null) itemSup = itemRegistry.register(name, () -> item.apply(blockReg));
 		else itemSup = (Supplier<I>) MutableSupplier.DEFAULT_ITEM;
-		Supplier<BlockEntityType<E>> blockEntityReg = blockEntityRegistry.register(name, () -> BlockEntityType.Builder.of(blockEntity).build(dataFixerType));
+		Supplier<BlockEntityType<E>> blockEntityReg = blockEntityRegistry.register(name, () -> BlockEntityType.Builder.of(blockEntity, blockReg.get()).build(dataFixerType));
 		return new BlockEntityObject<>(new ResourceLocation(modId, name), blockEntityReg, blockReg, itemSup);
 	}
 
@@ -208,7 +208,7 @@ public class DeferredObjectRegistry
 	{
 		return registerBlockEntityNoItem(name, block, blockEntity, null);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <B extends Block, I extends Item> BlockObject<B, I> registerBlock(String name, Supplier<B> block, Function<Supplier<B>, I> item)
 	{
@@ -218,17 +218,17 @@ public class DeferredObjectRegistry
 		else itemSup = (Supplier<I>) MutableSupplier.DEFAULT_ITEM;
 		return new BlockObject<>(new ResourceLocation(modId, name), blockReg, itemSup);
 	}
-	
+
 	public <B extends Block> BlockObject<B, BlockItem> registerBlock(String name, Supplier<B> block, Item.Properties itemProperties)
 	{
 		return registerBlock(name, block, (b) -> new BlockItem(b.get(), itemProperties));
 	}
-	
+
 	public <I extends Item> BlockObject<Block, I> registerBlock(String name, BlockBehaviour.Properties blockProperties, Function<Supplier<Block>, I> item)
 	{
 		return registerBlock(name, () -> new Block(blockProperties), item);
 	}
-	
+
 	public BlockObject<Block, BlockItem> registerBlock(String name, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
 	{
 		return registerBlock(name, () -> new Block(blockProperties), (b) -> new BlockItem(b.get(), itemProperties));
@@ -243,12 +243,12 @@ public class DeferredObjectRegistry
 	{
 		return registerBlockNoItem(name, () -> new Block(blockProperties));
 	}
-	
+
 	public <I extends Item> ItemObject<I> registerItem(String name, Supplier<I> item)
 	{
 		return new ItemObject<>(new ResourceLocation(modId, name), itemRegistry.register(name, item));
 	}
-	
+
 	public  ItemObject<Item> registerItem(String name, Item.Properties itemProperties)
 	{
 		return registerItem(name, () -> new Item(itemProperties));

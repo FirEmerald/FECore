@@ -15,19 +15,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BlockObject<B extends Block, I extends Item> extends ItemObject<I>
 {
-	private final Supplier<B> block;
-	
+	public final Supplier<B> block;
+
 	public BlockObject(ResourceLocation id, Supplier<B> block, Supplier<I> item)
 	{
 		super(id, item);
 		this.block = block;
 	}
-	
+
 	public B getBlock()
 	{
 		return Objects.requireNonNull(block.get(), "BlockObject missing block");
 	}
-	
+
 	public boolean isThisBlock(Block block)
 	{
 		return block != Blocks.AIR && block == getBlock();

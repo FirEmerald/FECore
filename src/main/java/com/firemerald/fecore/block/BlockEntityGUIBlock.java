@@ -1,8 +1,8 @@
 package com.firemerald.fecore.block;
 
 import com.firemerald.fecore.FECoreMod;
-import com.firemerald.fecore.blockentity.BlockEntityGUI;
 import com.firemerald.fecore.networking.client.BlockEntityGUIPacket;
+import com.firemerald.fecore.util.INetworkedGUIEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,14 +22,15 @@ public abstract class BlockEntityGUIBlock extends BaseEntityBlock
 		super(properties);
 	}
 
-    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult hitResult)
     {
     	if (!player.isCreative()) return InteractionResult.PASS;
     	else
     	{
     		BlockEntity blockEntity = level.getBlockEntity(blockPos);
-    		if (blockEntity instanceof BlockEntityGUI)
+    		if (blockEntity instanceof INetworkedGUIEntity)
     		{
     			if (level.isClientSide)
     	    	{
@@ -37,8 +38,7 @@ public abstract class BlockEntityGUIBlock extends BaseEntityBlock
     	    	}
     	    	else
     	    	{
-    	    		if (player instanceof ServerPlayer)
-    	    			FECoreMod.NETWORK.sendTo(new BlockEntityGUIPacket((BlockEntityGUI) blockEntity), (ServerPlayer) player);
+    	    		if (player instanceof ServerPlayer) FECoreMod.NETWORK.sendTo(new BlockEntityGUIPacket(blockEntity), (ServerPlayer) player);
     	    		return InteractionResult.CONSUME;
     	    	}
     		}
