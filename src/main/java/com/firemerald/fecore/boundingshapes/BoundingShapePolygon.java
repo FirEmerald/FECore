@@ -87,8 +87,10 @@ public class BoundingShapePolygon extends BoundingShapeBounded implements IRende
 			curX = pos.x() - x;
 			curY = pos.z() - z;
 			totalAng += Math.atan2((prevX * curY) - (curX * prevY), (curX * prevX) + (curY * prevY)); //quick and easy angle between points method
+			prevX = curX;
+			prevY = curY;
 		}
-		return totalAng == Constants.TAU || totalAng == -Constants.TAU;
+		return Math.abs(Math.abs(totalAng) - Constants.TAU) <= 0.001;
 	}
 
 	@Override
