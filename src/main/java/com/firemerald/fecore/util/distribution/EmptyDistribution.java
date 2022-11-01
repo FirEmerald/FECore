@@ -6,6 +6,16 @@ import javax.annotation.Nonnull;
 
 public class EmptyDistribution<T> implements IDistribution<T>
 {
+	public static final EmptyDistribution<?> INSTANCE = new EmptyDistribution<>();
+	
+	@SuppressWarnings("unchecked")
+	public static <T> EmptyDistribution<T> get()
+	{
+		return (EmptyDistribution<T>) INSTANCE;
+	}
+	
+	private EmptyDistribution() {};
+	
 	public float size()
 	{
 		return 0;
