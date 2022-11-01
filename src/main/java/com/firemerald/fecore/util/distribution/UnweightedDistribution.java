@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.util.Mth;
@@ -14,17 +16,17 @@ public class UnweightedDistribution<T> implements IDistribution<T>
 	
 	public UnweightedDistribution() {}
 	
-	public UnweightedDistribution(Collection<T> objects)
+	public UnweightedDistribution(@Nonnull Collection<T> objects)
 	{
 		objects.addAll(objects);
 	}
 	
-	public void add(T object)
+	public void add(@Nonnull T object)
 	{
 		objects.add(object);
 	}
 	
-	public void remove(T object)
+	public void remove(@Nonnull T object)
 	{
 		objects.remove(object);
 	}

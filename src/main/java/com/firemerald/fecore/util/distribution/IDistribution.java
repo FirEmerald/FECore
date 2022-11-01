@@ -3,6 +3,8 @@ package com.firemerald.fecore.util.distribution;
 import java.util.Collection;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 public interface IDistribution<T>
 {
 	public float size();
@@ -16,7 +18,7 @@ public interface IDistribution<T>
 		return size() == 0;
 	}
 	
-	public default T getRandom(Random rand)
+	public default T getRandom(@Nonnull Random rand)
 	{
 		return get(rand.nextFloat(size()));
 	}
@@ -26,7 +28,7 @@ public interface IDistribution<T>
 		return get((float) (Math.random() * size()));
 	}
 	
-	public default boolean contains(T value)
+	public default boolean contains(@Nonnull T value)
 	{
 		return getValues().contains(value);
 	}

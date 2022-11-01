@@ -2,6 +2,8 @@ package com.firemerald.fecore.util.distribution;
 
 import java.util.*;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.ImmutableMap;
 
 public class WeightedDistribution<T> implements IDistribution<T>
@@ -12,31 +14,31 @@ public class WeightedDistribution<T> implements IDistribution<T>
 	
 	public WeightedDistribution() {}
 	
-	public WeightedDistribution(Map<T, Float> objects)
+	public WeightedDistribution(@Nonnull Map<T, Float> objects)
 	{
 		set(objects);
 	}
 	
-	public void set(Map<T, Float> objects)
+	public void set(@Nonnull Map<T, Float> objects)
 	{
 		weights.clear();
 		weights.putAll(objects);
 		updateObjects();
 	}
 	
-	public void add(T object, float weight)
+	public void add(@Nonnull T object, float weight)
 	{
 		weights.compute(object, (o, w) -> w == null ? weight : (weight + w));
 		updateObjects();
 	}
 	
-	public void remove(T object, float weight)
+	public void remove(@Nonnull T object, float weight)
 	{
 		add(object, -weight);
 		updateObjects();
 	}
 	
-	public void remove(T object)
+	public void remove(@Nonnull T object)
 	{
 		weights.remove(object);
 		updateObjects();
@@ -92,24 +94,24 @@ public class WeightedDistribution<T> implements IDistribution<T>
 		
 		public Builder() {}
 		
-		public Builder(Map<T, Float> weights)
+		public Builder(@Nonnull Map<T, Float> weights)
 		{
 			this.weights.putAll(weights);
 		}
 		
-		public Builder<T> add(T object, float weight)
+		public Builder<T> add(@Nonnull T object, float weight)
 		{
 			weights.compute(object, (o, w) -> w == null ? weight : (weight + w));
 			return this;
 		}
 		
-		public Builder<T> remove(T object, float weight)
+		public Builder<T> remove(@Nonnull T object, float weight)
 		{
 			add(object, -weight);
 			return this;
 		}
 		
-		public Builder<T> remove(T object)
+		public Builder<T> remove(@Nonnull T object)
 		{
 			weights.remove(object);
 			return this;
