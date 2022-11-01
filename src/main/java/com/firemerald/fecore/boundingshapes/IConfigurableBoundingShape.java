@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class BoundingShapeConfigurable extends BoundingShape
+public interface IConfigurableBoundingShape
 {
 	public abstract int addPosition(Player player, BlockPos blockPos, int num);
 

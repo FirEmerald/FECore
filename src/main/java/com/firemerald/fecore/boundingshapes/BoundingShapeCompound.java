@@ -3,6 +3,8 @@ package com.firemerald.fecore.boundingshapes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -15,11 +17,43 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class BoundingShapeCompound extends BoundingShape
+public abstract class BoundingShapeCompound extends BoundingShapeBounded implements IUnbounded
 {
 	public List<BoundingShape> shapes = new ArrayList<>();
+
+	@Override
+	public AABB getBounds(double testerX, double testerY, double testerZ)
+	{
+		AABB box = null;
+		for (BoundingShape shape : shapes) if (shape instanceof IBounded)
+		{
+			AABB other = ((IBounded) shape).getBounds(testerX, testerY, testerZ);
+			if (box == null) box = other;
+			else box = box.minmax(other);
+		}
+		else return ALL;
+		return box == null ? ALL : box;
+	}
+
+	@Override
+	public Stream<Entity> getEntityList(LevelAccessor level, Entity entity, Predicate<? super Entity> filter, double testerX, double testerY, double testerZ)
+	{
+		AABB bounds = getBounds(testerX, testerY, testerZ);
+		return bounds == ALL ? getEntityList(level, entity, filter) : level.getEntities(entity, bounds, filter).stream();
+	}
+
+	@Override
+	public <T extends Entity> Stream<T> getEntityList(LevelAccessor level, EntityTypeTest<Entity, T> typeTest, Predicate<? super T> filter, double testerX, double testerY, double testerZ)
+	{
+		AABB bounds = getBounds(testerX, testerY, testerZ);
+		return bounds == ALL ? getEntityList(level, typeTest, filter) : level.getEntities(typeTest, bounds, filter).stream();
+	}
 
 	@Override
 	public void saveToNBT(CompoundTag tag)

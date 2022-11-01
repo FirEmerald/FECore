@@ -25,11 +25,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable implements IRenderableBoundingShape
+public class BoundingShapeBoxOffsets extends BoundingShapeBounded implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
 	public boolean isRelative = true;
 	public double x = 0, y = 0, z = 0, sizeX = 20, sizeY = 20, sizeZ = 20;
@@ -60,6 +61,25 @@ public class BoundingShapeBoxOffsets extends BoundingShapeConfigurable implement
 		double dy = entity.getY() - y;
 		double dz = entity.getZ() - z;
 		return (sizeX >= 0 ? (dx >=0 && dx <= sizeX) : (dx <= 0 && dx >= sizeX)) && (sizeY >= 0 ? (dy >=0 && dy <= sizeY) : (dy <= 0 && dy >= sizeY)) && (sizeZ >= 0 ? (dz >=0 && dz <= sizeZ) : (dz <= 0 && dz >= sizeZ));
+	}
+
+	@Override
+	public AABB getBounds(double testerX, double testerY, double testerZ)
+	{
+		double x, y, z;
+		if (isRelative)
+		{
+			x = this.x + testerX;
+			y = this.y + testerY;
+			z = this.z + testerZ;
+		}
+		else
+		{
+			x = this.x;
+			y = this.y;
+			z = this.z;
+		}
+		return new AABB(x, y, z, x + sizeX, y + sizeY, z + sizeZ);
 	}
 
 	@Override

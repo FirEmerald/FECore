@@ -149,7 +149,41 @@ public class DeferredObjectRegistry
 		return registerFluidNoBucket(name, name, attributes, blockProperties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties)
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties, Item.Properties itemProperties)
+	{
+		return registerFluid(name, forgeName,
+				(still, flowing) -> {
+					Properties props = new Properties(still, flowing, attributes);
+					properties.accept(props);
+					return props;
+				},
+				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
+				null,
+				(still) -> new BucketItem(still, itemProperties)
+				);
+	}
+
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, FluidAttributes.Builder attributes, Consumer<Properties> properties, Item.Properties itemProperties)
+	{
+		return registerFluidNoBlock(name, name, attributes, properties, itemProperties);
+	}
+
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes, Item.Properties itemProperties)
+	{
+		return registerFluid(name, forgeName,
+				(still, flowing) -> new Properties(still, flowing, attributes),
+				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
+				null,
+				(still) -> new BucketItem(still, itemProperties)
+				);
+	}
+
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, FluidAttributes.Builder attributes, Item.Properties itemProperties)
+	{
+		return registerFluidNoBlock(name, name, attributes, itemProperties);
+	}
+
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties)
 	{
 		return registerFluid(name, forgeName,
 				(still, flowing) -> {
@@ -163,12 +197,12 @@ public class DeferredObjectRegistry
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlock(String name, FluidAttributes.Builder attributes, Consumer<Properties> properties)
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, FluidAttributes.Builder attributes, Consumer<Properties> properties)
 	{
-		return registerFluidNoBlock(name, name, attributes, properties);
+		return registerFluidNoBlockOrBucket(name, name, attributes, properties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes)
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, String forgeName, FluidAttributes.Builder attributes)
 	{
 		return registerFluid(name, forgeName,
 				(still, flowing) -> new Properties(still, flowing, attributes),
@@ -178,9 +212,9 @@ public class DeferredObjectRegistry
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlock(String name, FluidAttributes.Builder attributes)
+	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, FluidAttributes.Builder attributes)
 	{
-		return registerFluidNoBlock(name, name, attributes);
+		return registerFluidNoBlockOrBucket(name, name, attributes);
 	}
 
 	@SuppressWarnings("unchecked")

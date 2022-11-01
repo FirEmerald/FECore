@@ -10,7 +10,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public class BoundingShapeAll extends BoundingShape
+public class BoundingShapeAll extends BoundingShapeUnbounded
 {
 	@Override
 	public String getUnlocalizedName()

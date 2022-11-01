@@ -11,7 +11,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public class BoundingShapeInversion extends BoundingShape
+public class BoundingShapeInversion extends BoundingShapeUnbounded
 {
 	public BoundingShape shape = new BoundingShapeCylinder();
 

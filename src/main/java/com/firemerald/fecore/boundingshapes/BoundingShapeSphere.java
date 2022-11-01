@@ -25,11 +25,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class BoundingShapeSphere extends BoundingShapeConfigurable implements IRenderableBoundingShape
+public class BoundingShapeSphere extends BoundingShapeBounded implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
 	public boolean isRelative = true;
 	public double x = .5, y = .5, z = .5, r = 10;
@@ -60,6 +61,25 @@ public class BoundingShapeSphere extends BoundingShapeConfigurable implements IR
 		double dy = posY - y;
 		double dz = posZ - z;
 		return (dx * dx) + (dy * dy) + (dz * dz) <= r * r;
+	}
+
+	@Override
+	public AABB getBounds(double testerX, double testerY, double testerZ)
+	{
+		double x, y, z;
+		if (isRelative)
+		{
+			x = this.x + testerX;
+			y = this.y + testerY;
+			z = this.z + testerZ;
+		}
+		else
+		{
+			x = this.x;
+			y = this.y;
+			z = this.z;
+		}
+		return new AABB(x - r, y - r, z - r, x + r, y + r, z + r);
 	}
 
 	@Override

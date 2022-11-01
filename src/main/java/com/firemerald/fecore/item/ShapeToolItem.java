@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.boundingshapes.BoundingShapeBoxPositions;
-import com.firemerald.fecore.boundingshapes.BoundingShapeConfigurable;
+import com.firemerald.fecore.boundingshapes.IConfigurableBoundingShape;
 import com.firemerald.fecore.capabilities.IShapeHolder;
 import com.firemerald.fecore.capabilities.IShapeTool;
 
@@ -52,11 +52,11 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 		else if (!context.getLevel().isClientSide)
 		{
 			IShapeTool.get(stack).ifPresent(tool -> {
-				BoundingShapeConfigurable shape;
+				BoundingShape shape;
 				int posIndex = tool.getConfigurationIndex();
 				BoundingShape s = tool.getShape();
 				boolean isNew = false;
-				if (s instanceof BoundingShapeConfigurable) shape = (BoundingShapeConfigurable) s;
+				if (s instanceof IConfigurableBoundingShape) shape = s;
 				else
 				{
 					isNew = true;
@@ -75,7 +75,7 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 				if (isNew) tool.setShape(shape);
 				else
 				{
-					posIndex = shape.addPosition(player, context.getClickedPos(), posIndex);
+					posIndex = ((IConfigurableBoundingShape) shape).addPosition(player, context.getClickedPos(), posIndex);
 					tool.setConfigurationIndex(posIndex);
 				}
 			});
@@ -92,11 +92,11 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 		if (!level.isClientSide)
 		{
 			IShapeTool.get(stack).ifPresent(tool -> {
-				BoundingShapeConfigurable shape;
+				BoundingShape shape;
 				int posIndex = tool.getConfigurationIndex();
 				BoundingShape s = tool.getShape();
 				boolean isNew = false;
-				if (s instanceof BoundingShapeConfigurable) shape = (BoundingShapeConfigurable) s;
+				if (s instanceof IConfigurableBoundingShape) shape = s;
 				else
 				{
 					isNew = true;
@@ -116,7 +116,7 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 				{
 					if (!isNew)
 					{
-						List<BoundingShapeConfigurable> shapes = BoundingShape.getConfigurableShapeList(shape);
+						List<BoundingShape> shapes = BoundingShape.getConfigurableShapeList(shape);
 						int index = shapes.indexOf(shape);
 						int newIndex = (index + 1) % shapes.size();
 						if (index != newIndex)
@@ -127,7 +127,7 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 						}
 					}
 				}
-				else if (!isNew) posIndex = shape.removePosition(player, posIndex);
+				else if (!isNew) posIndex = ((IConfigurableBoundingShape) shape).removePosition(player, posIndex);
 				if (isNew) tool.setShape(shape);
 				else tool.setConfigurationIndex(posIndex);
 			});
@@ -158,7 +158,7 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.use_block"));
 		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.open_gui"));
 		BoundingShape shape = getShape(stack);
-		if (shape instanceof BoundingShapeConfigurable) ((BoundingShapeConfigurable) shape).addInformation(stack, worldIn, tooltip, flagIn);
+		if (shape instanceof IConfigurableBoundingShape) ((IConfigurableBoundingShape) shape).addInformation(stack, worldIn, tooltip, flagIn);
     }
 
 	@Override

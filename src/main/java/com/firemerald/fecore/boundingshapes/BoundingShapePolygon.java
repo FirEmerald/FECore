@@ -33,11 +33,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class BoundingShapePolygon extends BoundingShapeConfigurable implements IRenderableBoundingShape
+public class BoundingShapePolygon extends BoundingShapeBounded implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
 	public boolean isRelative = true;
 	private float y1, y2;
@@ -88,6 +89,44 @@ public class BoundingShapePolygon extends BoundingShapeConfigurable implements I
 			totalAng += Math.atan2((prevX * curY) - (curX * prevY), (curX * prevX) + (curY * prevY)); //quick and easy angle between points method
 		}
 		return totalAng == Constants.TAU || totalAng == -Constants.TAU;
+	}
+
+	@Override
+	public AABB getBounds(double testerX, double testerY, double testerZ)
+	{
+		if (positions.length == 0) return isRelative ? new AABB(testerX, testerY, testerZ, testerX, testerY, testerZ) : new AABB(0, 0, 0, 0, 0, 0);
+		double vx1, vz1, vx2, vz2;
+		vx1 = vx2 = positions[0].x();
+		vz1 = vz2 = positions[0].z();
+		for (int i = 1; i < positions.length; ++i)
+		{
+			double x = positions[i].x();
+			double z = positions[i].z();
+			if (x < vx1) vx1 = x;
+			else if (x > vx2) vx2 = x;
+			if (z < vz1) vz1 = z;
+			else if (z > vz2) vz2 = x;
+		}
+		double x1, y1, z1, x2, y2, z2;
+		if (isRelative)
+		{
+			x1 = vx1 + testerX;
+			y1 = this.y1 + testerY;
+			z1 = vz1 + testerZ;
+			x2 = vx2 + testerX;
+			y2 = this.y2 + testerY;
+			z2 = vz2 + testerZ;
+		}
+		else
+		{
+			x1 = vx1;
+			y1 = this.y1;
+			z1 = vz1;
+			x2 = vx2;
+			y2 = this.y2;
+			z2 = vz2;
+		}
+		return new AABB(x1, y1, z1, x2, y2, z2);
 	}
 
 	@Override
