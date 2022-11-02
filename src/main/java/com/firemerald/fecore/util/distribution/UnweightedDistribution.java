@@ -18,7 +18,7 @@ public class UnweightedDistribution<T> implements IDistribution<T>
 	
 	public UnweightedDistribution(@Nonnull Collection<T> objects)
 	{
-		objects.addAll(objects);
+		this.objects.addAll(objects);
 	}
 	
 	public void add(@Nonnull T object)
