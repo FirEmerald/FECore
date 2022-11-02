@@ -227,6 +227,7 @@ public class BoundingShapeSphere extends BoundingShapeBounded implements IRender
 	}
 
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
 	{
 		float x, y, z;

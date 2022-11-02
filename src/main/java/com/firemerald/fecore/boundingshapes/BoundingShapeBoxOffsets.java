@@ -256,6 +256,7 @@ public class BoundingShapeBoxOffsets extends BoundingShapeBounded implements IRe
 	}
 
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
 	{
 		float x1, y1, z1;

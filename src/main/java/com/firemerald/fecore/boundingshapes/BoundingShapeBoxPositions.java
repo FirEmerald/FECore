@@ -264,6 +264,7 @@ public class BoundingShapeBoxPositions extends BoundingShapeBounded implements I
 	}
 
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
 	{
 		float x1, y1, z1, x2, y2, z2;

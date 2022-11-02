@@ -107,7 +107,7 @@ public class BoundingShapePolygon extends BoundingShapeBounded implements IRende
 			if (x < vx1) vx1 = x;
 			else if (x > vx2) vx2 = x;
 			if (z < vz1) vz1 = z;
-			else if (z > vz2) vz2 = x;
+			else if (z > vz2) vz2 = z;
 		}
 		double x1, y1, z1, x2, y2, z2;
 		if (isRelative)
@@ -380,6 +380,7 @@ public class BoundingShapePolygon extends BoundingShapeBounded implements IRende
 	}
 
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
 	{
 		float x, y1, y2, z;

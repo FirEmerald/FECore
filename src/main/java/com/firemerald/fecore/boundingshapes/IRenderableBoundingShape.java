@@ -22,6 +22,7 @@ public interface IRenderableBoundingShape
 	@OnlyIn(Dist.CLIENT)
 	public abstract void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick);
 
+	@OnlyIn(Dist.CLIENT)
 	public static void renderCube(Matrix4f m, Matrix3f n, float x1, float y1, float z1, float x2, float y2, float z2, float r, float g, float b, float a)
 	{
 		if (x1 > x2)
@@ -142,6 +143,7 @@ public interface IRenderableBoundingShape
 		tesselator.end();
 	}
 
+	@OnlyIn(Dist.CLIENT)
 	public static void renderCylinder(Matrix4f m, Matrix3f n, float x, float y, float z, float rad, float h, float r, float g, float b, float a)
 	{
 		float y2;
@@ -212,6 +214,7 @@ public interface IRenderableBoundingShape
 		tesselator.end();
 	}
 
+	@OnlyIn(Dist.CLIENT)
 	public static void renderSphere(Matrix4f m, Matrix3f n, float x, float y, float z, float rad, float r, float g, float b, float a)
 	{
 		Tesselator tesselator = Tesselator.getInstance();
@@ -304,6 +307,7 @@ public interface IRenderableBoundingShape
 		tesselator.end();
 	}
 
+	@OnlyIn(Dist.CLIENT)
 	public static void renderPolygon(Matrix4f m, Matrix3f n, float y1, float y2, float x, float z, Vector3f[] points, float r, float g, float b, float a)
 	{
 		if (points.length < 3) return;

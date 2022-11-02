@@ -245,6 +245,7 @@ public class BoundingShapeCylinder extends BoundingShapeBounded implements IRend
 	}
 
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
 	{
 		float x, y, z;
