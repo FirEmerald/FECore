@@ -1,8 +1,12 @@
 package com.firemerald.fecore.util.distribution;
 
 import java.util.*;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 public class EmptyDistribution<T> implements IDistribution<T>
 {
@@ -49,5 +53,11 @@ public class EmptyDistribution<T> implements IDistribution<T>
 	public boolean contains(@Nonnull T value)
 	{
 		return false;
+	}
+
+	@Override
+	public JsonElement toJson(Function<T, String> converter)
+	{
+		return new JsonArray();
 	}
 }

@@ -1,10 +1,13 @@
 package com.firemerald.fecore.util.distribution;
 
 import java.util.*;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class WeightedDistribution<T> implements IDistribution<T>
 {
@@ -121,5 +124,13 @@ public class WeightedDistribution<T> implements IDistribution<T>
 		{
 			return new WeightedDistribution<>(weights);
 		}
+	}
+
+	@Override
+	public JsonElement toJson(Function<T, String> converter)
+	{
+		JsonObject obj = new JsonObject();
+		weights.forEach((v, w) -> obj.addProperty(converter.apply(v), w));
+		return obj;
 	}
 }

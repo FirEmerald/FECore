@@ -3,10 +3,13 @@ package com.firemerald.fecore.util.distribution;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import net.minecraft.util.Mth;
 
@@ -47,6 +50,14 @@ public class UnweightedDistribution<T> implements IDistribution<T>
 	public Collection<T> getValues()
 	{
 		return ImmutableList.copyOf(objects);
+	}
+
+	@Override
+	public JsonElement toJson(Function<T, String> converter)
+	{
+		JsonArray array = new JsonArray(objects.size());
+		objects.stream().map(converter).forEach(array::add);
+		return array;
 	}
 	
 }

@@ -1,8 +1,12 @@
 package com.firemerald.fecore.util.distribution;
 
 import java.util.*;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 public class SingletonDistribution<T> implements IDistribution<T>
 {
@@ -47,5 +51,11 @@ public class SingletonDistribution<T> implements IDistribution<T>
 	public boolean contains(@Nonnull T value)
 	{
 		return object.equals(value);
+	}
+
+	@Override
+	public JsonElement toJson(Function<T, String> converter)
+	{
+		return new JsonPrimitive(converter.apply(object));
 	}
 }
