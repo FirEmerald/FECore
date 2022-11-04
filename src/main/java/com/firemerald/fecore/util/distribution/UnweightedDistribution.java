@@ -1,8 +1,6 @@
 package com.firemerald.fecore.util.distribution;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 import javax.annotation.Nonnull;
@@ -59,5 +57,44 @@ public class UnweightedDistribution<T> implements IDistribution<T>
 		objects.stream().map(converter).forEach(array::add);
 		return array;
 	}
+
 	
+	public Builder<T> toBuilder()
+	{
+		return new Builder<>(objects);
+	}
+	
+	public static <T> Builder<T> builder()
+	{
+		return new Builder<>();
+	}
+	
+	public static class Builder<T>
+	{
+		private final List<T> objects = new ArrayList<>();
+		
+		public Builder() {}
+		
+		public Builder(@Nonnull List<T> objects)
+		{
+			this.objects.addAll(objects);
+		}
+		
+		public Builder<T> add(@Nonnull T object)
+		{
+			objects.add(object);
+			return this;
+		}
+		
+		public Builder<T> remove(@Nonnull T object)
+		{
+			objects.remove(object);
+			return this;
+		}
+		
+		public UnweightedDistribution<T> build()
+		{
+			return new UnweightedDistribution<>(objects);
+		}
+	}
 }
