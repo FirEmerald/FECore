@@ -1,19 +1,21 @@
 package com.firemerald.fecore.init.registry;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
 
 public class BlockEntityObject<E extends BlockEntity, B extends Block, I extends Item> extends BlockObject<B, I>
 {
-	public final Supplier<BlockEntityType<E>> blockEntity;
+	public final DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> blockEntity;
 
-	public BlockEntityObject(ResourceLocation id, Supplier<BlockEntityType<E>> blockEntity, Supplier<B> block, Supplier<I> item)
+	public BlockEntityObject(ResourceLocation id, DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> blockEntity, DeferredBlock<B> block, DeferredItem<I> item)
 	{
 		super(id, block, item);
 		this.blockEntity = blockEntity;

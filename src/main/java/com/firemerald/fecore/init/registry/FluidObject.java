@@ -1,11 +1,7 @@
 package com.firemerald.fecore.init.registry;
 
 import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
@@ -13,21 +9,22 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
 
 public class FluidObject<S extends Fluid, F extends Fluid, B extends Block, I extends Item> extends BlockObject<B, I>
 {
 	public final TagKey<Fluid> localTag;
 	public final TagKey<Fluid> forgeTag;
-	public final Supplier<S> stillFluid;
-	public final Supplier<F> flowingFluid;
+	public final DeferredHolder<Fluid, S> stillFluid;
+	public final DeferredHolder<Fluid, F> flowingFluid;
 
-	public FluidObject(ResourceLocation id, String forgeName, Supplier<S> stillFluid, Supplier<F> flowingFluid, Supplier<B> block, Supplier<I> item)
+	public FluidObject(ResourceLocation id, String forgeName, DeferredHolder<Fluid, S> stillFluid, DeferredHolder<Fluid, F> flowingFluid, DeferredBlock<B> block, DeferredItem<I> item)
 	{
 		super(id, block, item);
 		this.localTag = FluidTags.create(id);
-		this.forgeTag = FluidTags.create(new ResourceLocation("forge", forgeName));
+		this.forgeTag = FluidTags.create(ResourceLocation.fromNamespaceAndPath("forge", forgeName));
 		this.stillFluid = stillFluid;
 		this.flowingFluid = flowingFluid;
 	}
@@ -50,21 +47,5 @@ public class FluidObject<S extends Fluid, F extends Fluid, B extends Block, I ex
 	public boolean isFlowingFluid(Fluid fluid)
 	{
 		return fluid != Fluids.EMPTY && fluid == getFlowingFluid();
-	}
-
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void setRenderLayer(RenderType layer)
-	{
-		ItemBlockRenderTypes.setRenderLayer(getStillFluid(), layer);
-		ItemBlockRenderTypes.setRenderLayer(getFlowingFluid(), layer);
-	}
-
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void setRenderLayer(Predicate<RenderType> layer)
-	{
-		ItemBlockRenderTypes.setRenderLayer(getStillFluid(), layer);
-		ItemBlockRenderTypes.setRenderLayer(getFlowingFluid(), layer);
 	}
 }

@@ -1,18 +1,15 @@
 package com.firemerald.fecore.client.gui.components.decoration;
 
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
-import com.firemerald.fecore.client.gui.ScissorUtil;
 import com.firemerald.fecore.client.gui.components.InteractableComponent;
-import com.mojang.blaze3d.platform.GlStateManager.LogicOp;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class FloatingText extends InteractableComponent
 {
@@ -20,7 +17,7 @@ public class FloatingText extends InteractableComponent
 	public int clickPos = 0;
 	public int selStart = 0, selEnd = 0;
 	public Font font;
-	protected float selX1, selX2;
+	protected int selX1, selX2;
 	public float clickTime = 0;
 	public int clickNum = 0;
 	private EnumTextAlignment alignment = EnumTextAlignment.LEFT;
@@ -54,7 +51,7 @@ public class FloatingText extends InteractableComponent
 	}
 
 	@Override
-	public void updateNarration(NarrationElementOutput output)
+	public void updateWidgetNarration(NarrationElementOutput output)
 	{
 		output.add(NarratedElementType.TITLE, text);
 	}
@@ -64,10 +61,10 @@ public class FloatingText extends InteractableComponent
 		switch (alignment)
 		{
 		case CENTER:
-			offset = ((x2 - x1) - font.width(text)) / 2;
+			offset = (getWidth() - font.width(text)) / 2;
 			break;
 		case RIGHT:
-			offset = (x2 - x1) - font.width(text) - 2;
+			offset = getWidth() - font.width(text) - 2;
 			break;
 		case LEFT:
 		default:
@@ -78,16 +75,16 @@ public class FloatingText extends InteractableComponent
 
 	protected void updatePos()
 	{
-		selX1 = x1 + font.width(text.substring(0, selStart));
-		selX2 = x1 + font.width(text.substring(0, selEnd));
+		selX1 = getX1() + font.width(text.substring(0, selStart));
+		selX2 = getX1() + font.width(text.substring(0, selEnd));
 		clickNum = 0;
 		clickTime = 0;
 	}
 
 	protected void updatePos2()
 	{
-		selX1 = x1 + font.width(text.substring(0, selStart));
-		selX2 = x1 + font.width(text.substring(0, selEnd));
+		selX1 = getX1() + font.width(text.substring(0, selStart));
+		selX2 = getX1() + font.width(text.substring(0, selEnd));
 	}
 
 	public void setText(String text)
@@ -108,7 +105,7 @@ public class FloatingText extends InteractableComponent
 		mx -= offset;
 		if (button == 0)
 		{
-			int clicked = font.plainSubstrByWidth(text, (int) Math.floor(mx - x1)).length();
+			int clicked = font.plainSubstrByWidth(text, (int) Math.floor(mx - getX1())).length();
 			if (clicked == clickPos && clickTime > 0)
 			{
 				if (clickNum == 0)
@@ -169,7 +166,7 @@ public class FloatingText extends InteractableComponent
 		mx -= offset;
 		if (button == 0)
 		{
-			int pos = font.plainSubstrByWidth(text, (int) Math.floor(mx - x1)).length();
+			int pos = font.plainSubstrByWidth(text, (int) Math.floor(mx - getX1())).length();
 			if (pos == clickPos) selStart = selEnd = pos;
 			else if (pos < clickPos)
 			{
@@ -196,28 +193,12 @@ public class FloatingText extends InteractableComponent
 	}
 
 	@Override
-	public void doRender(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
+	public void doRender(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
-		this.setScissor(0, 0, x2 - x1, y2 - y1);
-		font.draw(pose, text, x1 + offset, y1 + (y2 - y1 - 8) / 2, this.focused ? focusedColor : color);
-		if (selStart != selEnd)
-		{
-			Matrix4f mat = pose.last().pose();
-			Tesselator tessellator = Tesselator.getInstance();
-	        BufferBuilder bufferbuilder = tessellator.getBuilder();
-	        RenderSystem.disableTexture();
-	        RenderSystem.enableColorLogicOp();
-	        RenderSystem.logicOp(LogicOp.OR_REVERSE);
-	        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-	        bufferbuilder.vertex(mat, selX1 + offset, y2 - 2, 0).color(0f, 0f, 1f, 1f).endVertex();
-	        bufferbuilder.vertex(mat, selX2 + offset, y2 - 2, 0).color(0f, 0f, 1f, 1f).endVertex();
-	        bufferbuilder.vertex(mat, selX2 + offset, y1 + 2, 0).color(0f, 0f, 1f, 1f).endVertex();
-	        bufferbuilder.vertex(mat, selX1 + offset, y1 + 2, 0).color(0f, 0f, 1f, 1f).endVertex();
-	        tessellator.end();
-	        RenderSystem.disableColorLogicOp();
-	        RenderSystem.enableTexture();
-		}
-		ScissorUtil.popScissor();
+		guiGraphics.enableScissor(getX1(), getY1(), getX2(), getY2());
+		guiGraphics.drawString(font, text, getX1() + offset, (getY1() + getHeight() / 2) - 4, this.isFocused() ? focusedColor : color);
+		if (selStart != selEnd) guiGraphics.fill(selX1 + offset, getY1() + 2, selX2 + offset, getY2() - 2, 0xFF0000FF);
+		guiGraphics.disableScissor();
 	}
 
 	@Override
@@ -238,26 +219,18 @@ public class FloatingText extends InteractableComponent
 	}
 
 	@Override
-	public boolean changeFocus(boolean focused)
-	{
-		if (super.changeFocus(focused))
-		{
-			selStart = 0;
-			selEnd = this.text.length();
-			updatePos();
-			return true;
-		}
-		else return false;
-	}
-
-	@Override
-	public void setIsFocused(boolean focused)
+	public void setFocused(boolean focused)
 	{
 		if (!focused)
 		{
-			super.setIsFocused(false);
+			super.setFocused(false);
 			selStart = selEnd = 0;
 		}
-		else super.setIsFocused(true);
+		else super.setFocused(true);
+	}
+
+	@Override
+	public Component getMessage() {
+		return Component.literal(text);
 	}
 }

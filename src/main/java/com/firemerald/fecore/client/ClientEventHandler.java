@@ -1,135 +1,88 @@
 package com.firemerald.fecore.client;
 
 import com.firemerald.fecore.FECoreMod;
-import com.firemerald.fecore.block.ICustomBlockHighlight;
 import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.boundingshapes.IRenderableBoundingShape;
-import com.firemerald.fecore.client.gui.IBetterScreen;
-import com.firemerald.fecore.client.gui.IScrollValuesHolder;
-import com.firemerald.fecore.init.FECoreItems;
-import com.firemerald.fecore.item.ShapeToolItem;
-import com.firemerald.fecore.networking.server.ShapeToolClickedPacket;
+import com.firemerald.fecore.init.FECoreDataComponents;
+import com.firemerald.fecore.init.FECoreObjects;
+import com.firemerald.fecore.item.ICustomBlockHighlight;
+import com.firemerald.fecore.network.serverbound.ShapeToolClickedPacket;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.DrawSelectionEvent.HighlightBlock;
-import net.minecraftforge.client.event.InputEvent.ClickInputEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.RenderHighlightEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class ClientEventHandler
-{
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onMouseScrollEventPre(ScreenEvent.MouseScrollEvent.Pre event)
-	{
-    	if (!Minecraft.ON_OSX && event.getScreen() instanceof IBetterScreen) //bad forge fix for MC-121772 that doesn't take into account whether shift is actually held means we can't do this on macOS ever
-    	{
-    		Minecraft minecraft = Minecraft.getInstance();
-    		double scrollX = ((IScrollValuesHolder) minecraft.mouseHandler).getScrollX();
-    		if (scrollX != 0) ((IBetterScreen) event.getScreen()).mouseScrolledX(event.getMouseX(), event.getMouseY(), (minecraft.options.discreteMouseScroll ? Math.signum(scrollX) : scrollX) * minecraft.options.mouseWheelSensitivity);
-    	}
-	}
-
+@EventBusSubscriber(value = Dist.CLIENT, modid = FECoreMod.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+public class ClientEventHandler {
 	@SuppressWarnings("resource")
 	@SubscribeEvent
-	public static void onClick(ClickInputEvent event)
+	public static void onClick(InputEvent.InteractionKeyMappingTriggered event)
 	{
-		if (event.isAttack())
-		{
+		if (event.isAttack()) {
 			Player player = Minecraft.getInstance().player;
+			InteractionHand hand = InteractionHand.MAIN_HAND;
 			ItemStack stack = player.getMainHandItem();
-			if (stack.isEmpty())
-			{
+			if (stack.isEmpty()) {
 				stack = player.getOffhandItem();
-				if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
-				{
-					FECoreMod.NETWORK.sendToServer(new ShapeToolClickedPacket(InteractionHand.OFF_HAND));
-					event.setCanceled(true);
-				}
+				hand = InteractionHand.OFF_HAND;
 			}
-			else if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
-			{
-				FECoreMod.NETWORK.sendToServer(new ShapeToolClickedPacket(InteractionHand.MAIN_HAND));
+			if (FECoreObjects.SHAPE_TOOL.isThisItem(stack) ) {
+				event.setSwingHand(false);
 				event.setCanceled(true);
+				new ShapeToolClickedPacket(hand).sendToServer();
 			}
 		}
 	}
-
 
 	@SubscribeEvent
 	public static void onRenderLevelLast(RenderLevelStageEvent event)
 	{
-		if (event.getStage() == Stage.AFTER_TRIPWIRE_BLOCKS)
+		if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRIPWIRE_BLOCKS)
 		{
 			@SuppressWarnings("resource")
 			Player player = Minecraft.getInstance().player;
 			ItemStack stack = player.getMainHandItem();
-			if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
-			{
-				BoundingShape shape = ShapeToolItem.getShape(stack);
-				if (shape instanceof IRenderableBoundingShape)
-				{
+			if (!FECoreObjects.SHAPE_TOOL.isThisItem(stack)) stack = player.getOffhandItem();
+			if (FECoreObjects.SHAPE_TOOL.isThisItem(stack)) {
+				BoundingShape shape = stack.get(FECoreDataComponents.HELD_SHAPE);
+				if (shape instanceof IRenderableBoundingShape renderable) {
 					Vec3 pos = event.getCamera().getPosition();
 					PoseStack pose = event.getPoseStack();
 					pose.pushPose();
 					pose.translate(-pos.x, -pos.y, -pos.z);
-					((IRenderableBoundingShape) shape).renderIntoWorld(event.getPoseStack(), player.getPosition(event.getPartialTick()), event.getPartialTick());
+					renderable.renderIntoWorld(event.getPoseStack(), player.getPosition(event.getPartialTick().getGameTimeDeltaPartialTick(true)), event.getPartialTick());
 					pose.popPose();
-				}
-			}
-			else
-			{
-				stack = player.getOffhandItem();
-				if (FECoreItems.SHAPE_TOOL.isThisItem(stack))
-				{
-					BoundingShape shape = ShapeToolItem.getShape(stack);
-					if (shape instanceof IRenderableBoundingShape)
-					{
-						Vec3 pos = event.getCamera().getPosition();
-						PoseStack pose = event.getPoseStack();
-						pose.pushPose();
-						pose.translate(-pos.x, -pos.y, -pos.z);
-						((IRenderableBoundingShape) shape).renderIntoWorld(event.getPoseStack(), player.getPosition(event.getPartialTick()), event.getPartialTick());
-						pose.popPose();
-					}
 				}
 			}
 		}
 	}
 
 	@SubscribeEvent
-	public static void onHighlightBlock(HighlightBlock event)
+	public static void onHighlightBlock(RenderHighlightEvent.Block event)
 	{
 		@SuppressWarnings("resource")
 		Player player = Minecraft.getInstance().player;
 		ItemStack stack = player.getMainHandItem();
 		if (stack.isEmpty()) stack = player.getOffhandItem();
-		if (stack.getItem() instanceof ICustomBlockHighlight)
+		if (stack.getItem() instanceof ICustomBlockHighlight customHighlight)
 		{
-			IBlockHighlight highlight = ((ICustomBlockHighlight) stack.getItem()).getBlockHighlight(player, event.getTarget());
-			if (highlight != null) highlight.render(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.LINES), player, event.getTarget(), event.getCamera(), event.getPartialTicks());
+			IBlockHighlight highlight = customHighlight.getBlockHighlight(player, event);
+			if (highlight != null) highlight.render(player, event);
 		}
-		else if (stack.getItem() instanceof BlockItem)
+		else if (stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ICustomBlockHighlight customHighlight)
 		{
-			Block block = ((BlockItem) stack.getItem()).getBlock();
-			if (block instanceof ICustomBlockHighlight)
-			{
-				IBlockHighlight highlight = ((ICustomBlockHighlight) block).getBlockHighlight(player, event.getTarget());
-				if (highlight != null) highlight.render(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.LINES), player, event.getTarget(), event.getCamera(), event.getPartialTicks());
-			}
+			IBlockHighlight highlight = customHighlight.getBlockHighlight(player, event);
+			if (highlight != null) highlight.render(player, event);
 		}
 	}
 }

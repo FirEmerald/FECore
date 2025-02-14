@@ -1,8 +1,6 @@
 package com.firemerald.fecore.client.gui.screen;
 
 import com.firemerald.fecore.FECoreMod;
-import com.firemerald.fecore.client.ConfigClient;
-import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.ToggleButton;
@@ -10,14 +8,20 @@ import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.scrolling.FullyScrollableComponentPane;
 import com.firemerald.fecore.client.gui.components.scrolling.HorizontalScrollBar;
 import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollBar;
-import com.firemerald.fecore.client.gui.components.text.*;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.firemerald.fecore.client.gui.components.text.BetterTextField;
+import com.firemerald.fecore.client.gui.components.text.CompoundTagField;
+import com.firemerald.fecore.client.gui.components.text.DoubleField;
+import com.firemerald.fecore.client.gui.components.text.LabeledBetterTextField;
+import com.firemerald.fecore.client.gui.components.text.LabeledDoubleField;
+import com.firemerald.fecore.config.ClientConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ConfigScreenTest extends BetterScreen
@@ -48,35 +52,35 @@ public class ConfigScreenTest extends BetterScreen
 	@SuppressWarnings("resource")
 	public ConfigScreenTest(Screen previous)
 	{
-		super(new TextComponent("ConfigBase Test"));
+		super(Component.literal("ConfigBase Test"));
 		this.previous = previous;
 		this.pane = new FullyScrollableComponentPane(0, 0, 100, 100);
 		this.vertScroll = new VerticalScrollBar(100, 0, 110, 100, pane);
 		this.horScroll = new HorizontalScrollBar(0, 100, 100, 110, pane);
-		this.button = new Button(0, 0, 210, 20, new TextComponent("test button"), () -> FECoreMod.LOGGER.info("button test"));
-		this.toggleButton = new ToggleButton(210, 0, 210, 20, new TextComponent("test toggle"), v -> FECoreMod.LOGGER.info("toggle test: " + v));
+		this.button = new Button(0, 0, 210, 20, Component.literal("test button"), () -> FECoreMod.LOGGER.info("button test"));
+		this.toggleButton = new ToggleButton(210, 0, 210, 20, Component.literal("test toggle"), v -> FECoreMod.LOGGER.info("toggle test: " + v));
 		this.text = new FloatingText(0, 20, 420, 40, Minecraft.getInstance().font, "test floating text");
-		this.textField = new BetterTextField(Minecraft.getInstance().font, 0, 40, 420, 20, "test text field", new TextComponent("test text field"), v -> {
+		this.textField = new BetterTextField(Minecraft.getInstance().font, 0, 40, 420, 20, "test text field", Component.literal("test text field"), v -> {
 			FECoreMod.LOGGER.info("text field test: " + v);
 			return v.length() < 20;
 		});
 		textField.setMaxLength(Integer.MAX_VALUE);
-		this.labeledTextField = new LabeledBetterTextField(Minecraft.getInstance().font, 0, 60, 420, 20, "test labeled text field", new TextComponent("test labeled text field"), v -> {
+		this.labeledTextField = new LabeledBetterTextField(Minecraft.getInstance().font, 0, 60, 420, 20, Component.literal("test labeled text field"), Component.literal("test labeled text field"), v -> {
 			FECoreMod.LOGGER.info("labeled text field test: " + v);
 			return v.length() < 20;
 		});
 		labeledTextField.setMaxLength(Integer.MAX_VALUE);
-		this.doubleField = new DoubleField(Minecraft.getInstance().font, 0, 80, 420, 20, 0, new TextComponent("test double field"), v -> {
+		this.doubleField = new DoubleField(Minecraft.getInstance().font, 0, 80, 420, 20, 0, Component.literal("test double field"), v -> {
 			FECoreMod.LOGGER.info("double field test: " + v);
 			return v >= 0;
 		});
 		doubleField.setMaxLength(Integer.MAX_VALUE);
-		this.labeledDoubleField = new LabeledDoubleField(Minecraft.getInstance().font, 0, 100, 420, 20, "test labeled double field", new TextComponent("test labeled double field"), v -> {
+		this.labeledDoubleField = new LabeledDoubleField(Minecraft.getInstance().font, 0, 100, 420, 20, Component.literal("test labeled double field"), Component.literal("test labeled double field"), v -> {
 			FECoreMod.LOGGER.info("labeled double field test: " + v);
 			return v >= 0;
 		});
 		labeledDoubleField.setMaxLength(Integer.MAX_VALUE);
-		this.compundTagField = new CompoundTagField(Minecraft.getInstance().font, 0, 120, 420, 20, new TextComponent("test compound tag field"), v -> {
+		this.compundTagField = new CompoundTagField(Minecraft.getInstance().font, 0, 120, 420, 20, Component.literal("test compound tag field"), v -> {
 			FECoreMod.LOGGER.info("compound tag field test: " + v);
 			return v.size() < 3;
 		});
@@ -88,9 +92,8 @@ public class ConfigScreenTest extends BetterScreen
 		this.loremIpsum6 = new FloatingText(0, 240, 420, 260, Minecraft.getInstance().font, "fugiat nulla pariatur. Excepteur sint occaecat cupidatat non");
 		this.loremIpsum7 = new FloatingText(0, 260, 420, 280, Minecraft.getInstance().font, "proident, sunt in culpa qui officia deserunt mollit anim id est");
 		this.loremIpsum8 = new FloatingText(0, 280, 420, 300, Minecraft.getInstance().font, "laborum.");
-		this.scrollSensitivityLabel = new FloatingText(0, 300, 200, 320, Minecraft.getInstance().font, Translator.translate("fecore.configgui.scrollSensitivity"), EnumTextAlignment.RIGHT);
-		ConfigClient clientConfig = ConfigClient.instance();
-		this.scrollSensitivity = new DoubleField(Minecraft.getInstance().font, 200, 300, 200, 20, clientConfig.scrollSensitivity.get(), 0, Double.POSITIVE_INFINITY, new TextComponent("Scrolling sensitivity"), clientConfig.scrollSensitivity::set);
+		this.scrollSensitivityLabel = new FloatingText(0, 300, 200, 320, Minecraft.getInstance().font, I18n.get("fecore.configgui.scrollSensitivity"), EnumTextAlignment.RIGHT);
+		this.scrollSensitivity = new DoubleField(Minecraft.getInstance().font, 200, 300, 200, 20, ClientConfig.SCROLL_SENSITIVITY.get(), 0, Double.POSITIVE_INFINITY, Component.literal("Scrolling sensitivity"), ClientConfig.SCROLL_SENSITIVITY::set);
 		compundTagField.setMaxLength(Integer.MAX_VALUE);
 		pane.setScrollBar(vertScroll);
 		pane.setScrollBar(horScroll);
@@ -132,9 +135,9 @@ public class ConfigScreenTest extends BetterScreen
     }
 
 	@Override
-	public void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover)
+	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTick, boolean canHover)
 	{
-		this.renderBackground(pose);
-		super.render(pose, mx, my, partialTick, canHover);
+		this.renderBackground(guiGraphics, mx, my, partialTick);
+		super.render(guiGraphics, mx, my, partialTick, canHover);
 	}
 }

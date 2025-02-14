@@ -2,11 +2,11 @@ package com.firemerald.fecore.client.gui.components.scrolling;
 
 public interface IVerticalScrollable extends IScrollableBase
 {
-	public double getHeight();
+	public int getHeight();
 
-	public double getFullHeight();
+	public int getFullHeight();
 
-	public double getMaxVerticalScroll();
+	public int getMaxVerticalScroll();
 
 	public double getVerticalScroll();
 
@@ -15,5 +15,13 @@ public interface IVerticalScrollable extends IScrollableBase
 	public default double scrollVertical(double scrollAmount)
 	{
 		return scroll(scrollAmount, getVerticalScroll(), getMaxVerticalScroll(), this::setVerticalScroll);
+	}
+
+	public default boolean canScrollUp() {
+		return getVerticalScroll() > 0;
+	}
+
+	public default boolean canScrollDown() {
+		return getVerticalScroll() < getMaxVerticalScroll();
 	}
 }

@@ -1,16 +1,13 @@
 package com.firemerald.fecore.client.gui.components.scrolling;
 
 import com.firemerald.fecore.client.gui.ButtonState;
-import com.firemerald.fecore.client.gui.RGB;
 import com.firemerald.fecore.client.gui.components.InteractableComponent;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 
 public class HorizontalScrollBar extends InteractableComponent
 {
@@ -55,12 +52,13 @@ public class HorizontalScrollBar extends InteractableComponent
 	}
 
 	@Override
-	public void doRender(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
+	public void doRender(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
-		fill(pose, x1, y1, x2, y2, this.focused ? 0xFFD0D0D0 : 0xFF000000);
+		int x1 = getX1(), y1 = getY1(), x2 = getX2(), y2 = getY2();
+		guiGraphics.fill(x1, y1, x2, y2, this.isFocused() ? 0xFFD0D0D0 : 0xFF000000);
 		if (enabled)
 		{
-			fill(pose, x1 + 1, y1 + 1, x2 - 1, y2 - 1, 0xFF404040);
+			guiGraphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, 0xFF404040);
 			double scroll = scrollable.getHorizontalScroll();
 			double max = scrollable.getMaxHorizontalScroll();
 			ButtonState state;
@@ -75,29 +73,13 @@ public class HorizontalScrollBar extends InteractableComponent
 				}
 				else state = ButtonState.NONE;
 			}
-			RGB outerCol = state.getColor(.5f, .5f, .5f);
-			RGB innerCol = state.getColor(1, 1, 1);
-			float scrollX = (float) (x1 + scrollWidth * scroll / max);
-			float scrollBarSize = (float) this.scrollBarSize;
-	        RenderSystem.disableTexture();
-			Matrix4f mat = pose.last().pose();
-	        Tesselator tessellator = Tesselator.getInstance();
-	        BufferBuilder bufferbuilder = tessellator.getBuilder();
-	        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-	        bufferbuilder.vertex(mat, scrollX                , y2, 0).color(outerCol.r(), outerCol.g(), outerCol.b(), 1).endVertex();
-	        bufferbuilder.vertex(mat, scrollX + scrollBarSize, y2, 0).color(outerCol.r(), outerCol.g(), outerCol.b(), 1).endVertex();
-	        bufferbuilder.vertex(mat, scrollX + scrollBarSize, y1, 0).color(outerCol.r(), outerCol.g(), outerCol.b(), 1).endVertex();
-	        bufferbuilder.vertex(mat, scrollX                , y1, 0).color(outerCol.r(), outerCol.g(), outerCol.b(), 1).endVertex();
-	        tessellator.end();
-	        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-	        bufferbuilder.vertex(mat, scrollX                 + 1, y2 - 1, 0).color(innerCol.r(), innerCol.g(), innerCol.b(), 1).endVertex();
-	        bufferbuilder.vertex(mat, scrollX + scrollBarSize - 1, y2 - 1, 0).color(innerCol.r(), innerCol.g(), innerCol.b(), 1).endVertex();
-	        bufferbuilder.vertex(mat, scrollX + scrollBarSize - 1, y1 + 1, 0).color(innerCol.r(), innerCol.g(), innerCol.b(), 1).endVertex();
-	        bufferbuilder.vertex(mat, scrollX                 + 1, y1 + 1, 0).color(innerCol.r(), innerCol.g(), innerCol.b(), 1).endVertex();
-	        tessellator.end();
-	        RenderSystem.enableTexture();
+			double scrollX = (x1 + scrollWidth * scroll / max);
+			int scrollX1 = (int) scrollX;
+			int scrollX2 = (int) (scrollX + scrollBarSize);
+			guiGraphics.fill(scrollX1, y1, scrollX2, y2, state.getColorFromFloat(.5f, .5f, .5f));
+			guiGraphics.fill(scrollX1 + 1, y1 + 1, scrollX2 - 1, y2 - 1, state.getColorFromFloat(.9f, .9f, .9f));
 		}
-		else fill(pose, x1 + 1, y1 + 1, x2 - 1, y2 - 1, 0xFF202020);
+		else guiGraphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, 0xFF202020);
 	}
 
 	@Override
@@ -112,10 +94,10 @@ public class HorizontalScrollBar extends InteractableComponent
 		if (button == 0)
 		{
 			pX = mx;
-			if (my >= y1 + 1 && my < y2 - 1)
+			if (my >= getY1() + 1 && my < getY2() - 1)
 			{
 				double scroll = scrollable.getHorizontalScroll();
-				double scrollPos = x1 + 1 + scrollWidth * scroll / scrollable.getMaxHorizontalScroll();
+				double scrollPos = getX1() + 1 + scrollWidth * scroll / scrollable.getMaxHorizontalScroll();
 				if (mx >= scrollPos && mx < scrollPos + scrollBarSize)
 				{
 					pressedScroll = true;
@@ -155,30 +137,24 @@ public class HorizontalScrollBar extends InteractableComponent
 	}
 
 	@Override
-	public boolean changeFocus(boolean focused)
-	{
-		if (!enabled) return false;
-		else if (!super.changeFocus(focused))
-		{
-			pressedScroll = false;
-			return false;
-		}
-		else return true;
+	public void setFocused(boolean focused) {
+		super.setFocused(focused);
+		if (!focused) pressedScroll = false;
 	}
 
 	@Override
-	public void updateNarration(NarrationElementOutput output)
+	public void updateWidgetNarration(NarrationElementOutput output)
 	{
-    	output.add(NarratedElementType.TITLE, new TranslatableComponent("narration.scrollbar.horizontal.title"));
+    	output.add(NarratedElementType.TITLE, Component.translatable("narration.scrollbar.horizontal.title"));
     	if (this.enabled)
     	{
     		if (this.isFocused())
     		{
-    			output.add(NarratedElementType.USAGE, new TranslatableComponent("narration.scrollbar.horizontal.usage.focused"));
+    			output.add(NarratedElementType.USAGE, Component.translatable("narration.scrollbar.horizontal.usage.focused"));
     		}
     		else
     		{
-    			output.add(NarratedElementType.USAGE, new TranslatableComponent("narration.scrollbar.horizontal.usage.hovered"));
+    			output.add(NarratedElementType.USAGE, Component.translatable("narration.scrollbar.horizontal.usage.hovered"));
     		}
     	}
 	}
@@ -186,8 +162,13 @@ public class HorizontalScrollBar extends InteractableComponent
 	@Override
 	public boolean keyPressed(int key, int scancode, int mods)
 	{
-		if (key == InputConstants.KEY_LEFT) return this.scrollable.scrollHorizontal(1) != 0;
-		else if (key == InputConstants.KEY_RIGHT) return this.scrollable.scrollHorizontal(-1) != 0;
+		if (key == InputConstants.KEY_LEFT) return this.scrollable.scrollHorizontal(1) != 1;
+		else if (key == InputConstants.KEY_RIGHT) return this.scrollable.scrollHorizontal(-1) != -1;
 		else return false;
+	}
+
+	@Override
+	public Component getMessage() {
+		return null;
 	}
 }

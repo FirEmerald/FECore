@@ -2,18 +2,25 @@ package com.firemerald.fecore.client.gui.components.scrolling;
 
 public interface IHorizontalScrollable extends IScrollableBase
 {
-	public double getWidth();
+	public int getWidth();
 
-	public double getFullWidth();
+	public int getFullWidth();
 
-	public double getMaxHorizontalScroll();
+	public int getMaxHorizontalScroll();
 
 	public double getHorizontalScroll();
 
 	public void setHorizontalScroll(double scroll);
 
-	public default double scrollHorizontal(double scrollAmount)
-	{
+	public default double scrollHorizontal(double scrollAmount) {
 		return scroll(scrollAmount, getHorizontalScroll(), getMaxHorizontalScroll(), this::setHorizontalScroll);
+	}
+
+	public default boolean canScrollLeft() {
+		return getHorizontalScroll() > 0;
+	}
+
+	public default boolean canScrollRight() {
+		return getHorizontalScroll() < getMaxHorizontalScroll();
 	}
 }

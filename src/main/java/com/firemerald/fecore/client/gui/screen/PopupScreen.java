@@ -2,11 +2,11 @@ package com.firemerald.fecore.client.gui.screen;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.Music;
 
 public abstract class PopupScreen extends BetterScreen
 {
@@ -41,19 +41,26 @@ public abstract class PopupScreen extends BetterScreen
 	}
 
 	@Override
-	public void render(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
+	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
 	{
 		if (under != null)
 		{
-			if (under instanceof BetterScreen) ((BetterScreen) under).render(pose, mx, my, partialTicks, false);
-			else under.render(pose, -1000, -1000, partialTicks);
+			guiGraphics.pose().pushPose();
+			guiGraphics.pose().translate(0, 0, -1);
+			if (under instanceof BetterScreen betterUnder) betterUnder.render(guiGraphics, mx, my, partialTicks, false);
+			else under.render(guiGraphics, Integer.MIN_VALUE, Integer.MIN_VALUE, partialTicks);
+			guiGraphics.pose().popPose();
 		}
-		pose.pushPose();
-		pose.translate(0, 0, 300);
-		renderBackground(pose, mx, my, partialTicks, canHover);
-		super.render(pose, mx, my, partialTicks, canHover);
-		pose.popPose();
+		renderBackground(guiGraphics, mx, my, partialTicks, canHover);
+		super.render(guiGraphics, mx, my, partialTicks, canHover);
 	}
 
-	public void renderBackground(PoseStack pose, int mx, int my, float partialTicks, boolean canHover) {}
+	public void renderBackground(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover) {
+		guiGraphics.fill(0, 0, width, height, 0x7F000000);
+	}
+
+	@Override
+    public Music getBackgroundMusic() {
+        return under != null ? under.getBackgroundMusic() : null;
+    }
 }

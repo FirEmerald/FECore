@@ -1,6 +1,6 @@
 package com.firemerald.fecore.util;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
@@ -18,7 +18,8 @@ public class Constants
 	TAU_F = (float) TAU,
 	HALF_PI_F = (float) HALF_PI,
 	DEG_TO_RAD_F = (float) DEG_TO_RAD,
-	RAD_TO_DEG_F = (float) RAD_TO_DEG;
+	RAD_TO_DEG_F = (float) RAD_TO_DEG,
+	SQRT_2_INV = 0.70710678118654752440084436210485f;
 
 	public static final int CIRCLE_SEGMENTS = 32;
 	public static final int HALF_CIRCLE_SEGMENTS = CIRCLE_SEGMENTS >> 1;

@@ -2,83 +2,58 @@ package com.firemerald.fecore.item;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.boundingshapes.BoundingShapeBoxPositions;
+import com.firemerald.fecore.boundingshapes.BoundingShapeDefinition;
 import com.firemerald.fecore.boundingshapes.IConfigurableBoundingShape;
-import com.firemerald.fecore.capabilities.IShapeHolder;
-import com.firemerald.fecore.capabilities.IShapeTool;
+import com.firemerald.fecore.init.FECoreDataComponents;
 
-import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 
-public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTool>
-{
-	public ShapeToolItem(Properties properties)
-	{
-		super(properties);
-	}
-
-	@Override
-	public boolean doesSneakBypassUse(ItemStack stack, LevelReader level, BlockPos pos, Player player)
-	{
-		return true;
+public class ShapeToolItem extends Item {
+	public ShapeToolItem(Properties properties) {
+		super(properties.component(FECoreDataComponents.HELD_SHAPE, new BoundingShapeBoxPositions(false)).component(FECoreDataComponents.HELD_SHAPE_INDEX, 0));
 	}
 
 	//right-click on block = add pos
-	//shift-right-click on block = default action
-	@SuppressWarnings("resource")
 	@Override
-	public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context)
-	{
+    public InteractionResult useOn(UseOnContext context) {
 		Player player = context.getPlayer();
-		if (player.isShiftKeyDown()) return InteractionResult.PASS;
-		else if (!context.getLevel().isClientSide)
-		{
-			IShapeTool.get(stack).ifPresent(tool -> {
-				BoundingShape shape;
-				int posIndex = tool.getConfigurationIndex();
-				BoundingShape s = tool.getShape();
-				boolean isNew = false;
-				if (s instanceof IConfigurableBoundingShape) shape = s;
-				else
-				{
-					isNew = true;
-					shape = new BoundingShapeBoxPositions();
-					((BoundingShapeBoxPositions) shape).isRelative = false;
-					posIndex = 0;
-					if (s != null) //was invalid shape
-					{
-						player.sendMessage(new TranslatableComponent("fecore.shapetool.invalid", new TranslatableComponent(s.getUnlocalizedName()), new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
-					}
-					else //no shape selected
-					{
-						player.sendMessage(new TranslatableComponent("fecore.shapetool.new", new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
-					}
-				}
-				if (isNew) tool.setShape(shape);
-				else
-				{
-					posIndex = ((IConfigurableBoundingShape) shape).addPosition(player, context.getClickedPos(), posIndex);
-					tool.setConfigurationIndex(posIndex);
-				}
-			});
+		if (player instanceof ServerPlayer serverPlayer) {
+			ItemStack stack = context.getItemInHand();
+			BoundingShape shape;
+			BoundingShape s = stack.get(FECoreDataComponents.HELD_SHAPE);
+			int posIndex = stack.get(FECoreDataComponents.HELD_SHAPE_INDEX);
+			boolean isNew = false;
+			if (s instanceof IConfigurableBoundingShape) shape = s;
+			else {
+				isNew = true;
+				shape = new BoundingShapeBoxPositions(false);
+				posIndex = 0;
+				if (s != null) //was invalid shape
+					serverPlayer.sendSystemMessage(Component.translatable("fecore.shapetool.invalid", Component.translatable(s.getUnlocalizedName()), Component.translatable(shape.getUnlocalizedName())));
+				else //no shape selected
+					serverPlayer.sendSystemMessage(Component.translatable("fecore.shapetool.new", Component.translatable(shape.getUnlocalizedName())));
+			}
+			if (shape != s) shape.getPropertiesFrom(s);
+			if (isNew) {
+				stack.set(FECoreDataComponents.HELD_SHAPE, shape);
+				stack.set(FECoreDataComponents.HELD_SHAPE_INDEX, 0);
+			}
+			else {
+				posIndex = ((IConfigurableBoundingShape) shape).addPosition(serverPlayer, context.getClickedPos(), posIndex);
+				stack.set(FECoreDataComponents.HELD_SHAPE, shape);
+				stack.set(FECoreDataComponents.HELD_SHAPE_INDEX, posIndex);
+			}
 		}
 		return InteractionResult.SUCCESS;
 	}
@@ -86,104 +61,63 @@ public class ShapeToolItem extends Item implements ICapSynchronizedItem<IShapeTo
 	//right-click empty = remove pos
 	//shift-right-click on empty = change mode
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
-	{
-		ItemStack stack = player.getItemInHand(hand);
-		if (!level.isClientSide)
-		{
-			IShapeTool.get(stack).ifPresent(tool -> {
-				BoundingShape shape;
-				int posIndex = tool.getConfigurationIndex();
-				BoundingShape s = tool.getShape();
-				boolean isNew = false;
-				if (s instanceof IConfigurableBoundingShape) shape = s;
-				else
-				{
-					isNew = true;
-					shape = new BoundingShapeBoxPositions();
-					((BoundingShapeBoxPositions) shape).isRelative = false;
-					posIndex = 0;
-					if (s != null) //was invalid shape
-					{
-						player.sendMessage(new TranslatableComponent("fecore.shapetool.invalid", new TranslatableComponent(s.getUnlocalizedName()), new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
-					}
-					else //no shape selected
-					{
-						player.sendMessage(new TranslatableComponent("fecore.shapetool.new", new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
-					}
-				}
-				if (player.isShiftKeyDown())
-				{
-					if (!isNew)
-					{
-						List<BoundingShape> shapes = BoundingShape.getConfigurableShapeList(shape);
-						int index = shapes.indexOf(shape);
-						int newIndex = (index + 1) % shapes.size();
-						if (index != newIndex)
-						{
-							shape = shapes.get(newIndex);
-							isNew = true;
-							player.sendMessage(new TranslatableComponent("fecore.shapetool.mode", new TranslatableComponent(shape.getUnlocalizedName())), Util.NIL_UUID);
-						}
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+		if (player instanceof ServerPlayer serverPlayer) {
+			ItemStack stack = player.getItemInHand(hand);
+			BoundingShape shape;
+			BoundingShape s = stack.get(FECoreDataComponents.HELD_SHAPE);
+			int posIndex = stack.get(FECoreDataComponents.HELD_SHAPE_INDEX);
+			boolean isNew = false;
+			if (s instanceof IConfigurableBoundingShape) shape = s;
+			else {
+				isNew = true;
+				shape = new BoundingShapeBoxPositions();
+				((BoundingShapeBoxPositions) shape).isRelative = false;
+				posIndex = 0;
+				if (s != null) //was invalid shape
+					serverPlayer.sendSystemMessage(Component.translatable("fecore.shapetool.invalid", Component.translatable(s.getUnlocalizedName()), Component.translatable(shape.getUnlocalizedName())));
+				else //no shape selected
+					serverPlayer.sendSystemMessage(Component.translatable("fecore.shapetool.new", Component.translatable(shape.getUnlocalizedName())));
+			}
+			if (serverPlayer.isShiftKeyDown()) {
+				if (!isNew) {
+					List<BoundingShapeDefinition<?>> shapeDefs = BoundingShape.getConfigurableShapeDefinitions().toList();
+					int index = shapeDefs.indexOf(shape.definition());
+					int newIndex = (index + 1) % shapeDefs.size();
+					if (index != newIndex) {
+						shape = shapeDefs.get(newIndex).newShape();
+						isNew = true;
+						serverPlayer.sendSystemMessage(Component.translatable("fecore.shapetool.mode", Component.translatable(shape.getUnlocalizedName())));
 					}
 				}
-				else if (!isNew) posIndex = ((IConfigurableBoundingShape) shape).removePosition(player, posIndex);
-				if (isNew) tool.setShape(shape);
-				else tool.setConfigurationIndex(posIndex);
-			});
-
+			}
+			else if (!isNew) posIndex = ((IConfigurableBoundingShape) shape).removePosition(player, posIndex);
+			if (shape != s) shape.getPropertiesFrom(s);
+			if (isNew) {
+				stack.set(FECoreDataComponents.HELD_SHAPE, shape);
+				stack.set(FECoreDataComponents.HELD_SHAPE_INDEX, 0);
+			} else {
+				stack.set(FECoreDataComponents.HELD_SHAPE, shape);
+				stack.set(FECoreDataComponents.HELD_SHAPE_INDEX, posIndex);
+			}
 		}
-		return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
-	}
-
-	public static BoundingShape getShape(ItemStack stack)
-	{
-		IShapeHolder holder = IShapeHolder.get(stack).orElse(null);
-		return holder == null ? null : holder.getShape();
+		return InteractionResult.SUCCESS;
 	}
 
     @Override
-    public Component getName(ItemStack stack)
-    {
-    	BoundingShape shape = getShape(stack);
-    	return new TranslatableComponent(this.getDescriptionId(stack), shape == null ? new TranslatableComponent("fecore.shape.none") : shape.getLocalizedName());
+    public Component getName(ItemStack stack) {
+    	BoundingShape shape = stack.get(FECoreDataComponents.HELD_SHAPE);
+    	return Component.translatable(this.getDescriptionId(), shape == null ? Component.translatable("fecore.shape.none") : shape.getLocalizedName());
     }
 
 	@Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
-    {
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.add_pos"));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.remove_pos"));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.change_mode"));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.use_block"));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.open_gui"));
-		BoundingShape shape = getShape(stack);
-		if (shape instanceof IConfigurableBoundingShape) ((IConfigurableBoundingShape) shape).addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.add_pos"));
+		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.remove_pos"));
+		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.change_mode"));
+		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.open_gui"));
+		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.bypass_block_activation"));
+		BoundingShape shape = stack.get(FECoreDataComponents.HELD_SHAPE);
+		if (shape instanceof IConfigurableBoundingShape configurable) configurable.addInformation(stack, context, tooltipComponents, tooltipFlag);
     }
-
-	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt)
-	{
-		IShapeTool cap = new IShapeTool.Impl();
-		if (nbt != null) cap.deserializeNBT(nbt);
-		return cap;
-	}
-
-	@Override
-	public LazyOptional<IShapeTool> getCap(ItemStack stack)
-	{
-		return IShapeTool.get(stack);
-	}
-
-	@Override
-	public CompoundTag writeCap(IShapeTool cap, ItemStack stack)
-	{
-		return cap.serializeNBT();
-	}
-
-	@Override
-	public void readCap(IShapeTool cap, ItemStack stack, CompoundTag tag)
-	{
-		cap.deserializeNBT(tag);
-	}
 }

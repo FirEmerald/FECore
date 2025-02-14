@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 
 public class LabeledDoubleField extends LabeledBetterTextField
 {
-	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, String label, Component message, DoubleConsumer onChanged)
+	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, net.minecraft.network.chat.Component label, Component message, DoubleConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -23,7 +23,7 @@ public class LabeledDoubleField extends LabeledBetterTextField
 		});
 	}
 
-	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double min, double max, String label, Component message, DoubleConsumer onChanged)
+	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double min, double max, net.minecraft.network.chat.Component label, Component message, DoubleConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -43,7 +43,7 @@ public class LabeledDoubleField extends LabeledBetterTextField
 		});
 	}
 
-	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, String label, Component message, DoublePredicate onChanged)
+	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, net.minecraft.network.chat.Component label, Component message, DoublePredicate onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -57,7 +57,7 @@ public class LabeledDoubleField extends LabeledBetterTextField
 		});
 	}
 
-	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double val, String label, Component message, DoubleConsumer onChanged)
+	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double val, net.minecraft.network.chat.Component label, Component message, DoubleConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -73,7 +73,7 @@ public class LabeledDoubleField extends LabeledBetterTextField
 		this.setDouble(val);
 	}
 
-	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double val, double min, double max, String label, Component message, DoubleConsumer onChanged)
+	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double val, double min, double max, net.minecraft.network.chat.Component label, Component message, DoubleConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -94,7 +94,7 @@ public class LabeledDoubleField extends LabeledBetterTextField
 		this.setDouble(val);
 	}
 
-	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double val, String label, Component message, DoublePredicate onChanged)
+	public LabeledDoubleField(Font fontrendererObj, int x, int y, int w, int h, double val, net.minecraft.network.chat.Component label, Component message, DoublePredicate onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try

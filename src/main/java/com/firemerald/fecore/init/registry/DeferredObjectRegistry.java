@@ -5,9 +5,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.mojang.datafixers.types.Type;
-
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -18,273 +19,269 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Properties;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid.Flowing;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid.Properties;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid.Source;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class DeferredObjectRegistry
-{
+public class DeferredObjectRegistry {
 	public final String modId;
-	public final DeferredDeferredRegister<Fluid> fluidRegistry;
-	public final DeferredDeferredRegister<BlockEntityType<?>> blockEntityRegistry;
-	public final DeferredDeferredRegister<Block> blockRegistry;
-	public final DeferredDeferredRegister<Item> itemRegistry;
+	public final DeferredRegister<Fluid> fluidRegistry;
+	public final DeferredRegister<BlockEntityType<?>> blockEntityRegistry;
+	public final DeferredRegister.Blocks blockRegistry;
+	public final DeferredRegister.Items itemRegistry;
+	public final DeferredRegister<EntityType<?>> entityRegistry;
 
-	public DeferredObjectRegistry(String modId)
-	{
+	public DeferredObjectRegistry(String modId) {
 		this.modId = modId;
-		fluidRegistry = new DeferredDeferredRegister<>(ForgeRegistries.FLUIDS, modId);
-		blockEntityRegistry = new DeferredDeferredRegister<>(ForgeRegistries.BLOCK_ENTITIES, modId);
-		blockRegistry = new DeferredDeferredRegister<>(ForgeRegistries.BLOCKS, modId);
-		itemRegistry = new DeferredDeferredRegister<>(ForgeRegistries.ITEMS, modId);
+		fluidRegistry = DeferredRegister.create(Registries.FLUID, modId);
+		blockEntityRegistry = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, modId);
+		blockRegistry = DeferredRegister.createBlocks(modId);
+		itemRegistry = DeferredRegister.createItems(modId);
+		entityRegistry = DeferredRegister.create(Registries.ENTITY_TYPE, modId);
 	}
 
-	public void register(IEventBus bus)
-	{
+	public void register(IEventBus bus) {
 		fluidRegistry.register(bus);
 		blockEntityRegistry.register(bus);
 		blockRegistry.register(bus);
 		itemRegistry.register(bus);
+		entityRegistry.register(bus);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <S extends Fluid, F extends Fluid, B extends Block, I extends Item> FluidObject<S, F, B, I> registerFluid(String name, String forgeName, BiFunction<Supplier<S>, Supplier<F>, Properties> fluidProperties, Function<Properties, S> still, Function<Properties, F> flowing, Function<Supplier<S>, B> block, Function<Supplier<S>, I> bucket)
-	{
+	public <S extends Source, F extends Flowing, B extends LiquidBlock, I extends Item> FluidObject<S, F, B, I> registerFluid(String name, String forgeName, BiFunction<Supplier<S>, Supplier<F>, Properties> fluidProperties, Function<Properties, S> still, Function<Properties, F> flowing, BiFunction<Supplier<S>, ResourceKey<Block>, B> block, BiFunction<Supplier<S>, ResourceKey<Item>, I> bucket) {
 		MutableSupplier<S> stillMutable = new MutableSupplier<>();
 		MutableSupplier<F> flowingMutable = new MutableSupplier<>();
 		Properties properties = fluidProperties.apply(stillMutable, flowingMutable);
-		Supplier<S> stillReg = fluidRegistry.register(name, () -> still.apply(properties));
+		DeferredHolder<Fluid, S> stillReg = fluidRegistry.register(name, () -> still.apply(properties));
 		stillMutable.set(stillReg);
-		Supplier<F> flowingReg = fluidRegistry.register(name + "_flowing", () -> flowing.apply(properties));
+		DeferredHolder<Fluid, F> flowingReg = fluidRegistry.register(name + "_flowing", () -> flowing.apply(properties));
 		flowingMutable.set(flowingReg);
-		Supplier<B> blockSup;
-		if (block != null)
-		{
-			blockSup = blockRegistry.register(name, () -> block.apply(stillReg));
-			properties.block((Supplier<? extends LiquidBlock>) blockSup);
-		}
-		else blockSup = (Supplier<B>) MutableSupplier.DEFAULT_BLOCK;
-		Supplier<I> bucketSup;
-		if (bucket != null)
-		{
-			bucketSup = itemRegistry.register(name + "_bucket", () -> bucket.apply(stillReg));
+		DeferredBlock<B> blockSup;
+		if (block != null) {
+			blockSup = RegistryUtil.registerBlock(blockRegistry, name, key -> block.apply(stillReg, key));
+			properties.block(blockSup);
+		} else blockSup = null;
+		DeferredItem<I> bucketSup;
+		if (bucket != null) {
+			bucketSup = RegistryUtil.registerItem(itemRegistry, name, key -> bucket.apply(stillReg, key));
 			properties.bucket(bucketSup);
-		}
-		else bucketSup = (Supplier<I>) MutableSupplier.DEFAULT_ITEM;
-		return new FluidObject<>(new ResourceLocation(modId, name), forgeName, stillReg, flowingReg, blockSup, bucketSup);
+		} else bucketSup = null;
+		return new FluidObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), forgeName, stillReg, flowingReg, blockSup, bucketSup);
 	}
 
-	public <S extends Fluid, F extends Fluid, B extends Block, I extends Item> FluidObject<S, F, B, I> registerFluid(String name, BiFunction<Supplier<S>, Supplier<F>, Properties> fluidProperties, Function<Properties, S> still, Function<Properties, F> flowing, Function<Supplier<S>, B> block, Function<Supplier<S>, I> bucket)
-	{
+	public <S extends Source, F extends Flowing, B extends LiquidBlock, I extends Item> FluidObject<S, F, B, I> registerFluid(String name, BiFunction<Supplier<S>, Supplier<F>, Properties> fluidProperties, Function<Properties, S> still, Function<Properties, F> flowing, BiFunction<Supplier<S>, ResourceKey<Block>, B> block, BiFunction<Supplier<S>, ResourceKey<Item>, I> bucket) {
 		return registerFluid(name, name, fluidProperties, still, flowing, block, bucket);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, BucketItem> registerFluid(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
-	{
+	public FluidObject<Source, Flowing, LiquidBlock, BucketItem> registerFluid(String name, String forgeName, Supplier<FluidType> fluidType, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties) {
 		return registerFluid(name, forgeName,
 				(still, flowing) -> {
-					Properties props = new Properties(still, flowing, attributes);
+					Properties props = new Properties(fluidType, still, flowing);
 					properties.accept(props);
 					return props;
 				},
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				(still) -> new LiquidBlock(still, blockProperties),
-				(still) -> new BucketItem(still, itemProperties)
+				Source::new, Flowing::new,
+				(still, id) -> new LiquidBlock(still.get(), blockProperties.setId(id)),
+				(still, id) -> new BucketItem(still.get(), itemProperties.setId(id))
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, BucketItem> registerFluid(String name, FluidAttributes.Builder attributes, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
-	{
-		return registerFluid(name, name, attributes, properties, blockProperties, itemProperties);
+	public FluidObject<Source, Flowing, LiquidBlock, BucketItem> registerFluid(String name, Supplier<FluidType> fluidType, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties) {
+		return registerFluid(name, name, fluidType, properties, blockProperties, itemProperties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, BucketItem> registerFluid(String name, String forgeName, FluidAttributes.Builder attributes, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
-	{
+	public FluidObject<Source, Flowing, LiquidBlock, BucketItem> registerFluid(String name, String forgeName, Supplier<FluidType> fluidType, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties) {
 		return registerFluid(name, forgeName,
-				(still, flowing) -> new Properties(still, flowing, attributes),
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				(still) -> new LiquidBlock(still, blockProperties),
-				(still) -> new BucketItem(still, itemProperties)
+				(still, flowing) -> new Properties(fluidType, still, flowing),
+				Source::new, Flowing::new,
+				(still, id) -> new LiquidBlock(still.get(), blockProperties.setId(id)),
+				(still, id) -> new BucketItem(still.get(), itemProperties.setId(id))
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, BucketItem> registerFluid(String name, FluidAttributes.Builder attributes, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
-	{
-		return registerFluid(name, name, attributes, blockProperties, itemProperties);
+	public FluidObject<Source, Flowing, LiquidBlock, BucketItem> registerFluid(String name, Supplier<FluidType> fluidType, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties) {
+		return registerFluid(name, name, fluidType, blockProperties, itemProperties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties)
-	{
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, String forgeName, Supplier<FluidType> fluidType, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties) {
 		return registerFluid(name, forgeName,
 				(still, flowing) -> {
-					Properties props = new Properties(still, flowing, attributes);
+					Properties props = new Properties(fluidType, still, flowing);
 					properties.accept(props);
 					return props;
 				},
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				(still) -> new LiquidBlock(still, blockProperties),
-				null
+				Source::new, Flowing::new,
+				(still, id) -> new LiquidBlock(still.get(), blockProperties.setId(id)),
+				(BiFunction<Supplier<Source>, ResourceKey<Item>, Item>) null
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, FluidAttributes.Builder attributes, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties)
-	{
-		return registerFluidNoBucket(name, name, attributes, properties, blockProperties);
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, Supplier<FluidType> fluidType, Consumer<Properties> properties, BlockBehaviour.Properties blockProperties) {
+		return registerFluidNoBucket(name, name, fluidType, properties, blockProperties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, String forgeName, FluidAttributes.Builder attributes, BlockBehaviour.Properties blockProperties)
-	{
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, String forgeName, Supplier<FluidType> fluidType, BlockBehaviour.Properties blockProperties) {
 		return registerFluid(name, forgeName,
-				(still, flowing) -> new Properties(still, flowing, attributes),
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				(still) -> new LiquidBlock(still, blockProperties),
-				null
+				(still, flowing) -> new Properties(fluidType, still, flowing),
+				Source::new, Flowing::new,
+				(still, id) -> new LiquidBlock(still.get(), blockProperties.setId(id)),
+				(BiFunction<Supplier<Source>, ResourceKey<Item>, Item>) null
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, FluidAttributes.Builder attributes, BlockBehaviour.Properties blockProperties)
-	{
-		return registerFluidNoBucket(name, name, attributes, blockProperties);
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBucket(String name, Supplier<FluidType> fluidType, BlockBehaviour.Properties blockProperties) {
+		return registerFluidNoBucket(name, name, fluidType, blockProperties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties, Item.Properties itemProperties)
-	{
+	public FluidObject<Source, Flowing, ?, BucketItem> registerFluidNoBlock(String name, String forgeName, Supplier<FluidType> fluidType, Consumer<Properties> properties, Item.Properties itemProperties) {
 		return registerFluid(name, forgeName,
 				(still, flowing) -> {
-					Properties props = new Properties(still, flowing, attributes);
+					Properties props = new Properties(fluidType, still, flowing);
 					properties.accept(props);
 					return props;
 				},
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				null,
-				(still) -> new BucketItem(still, itemProperties)
+				Source::new, Flowing::new,
+				(BiFunction<Supplier<Source>, ResourceKey<Block>, LiquidBlock>) null,
+				(still, id) -> new BucketItem(still.get(), itemProperties.setId(id))
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, FluidAttributes.Builder attributes, Consumer<Properties> properties, Item.Properties itemProperties)
-	{
-		return registerFluidNoBlock(name, name, attributes, properties, itemProperties);
+	public FluidObject<Source, Flowing, ?, BucketItem> registerFluidNoBlock(String name, Supplier<FluidType> fluidType, Consumer<Properties> properties, Item.Properties itemProperties) {
+		return registerFluidNoBlock(name, name, fluidType, properties, itemProperties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, String forgeName, FluidAttributes.Builder attributes, Item.Properties itemProperties)
-	{
+	public FluidObject<Source, Flowing, ?, BucketItem> registerFluidNoBlock(String name, String forgeName, Supplier<FluidType> fluidType, Item.Properties itemProperties) {
 		return registerFluid(name, forgeName,
-				(still, flowing) -> new Properties(still, flowing, attributes),
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				null,
-				(still) -> new BucketItem(still, itemProperties)
+				(still, flowing) -> new Properties(fluidType, still, flowing),
+				Source::new, Flowing::new,
+				(BiFunction<Supplier<Source>, ResourceKey<Block>, LiquidBlock>) null,
+				(still, id) -> new BucketItem(still.get(), itemProperties.setId(id))
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, ?, BucketItem> registerFluidNoBlock(String name, FluidAttributes.Builder attributes, Item.Properties itemProperties)
-	{
-		return registerFluidNoBlock(name, name, attributes, itemProperties);
+	public FluidObject<Source, Flowing, ?, BucketItem> registerFluidNoBlock(String name, Supplier<FluidType> fluidType, Item.Properties itemProperties) {
+		return registerFluidNoBlock(name, name, fluidType, itemProperties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, String forgeName, FluidAttributes.Builder attributes, Consumer<Properties> properties)
-	{
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBlockOrBucket(String name, String forgeName, Supplier<FluidType> fluidType, Consumer<Properties> properties) {
 		return registerFluid(name, forgeName,
 				(still, flowing) -> {
-					Properties props = new Properties(still, flowing, attributes);
+					Properties props = new Properties(fluidType, still, flowing);
 					properties.accept(props);
 					return props;
 				},
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				null,
-				null
+				Source::new, Flowing::new,
+				(BiFunction<Supplier<Source>, ResourceKey<Block>, LiquidBlock>) null,
+				(BiFunction<Supplier<Source>, ResourceKey<Item>, Item>) null
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, FluidAttributes.Builder attributes, Consumer<Properties> properties)
-	{
-		return registerFluidNoBlockOrBucket(name, name, attributes, properties);
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBlockOrBucket(String name, Supplier<FluidType> fluidType, Consumer<Properties> properties) {
+		return registerFluidNoBlockOrBucket(name, name, fluidType, properties);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, String forgeName, FluidAttributes.Builder attributes)
-	{
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBlockOrBucket(String name, String forgeName, Supplier<FluidType> fluidType) {
 		return registerFluid(name, forgeName,
-				(still, flowing) -> new Properties(still, flowing, attributes),
-				ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new,
-				null,
-				null
+				(still, flowing) -> new Properties(fluidType, still, flowing),
+				Source::new, Flowing::new,
+				(BiFunction<Supplier<Source>, ResourceKey<Block>, LiquidBlock>) null,
+				(BiFunction<Supplier<Source>, ResourceKey<Item>, Item>) null
 				);
 	}
 
-	public FluidObject<ForgeFlowingFluid.Source, ForgeFlowingFluid.Flowing, Block, Item> registerFluidNoBlockOrBucket(String name, FluidAttributes.Builder attributes)
-	{
-		return registerFluidNoBlockOrBucket(name, name, attributes);
+	public FluidObject<Source, Flowing, LiquidBlock, Item> registerFluidNoBlockOrBucket(String name, Supplier<FluidType> fluidType) {
+		return registerFluidNoBlockOrBucket(name, name, fluidType);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <E extends BlockEntity, B extends Block, I extends Item> BlockEntityObject<E, B, I> registerBlockEntity(String name, Supplier<B> block, Function<Supplier<B>, I> item, BlockEntitySupplier<E> blockEntity, Type<?> dataFixerType)
-	{
-		Supplier<B> blockReg = blockRegistry.register(name, block);
-		Supplier<I> itemSup;
-		if (item != null) itemSup = itemRegistry.register(name, () -> item.apply(blockReg));
-		else itemSup = (Supplier<I>) MutableSupplier.DEFAULT_ITEM;
-		Supplier<BlockEntityType<E>> blockEntityReg = blockEntityRegistry.register(name, () -> BlockEntityType.Builder.of(blockEntity, blockReg.get()).build(dataFixerType));
-		return new BlockEntityObject<>(new ResourceLocation(modId, name), blockEntityReg, blockReg, itemSup);
+	public <E extends BlockEntity, B extends Block, I extends Item> BlockEntityObject<E, B, I> registerBlockEntity(String name, Function<ResourceKey<Block>, B> block, BiFunction<Supplier<B>, ResourceKey<Item>, I> item, BlockEntitySupplier<E> blockEntity) {
+		DeferredBlock<B> blockReg = RegistryUtil.registerBlock(blockRegistry, name, block);
+		DeferredItem<I> itemSup;
+		if (item != null) itemSup = RegistryUtil.registerItem(itemRegistry, name, key -> item.apply(blockReg, key));
+		else itemSup = null;
+		DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> blockEntityReg = blockEntityRegistry.register(name, () -> new BlockEntityType<>(blockEntity, blockReg.get()));
+		return new BlockEntityObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), blockEntityReg, blockReg, itemSup);
 	}
 
-	public <E extends BlockEntity, B extends Block, I extends Item> BlockEntityObject<E, B, I> registerBlockEntity(String name, Supplier<B> block, Function<Supplier<B>, I> item, BlockEntitySupplier<E> blockEntity)
-	{
-		return registerBlockEntity(name, block, item, blockEntity, null);
+	public <E extends BlockEntity, B extends Block> BlockEntityObject<E, B, BlockItem> registerBlockEntity(String name, Function<ResourceKey<Block>, B> block, Item.Properties itemProperties, BlockEntitySupplier<E> blockEntity) {
+		return registerBlockEntity(name, block, (b, id) -> new BlockItem(b.get(), itemProperties.setId(id)), blockEntity);
 	}
 
-	public <E extends BlockEntity, B extends Block, I extends Item> BlockEntityObject<E, B, I> registerBlockEntityNoItem(String name, Supplier<B> block, BlockEntitySupplier<E> blockEntity, Type<?> dataFixerType)
-	{
-		return registerBlockEntity(name, block, null, blockEntity, dataFixerType);
+	public <E extends BlockEntity, B extends Block> BlockEntityObject<E, B, BlockItem> registerBlockEntity(String name, Function<ResourceKey<Block>, B> block, BlockEntitySupplier<E> blockEntity) {
+		return registerBlockEntity(name, block, new Item.Properties(), blockEntity);
 	}
 
-	public <E extends BlockEntity, B extends Block, I extends Item> BlockEntityObject<E, B, I> registerBlockEntityNoItem(String name, Supplier<B> block, BlockEntitySupplier<E> blockEntity)
-	{
-		return registerBlockEntityNoItem(name, block, blockEntity, null);
+	public <E extends BlockEntity, B extends Block, I extends Item> BlockEntityObject<E, B, I> registerBlockEntityNoItem(String name, Function<ResourceKey<Block>, B> block, BlockEntitySupplier<E> blockEntity) {
+		return registerBlockEntity(name, block, (BiFunction<Supplier<B>, ResourceKey<Item>, I>) null, blockEntity);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <B extends Block, I extends Item> BlockObject<B, I> registerBlock(String name, Supplier<B> block, Function<Supplier<B>, I> item)
-	{
-		Supplier<B> blockReg = blockRegistry.register(name, block);
-		Supplier<I> itemSup;
-		if (item != null) itemSup = itemRegistry.register(name, () -> item.apply(blockReg));
-		else itemSup = (Supplier<I>) MutableSupplier.DEFAULT_ITEM;
-		return new BlockObject<>(new ResourceLocation(modId, name), blockReg, itemSup);
+	public <B extends Block, I extends Item> BlockObject<B, I> registerBlock(String name, Function<ResourceKey<Block>, B> block, BiFunction<Supplier<B>, ResourceKey<Item>, I> item) {
+		DeferredBlock<B> blockReg = RegistryUtil.registerBlock(blockRegistry, name, block);
+		DeferredItem<I> itemSup;
+		if (item != null) itemSup = RegistryUtil.registerItem(itemRegistry, name, key -> item.apply(blockReg, key));
+		else itemSup = null;
+		return new BlockObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), blockReg, itemSup);
 	}
 
-	public <B extends Block> BlockObject<B, BlockItem> registerBlock(String name, Supplier<B> block, Item.Properties itemProperties)
-	{
-		return registerBlock(name, block, (b) -> new BlockItem(b.get(), itemProperties));
+	public <B extends Block> BlockObject<B, BlockItem> registerBlock(String name, Function<ResourceKey<Block>, B> block, Item.Properties itemProperties) {
+		return registerBlock(name, block, (b, id) -> new BlockItem(b.get(), itemProperties.setId(id)));
 	}
 
-	public <I extends Item> BlockObject<Block, I> registerBlock(String name, BlockBehaviour.Properties blockProperties, Function<Supplier<Block>, I> item)
-	{
-		return registerBlock(name, () -> new Block(blockProperties), item);
+	public <B extends Block> BlockObject<B, BlockItem> registerBlock(String name, Function<ResourceKey<Block>, B> block, int stackSize) {
+		return registerBlock(name, block, new Item.Properties().stacksTo(stackSize));
 	}
 
-	public BlockObject<Block, BlockItem> registerBlock(String name, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties)
-	{
-		return registerBlock(name, () -> new Block(blockProperties), (b) -> new BlockItem(b.get(), itemProperties));
+	public <B extends Block> BlockObject<B, BlockItem> registerBlock(String name, Function<ResourceKey<Block>, B> block) {
+		return registerBlock(name, block, 64);
 	}
 
-	public <B extends Block> BlockObject<B, Item> registerBlockNoItem(String name, Supplier<B> block)
-	{
-		return registerBlock(name, block, (Function<Supplier<B>, Item>) null);
+	public <I extends Item> BlockObject<Block, I> registerBlock(String name, BlockBehaviour.Properties blockProperties, BiFunction<Supplier<Block>, ResourceKey<Item>, I> item) {
+		return registerBlock(name, id -> new Block(blockProperties.setId(id)), item);
 	}
 
-	public BlockObject<Block, Item> registerBlockNoItem(String name, BlockBehaviour.Properties blockProperties)
-	{
-		return registerBlockNoItem(name, () -> new Block(blockProperties));
+	public BlockObject<Block, BlockItem> registerBlock(String name, BlockBehaviour.Properties blockProperties, Item.Properties itemProperties) {
+		return registerBlock(name, id -> new Block(blockProperties.setId(id)), (b, id) -> new BlockItem(b.get(), itemProperties.setId(id)));
 	}
 
-	public <I extends Item> ItemObject<I> registerItem(String name, Supplier<I> item)
-	{
-		return new ItemObject<>(new ResourceLocation(modId, name), itemRegistry.register(name, item));
+	public BlockObject<Block, BlockItem> registerBlock(String name, BlockBehaviour.Properties blockProperties, int stackSize) {
+		return registerBlock(name, blockProperties, new Item.Properties().stacksTo(stackSize));
 	}
 
-	public  ItemObject<Item> registerItem(String name, Item.Properties itemProperties)
-	{
-		return registerItem(name, () -> new Item(itemProperties));
+	public BlockObject<Block, BlockItem> registerBlock(String name, BlockBehaviour.Properties blockProperties) {
+		return registerBlock(name, blockProperties, 64);
+	}
+
+	public <B extends Block> BlockObject<B, Item> registerBlockNoItem(String name, Function<ResourceKey<Block>, B> block) {
+		return registerBlock(name, block, (BiFunction<Supplier<B>, ResourceKey<Item>, Item>) null);
+	}
+
+	public BlockObject<Block, Item> registerBlockNoItem(String name, BlockBehaviour.Properties blockProperties) {
+		return registerBlockNoItem(name, id -> new Block(blockProperties.setId(id)));
+	}
+
+	public <I extends Item> ItemObject<I> registerItem(String name, Function<ResourceKey<Item>, I> item) {
+		DeferredItem<I> itemSup = RegistryUtil.registerItem(itemRegistry, name, item);
+		return new ItemObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), itemSup);
+	}
+
+	public <I extends Item> ItemObject<I> registerBasicItem(String name, Function<Item.Properties, I> item, int stackSize) {
+		return registerItem(name, id -> item.apply(new Item.Properties().stacksTo(stackSize).setId(id)));
+	}
+
+	public <I extends Item> ItemObject<I> registerBasicItem(String name, Function<Item.Properties, I> item) {
+		return registerBasicItem(name, item, 64);
+	}
+
+	public  ItemObject<Item> registerItem(String name, Item.Properties itemProperties) {
+		return registerItem(name, id -> new Item(itemProperties.setId(id)));
+	}
+
+	public  ItemObject<Item> registerItem(String name) {
+		return registerItem(name, new Item.Properties());
 	}
 }

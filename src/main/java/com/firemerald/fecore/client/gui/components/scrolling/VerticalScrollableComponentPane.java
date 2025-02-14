@@ -1,15 +1,14 @@
 package com.firemerald.fecore.client.gui.components.scrolling;
 
 import com.firemerald.fecore.client.gui.components.ComponentPane;
-import com.firemerald.fecore.client.gui.components.IInteractableComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.GuiGraphics;
 
 public class VerticalScrollableComponentPane extends ComponentPane implements IVerticalScrollable
 {
-	public double height = 0;
+	public int height = 0;
 	protected double scrollY = 0;
-	protected double scrollSizeY = 0;
-	public double h = 0;
+	protected int scrollSizeY = 0;
 	public VerticalScrollBar verticalScrollBar = null;
 
 	public VerticalScrollableComponentPane(int x1, int y1, int x2, int y2)
@@ -33,7 +32,6 @@ public class VerticalScrollableComponentPane extends ComponentPane implements IV
 	public void setSize(int x1, int y1, int x2, int y2)
 	{
 		super.setSize(x1, y1, x2, y2);
-		h = y2 - y1;
 		updateScrollSize();
 	}
 
@@ -47,18 +45,18 @@ public class VerticalScrollableComponentPane extends ComponentPane implements IV
 
 	public void updateScrollSize()
 	{
-		scrollSizeY = height - h;
+		scrollSizeY = height - getHeight();
 		if (scrollSizeY < 0) scrollY = scrollSizeY = 0;
 		else if (scrollY > scrollSizeY) scrollY = scrollSizeY;
 		if (verticalScrollBar != null) verticalScrollBar.setMaxScroll();
 	}
 
 	@Override
-	public void preRender(PoseStack pose)
+	public void preRender(GuiGraphics guiGraphics)
 	{
-		this.setScissor(margin, margin, (x2 - x1) - (margin << 1), (y2 - y1) - (margin << 1));
-		pose.pushPose();
-		pose.translate(ex1, ey1 - scrollY, 0);
+		guiGraphics.enableScissor(ex1, ey1, ex2, ey2);
+		guiGraphics.pose().pushPose();
+		guiGraphics.pose().translate(ex1, ey1 - scrollY, 0);
 	}
 
 	@Override
@@ -68,19 +66,19 @@ public class VerticalScrollableComponentPane extends ComponentPane implements IV
 	}
 
 	@Override
-	public double getHeight()
+	public int getHeight()
 	{
-		return h;
+		return super.getHeight();
 	}
 
 	@Override
-	public double getFullHeight()
+	public int getFullHeight()
 	{
 		return height;
 	}
 
 	@Override
-	public double getMaxVerticalScroll()
+	public int getMaxVerticalScroll()
 	{
 		return scrollSizeY;
 	}
@@ -98,9 +96,9 @@ public class VerticalScrollableComponentPane extends ComponentPane implements IV
 	}
 
 	@Override
-	public int getComponentOffsetY()
+	public int getHolderOffsetY()
 	{
-		return super.getComponentOffsetY() - (int) Math.floor(scrollY);
+		return super.getHolderOffsetY() - (int) Math.floor(scrollY);
 	}
 
 	@Override
@@ -110,11 +108,9 @@ public class VerticalScrollableComponentPane extends ComponentPane implements IV
 	}
 
 	@Override
-	public void ensureInView(IInteractableComponent component)
+	public void ensureInView(int minX, int minY, int maxX, int maxY)
 	{
-		//double prevScrollX = scrollX, prevScrollY = scrollY;
-		if (component.getY2() > h + scrollY) scrollY = component.getY2() - h;
-		if (component.getY1() < scrollY) scrollY = component.getY1();
-		//if (prevScrollX != scrollX || prevScrollY != scrollY)
+		if (minY < scrollY) scrollY = minY;
+		else if (maxY > getHeight() + scrollY) scrollY = maxY - getHeight();
 	}
 }

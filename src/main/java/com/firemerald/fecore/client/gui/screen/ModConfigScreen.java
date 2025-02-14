@@ -1,19 +1,18 @@
 package com.firemerald.fecore.client.gui.screen;
 
-import com.firemerald.fecore.client.ConfigClient;
-import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.EnumTextAlignment;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.firemerald.fecore.config.ClientConfig;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ModConfigScreen extends BetterScreen
@@ -26,12 +25,11 @@ public class ModConfigScreen extends BetterScreen
 	@SuppressWarnings("resource")
 	public ModConfigScreen(Screen previous)
 	{
-		super(new TranslatableComponent("fecore.configgui"));
+		super(Component.translatable("fecore.configgui"));
 		this.previous = previous;
-		this.scrollSensitivityLabel = new FloatingText(0, 0, 100, 20, Minecraft.getInstance().font, Translator.translate("fecore.configgui.scrollSensitivity"), EnumTextAlignment.RIGHT);
-		ConfigClient clientConfig = ConfigClient.instance();
-		this.scrollSensitivity = new DoubleField(Minecraft.getInstance().font, 100, 0, 100, 20, clientConfig.scrollSensitivity.get(), 0, Double.POSITIVE_INFINITY, new TextComponent("Scrolling sensitivity"), clientConfig.scrollSensitivity::set);
-		this.done = new Button(50, 20, 100, 20, new TranslatableComponent("fecore.gui.done"), this::onClose);
+		this.scrollSensitivityLabel = new FloatingText(0, 0, 100, 20, Minecraft.getInstance().font, I18n.get("fecore.configgui.scrollSensitivity"), EnumTextAlignment.RIGHT);
+		this.scrollSensitivity = new DoubleField(Minecraft.getInstance().font, 100, 0, 100, 20, ClientConfig.SCROLL_SENSITIVITY.get(), 0, Double.POSITIVE_INFINITY, Component.literal("Scrolling sensitivity"), ClientConfig.SCROLL_SENSITIVITY::set);
+		this.done = new Button(50, 20, 100, 20, Component.translatable("fecore.gui.done"), this::onClose);
 	}
 
     @Override
@@ -54,9 +52,9 @@ public class ModConfigScreen extends BetterScreen
     }
 
 	@Override
-	public void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover)
+	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTick, boolean canHover)
 	{
-		this.renderBackground(pose);
-		super.render(pose, mx, my, partialTick, canHover);
+		this.renderBackground(guiGraphics, mx, my, partialTick);
+		super.render(guiGraphics, mx, my, partialTick, canHover);
 	}
 }

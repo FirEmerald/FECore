@@ -4,12 +4,10 @@ import javax.annotation.Nullable;
 
 import com.firemerald.fecore.client.gui.IBetterRenderer;
 import com.firemerald.fecore.client.gui.IBetterScreen;
-import com.firemerald.fecore.client.gui.ScissorUtil;
 import com.firemerald.fecore.client.gui.components.IComponent;
-import com.firemerald.fecore.client.gui.components.IInteractableComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -25,21 +23,19 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 	}
 
 	@Override
-	public void render(PoseStack pose, int mx, int my, float partialTick)
+	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTick)
 	{
-		render(pose, mx, my, partialTick, true);
+		render(guiGraphics, mx, my, partialTick, true);
 	}
 
 	@Override
-	public void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover)
+	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTick, boolean canHover)
 	{
-		ScissorUtil.clearScissor();
-		for (Widget widget : this.renderables)
+		for (Renderable renderable : this.renderables)
 		{
-			if (widget instanceof IBetterRenderer) ((IBetterRenderer) widget).render(pose, mx, my, partialTick, canHover);
-			else widget.render(pose, mx, my, partialTick);
+			if (renderable instanceof IBetterRenderer betterRenderable) betterRenderable.render(guiGraphics, mx, my, partialTick, canHover);
+			else renderable.render(guiGraphics, mx, my, partialTick);
 		}
-		ScissorUtil.clearScissor();
 	}
 
 	@Override
@@ -51,30 +47,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 	}
 
 	@Override
-	public boolean mouseClicked(double mx, double my, int button)
-	{
-		if (!super.mouseClicked(mx, my, button))
-		{
-			setFocused(null);
-			return false;
-		}
-		else return true;
-	}
-
-	@Override
-	public void setFocused(@Nullable GuiEventListener focused)
-	{
-		GuiEventListener old = this.getFocused();
-		if (old != focused)
-		{
-			if (old instanceof IInteractableComponent) ((IInteractableComponent) old).setIsFocused(false);
-			super.setFocused(focused);
-			if (focused instanceof IInteractableComponent) ((IInteractableComponent) focused).setIsFocused(true);
-		}
-	}
-
-	@Override
-	public <T extends GuiEventListener & Widget & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addRenderableWidgetBefore(T component, Widget beforeRenderable, U beforeWidget)
+	public <T extends GuiEventListener & Renderable & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addRenderableWidgetBefore(T component, Renderable beforeRenderable, U beforeWidget)
 	{
 		int index = renderables.indexOf(beforeRenderable);
 		if (index < 0) index = 0;
@@ -83,7 +56,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 	}
 
 	@Override
-	public <T extends Widget> T addRenderableOnlyBefore(T component, Widget before)
+	public <T extends Renderable> T addRenderableOnlyBefore(T component, Renderable before)
 	{
 		int index = renderables.indexOf(before);
 		if (index < 0) index = 0;
@@ -105,7 +78,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 	}
 
 	@Override
-	public <T extends GuiEventListener & Widget & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addRenderableWidgetAfter(T component, Widget afterRenderable, U afterWidget)
+	public <T extends GuiEventListener & Renderable & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addRenderableWidgetAfter(T component, Renderable afterRenderable, U afterWidget)
 	{
 		int index = renderables.lastIndexOf(afterRenderable);
 		if (index < 0) index = renderables.size();
@@ -115,7 +88,7 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 	}
 
 	@Override
-	public <T extends Widget> T addRenderableOnlyAfter(T component, Widget after)
+	public <T extends Renderable> T addRenderableOnlyAfter(T component, Renderable after)
 	{
 		int index = renderables.lastIndexOf(after);
 		if (index < 0) index = renderables.size();
@@ -138,4 +111,9 @@ public abstract class BetterContainerScreen<E extends AbstractContainerMenu> ext
 		narratables.add(index, component);
 		return component;
 	}
+
+    @Override
+    public void setFocused(@Nullable GuiEventListener listener) {
+    	if (listener != this.getFocused()) super.setFocused(listener);
+    }
 }

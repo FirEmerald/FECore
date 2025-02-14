@@ -1,12 +1,9 @@
 package com.firemerald.fecore.client.gui.components;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.client.gui.screen.SelectorPopupScreen;
-
-import net.minecraft.network.chat.TextComponent;
 
 public class ButtonShape extends Button
 {
@@ -14,35 +11,34 @@ public class ButtonShape extends Button
 
 	public ButtonShape(int x, int y, BoundingShape shape, Consumer<BoundingShape> setShape)
 	{
-		super(x, y, new TextComponent(shape.getLocalizedName()), null);
-		this.shape = shape;
-		this.setAction(() -> {
-			List<BoundingShape> allShapes = BoundingShape.getShapeList(this.shape);
-			BoundingShape[] values = allShapes.toArray(new BoundingShape[allShapes.size()]);
-			new SelectorPopupScreen(this, values, (index, value) -> {
-				setShape(shape);
-				setShape.accept(this.shape = shape);
-			}, (value, size, action) -> new Button(size.x, size.y, size.width, size.height, new TextComponent(value.getLocalizedName()), action)).activate();
-		});
+		this(x, y, 200, 20, shape, setShape);
 	}
 
 	public ButtonShape(int x, int y, int w, int h, BoundingShape shape, Consumer<BoundingShape> setShape)
 	{
-		super(x, y, w, h, new TextComponent(shape.getLocalizedName()), null);
+		super(x, y, w, h, getShapeName(shape), null);
 		this.shape = shape;
 		this.setAction(() -> {
-			List<BoundingShape> allShapes = BoundingShape.getShapeList(this.shape);
-			BoundingShape[] values = allShapes.toArray(new BoundingShape[allShapes.size()]);
+			BoundingShape[] values = BoundingShape.getShapeDefinitions().map(def -> {
+				if (def == this.shape.definition()) return this.shape;
+				else return def.newShape();
+			}).toArray(BoundingShape[]::new);
 			new SelectorPopupScreen(this, values, (index, value) -> {
-				setShape(value);
-				setShape.accept(value);
-			}, (value, size, action) -> new Button(size.x, size.y, size.width, size.height, new TextComponent(value.getLocalizedName()), action)).activate();
+				if (value != this.shape) {
+					value.getPropertiesFrom(this.shape);
+					setShape(value);
+					setShape.accept(value);
+				}
+			}, (value, size, action) -> new Button(size.x, size.y, size.width, size.height, getShapeName(value), action)).activate();
 		});
 	}
 
-	public void setShape(BoundingShape shape)
-	{
+	public static net.minecraft.network.chat.Component getShapeName(BoundingShape shape) {
+		return net.minecraft.network.chat.Component.literal(shape.getLocalizedName());
+	}
+
+	public void setShape(BoundingShape shape) {
 		this.shape = shape;
-		this.displayString = new TextComponent(shape.getLocalizedName());
+		this.displayString = getShapeName(shape);
 	}
 }

@@ -1,12 +1,10 @@
 package com.firemerald.fecore.block;
 
-import com.firemerald.fecore.FECoreMod;
-import com.firemerald.fecore.networking.client.BlockEntityGUIPacket;
+import com.firemerald.fecore.network.clientbound.BlockEntityGUIPacket;
 import com.firemerald.fecore.util.INetworkedGUIEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -22,27 +20,22 @@ public abstract class BlockEntityGUIBlock extends BaseEntityBlock
 		super(properties);
 	}
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public abstract boolean canOpenGUI(BlockState state, Level level, BlockPos blockPos, Player player, BlockHitResult hitResult);
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult hitResult)
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos blockPos, Player player, BlockHitResult hitResult)
     {
-    	if (!player.isCreative()) return InteractionResult.PASS;
-    	else
-    	{
+    	if (!canOpenGUI(state, level, blockPos, player, hitResult)) return InteractionResult.PASS;
+    	else {
     		BlockEntity blockEntity = level.getBlockEntity(blockPos);
-    		if (blockEntity instanceof INetworkedGUIEntity)
-    		{
-    			if (level.isClientSide)
-    	    	{
-    	    		return InteractionResult.SUCCESS;
-    	    	}
-    	    	else
-    	    	{
-    	    		if (player instanceof ServerPlayer) FECoreMod.NETWORK.sendTo(new BlockEntityGUIPacket(blockEntity), (ServerPlayer) player);
+    		if (blockEntity instanceof INetworkedGUIEntity) {
+    			if (level.isClientSide) return InteractionResult.SUCCESS;
+    	    	else {
+    	    		if (player instanceof ServerPlayer serverPlayer) new BlockEntityGUIPacket(blockEntity).sendToClient(serverPlayer);
     	    		return InteractionResult.CONSUME;
     	    	}
-    		}
-    		else return InteractionResult.FAIL;
+    		} else return InteractionResult.FAIL;
     	}
     }
 }

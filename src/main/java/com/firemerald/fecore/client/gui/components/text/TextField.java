@@ -2,9 +2,9 @@ package com.firemerald.fecore.client.gui.components.text;
 
 import com.firemerald.fecore.client.gui.IComponentHolder;
 import com.firemerald.fecore.client.gui.components.IInteractableComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 
@@ -18,37 +18,37 @@ public class TextField extends EditBox implements IInteractableComponent
     }
 
 	@Override
-	public void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover)
+	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTick, boolean canHover)
 	{
 		if (this.visible)
 		{
-			this.isHovered = canHover && mx >= this.x && my >= this.y && mx < this.x + this.width && my < this.y + this.height;
-			this.renderButton(pose, mx, my, partialTick);
+			this.isHovered = canHover && this.isMouseOver(mx, my);
+			this.renderWidget(guiGraphics, mx, my, partialTick);
 		}
 	}
 
 	@Override
 	public int getX1()
 	{
-		return x - 1;
+		return getX() - 1;
 	}
 
 	@Override
 	public int getY1()
 	{
-		return y - 1;
+		return getY() - 1;
 	}
 
 	@Override
 	public int getX2()
 	{
-		return x + width + 1;
+		return getX() + width + 1;
 	}
 
 	@Override
 	public int getY2()
 	{
-		return y + height + 1;
+		return getY() + height + 1;
 	}
 
 	@Override
@@ -65,21 +65,12 @@ public class TextField extends EditBox implements IInteractableComponent
 
 	public void setSize(int x1, int y1, int x2, int y2)
 	{
-		this.x = x1 + 1;
-		this.y = y1 + 1;
-		this.width = x2 - x1 - 2;
-		this.height = y2 - y1 - 2;
+		setRectangle(x2 - x1, y2 - y1, x1, y1);
 	}
 
 	@Override
 	public boolean isFocused()
 	{
 		return super.isFocused();
-	}
-
-	@Override
-	public void setIsFocused(boolean focused)
-	{
-		this.setFocused(focused);
 	}
 }

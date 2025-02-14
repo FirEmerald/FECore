@@ -1,10 +1,10 @@
 package com.firemerald.fecore.client.gui.components;
 
 import com.firemerald.fecore.client.gui.IComponentHolder;
-import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ComponentPane extends ComponentHolder
@@ -25,15 +25,15 @@ public class ComponentPane extends ComponentHolder
 	}
 
 	@Override
-	public int getComponentOffsetX()
+	public int getHolderOffsetX()
 	{
-		return super.getComponentOffsetX() + margin;
+		return super.getHolderOffsetX() + margin;
 	}
 
 	@Override
-	public int getComponentOffsetY()
+	public int getHolderOffsetY()
 	{
-		return super.getComponentOffsetY() + margin;
+		return super.getHolderOffsetY() + margin;
 	}
 
 	@Override
@@ -49,10 +49,10 @@ public class ComponentPane extends ComponentHolder
 	public void setMargin(int margin)
 	{
 		this.margin = margin;
-		ex1 = x1 + margin;
-		ey1 = y1 + margin;
-		ex2 = x2 - margin;
-		ey2 = y2 - margin;
+		ex1 = getX1() + margin;
+		ey1 = getY1() + margin;
+		ex2 = getX2() - margin;
+		ey2 = getY2() - margin;
 	}
 
 	@Override
@@ -62,11 +62,18 @@ public class ComponentPane extends ComponentHolder
 	}
 
 	@Override
-	public void preRender(PoseStack pose)
+	public void preRender(GuiGraphics guiGraphics)
 	{
-		//this.setScissor(margin, margin, (x2 - x1) - (margin << 1), (y2 - y1) - (margin << 1));
-		pose.pushPose();
-		pose.translate(ex1, ey1, 0);
+		guiGraphics.enableScissor(ex1, ey1, ex2, ey2);
+		guiGraphics.pose().pushPose();
+		guiGraphics.pose().translate(ex1, ey1, 0);
+	}
+
+	@Override
+	public void postRender(GuiGraphics guiGraphics)
+	{
+		guiGraphics.pose().popPose();
+		guiGraphics.disableScissor();
 	}
 
 	@Override

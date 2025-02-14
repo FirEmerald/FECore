@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 
 public class LabeledFloatField extends LabeledBetterTextField
 {
-	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, String label, Component message, FloatConsumer onChanged)
+	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, net.minecraft.network.chat.Component label, Component message, FloatConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -22,7 +22,7 @@ public class LabeledFloatField extends LabeledBetterTextField
 		});
 	}
 
-	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float min, float max, String label, Component message, FloatConsumer onChanged)
+	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float min, float max, net.minecraft.network.chat.Component label, Component message, FloatConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -42,7 +42,7 @@ public class LabeledFloatField extends LabeledBetterTextField
 		});
 	}
 
-	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, String label, Component message, FloatPredicate onChanged)
+	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, net.minecraft.network.chat.Component label, Component message, FloatPredicate onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -56,7 +56,7 @@ public class LabeledFloatField extends LabeledBetterTextField
 		});
 	}
 
-	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float val, String label, Component message, FloatConsumer onChanged)
+	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float val, net.minecraft.network.chat.Component label, Component message, FloatConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -72,7 +72,7 @@ public class LabeledFloatField extends LabeledBetterTextField
 		this.setFloat(val);
 	}
 
-	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float val, float min, float max, String label, Component message, FloatConsumer onChanged)
+	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float val, float min, float max, net.minecraft.network.chat.Component label, Component message, FloatConsumer onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try
@@ -93,7 +93,7 @@ public class LabeledFloatField extends LabeledBetterTextField
 		this.setFloat(val);
 	}
 
-	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float val, String label, Component message, FloatPredicate onChanged)
+	public LabeledFloatField(Font fontrendererObj, int x, int y, int w, int h, float val, net.minecraft.network.chat.Component label, Component message, FloatPredicate onChanged)
 	{
 		super(fontrendererObj, x, y, w, h, label, message, v -> {
 			try

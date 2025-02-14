@@ -6,34 +6,90 @@ import java.util.function.DoubleConsumer;
 
 import javax.annotation.Nullable;
 
-import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.IComponent;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
+import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.Util;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-public class BoundingShapeBoxPositions extends BoundingShapeBounded implements IRenderableBoundingShape, IConfigurableBoundingShape
+public class BoundingShapeBoxPositions extends BoundingShapeShaped implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
-	public boolean isRelative = true;
-	public double x1 = -10, y1 = -10, z1 = -10, x2 = 10, y2 = 10, z2 = 10;
+	public static final MapCodec<BoundingShapeBoxPositions> CODEC = RecordCodecBuilder.mapCodec(instance ->
+		instance.group(
+				Codec.DOUBLE.fieldOf("x1").forGetter(box -> box.x1),
+				Codec.DOUBLE.fieldOf("y1").forGetter(box -> box.y1),
+				Codec.DOUBLE.fieldOf("z1").forGetter(box -> box.z1),
+				Codec.DOUBLE.fieldOf("x2").forGetter(box -> box.x2),
+				Codec.DOUBLE.fieldOf("y2").forGetter(box -> box.y2),
+				Codec.DOUBLE.fieldOf("z2").forGetter(box -> box.z2),
+				Codec.BOOL.optionalFieldOf("isRelative", true).forGetter(box -> box.isRelative)
+				)
+		.apply(instance, BoundingShapeBoxPositions::new)
+	);
+	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeBoxPositions> STREAM_CODEC = StreamCodec.composite(
+			ByteBufCodecs.DOUBLE, box -> box.x1,
+			ByteBufCodecs.DOUBLE, box -> box.y1,
+			ByteBufCodecs.DOUBLE, box -> box.z1,
+			ByteBufCodecs.DOUBLE, box -> box.x2,
+			ByteBufCodecs.DOUBLE, box -> box.y2,
+			ByteBufCodecs.DOUBLE, box -> box.z2,
+			ByteBufCodecs.BOOL, box -> box.isRelative,
+			BoundingShapeBoxPositions::new
+			);
+
+	public double x1, y1, z1, x2, y2, z2;
+
+	public BoundingShapeBoxPositions(double x1, double y1, double z1, double x2, double y2, double z2, boolean isRelative) {
+		super(isRelative);
+		this.x1 = x1;
+		this.y1 = y1;
+		this.z1 = z1;
+		this.x2 = x2;
+		this.y2 = y2;
+		this.z2 = z2;
+	}
+
+	public BoundingShapeBoxPositions(double x1, double y1, double z1, double x2, double y2, double z2) {
+		this(x1, y1, z1, x2, y2, z2, true);
+	}
+
+	public BoundingShapeBoxPositions(AABB box, boolean isRelative) {
+		this(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, true);
+	}
+
+	public BoundingShapeBoxPositions(AABB box) {
+		this(box, true);
+	}
+
+	public BoundingShapeBoxPositions(boolean isRelative) {
+		this(-10, -10, -10, 10, 10, 10, isRelative);
+	}
+
+	public BoundingShapeBoxPositions() {
+		this(true);
+	}
 
 	@Override
 	public String getUnlocalizedName()
@@ -67,86 +123,9 @@ public class BoundingShapeBoxPositions extends BoundingShapeBounded implements I
 	}
 
 	@Override
-	public AABB getBounds(double testerX, double testerY, double testerZ)
+	public AABB getBoundsOffset(double x, double y, double z)
 	{
-		double x1, y1, z1, x2, y2, z2;
-		if (isRelative)
-		{
-			x1 = this.x1 + testerX;
-			y1 = this.y1 + testerY;
-			z1 = this.z1 + testerZ;
-			x2 = this.x2 + testerX;
-			y2 = this.y2 + testerY;
-			z2 = this.z2 + testerZ;
-		}
-		else
-		{
-			x1 = this.x1;
-			y1 = this.y1;
-			z1 = this.z1;
-			x2 = this.x2;
-			y2 = this.y2;
-			z2 = this.z2;
-		}
-		return new AABB(x1, y1, z1, x2, y2, z2);
-	}
-
-	@Override
-	public void saveToNBT(CompoundTag tag)
-	{
-		super.saveToNBT(tag);
-		tag.putBoolean("isRelative", isRelative);
-		tag.putDouble("x1", x1);
-		tag.putDouble("y1", y1);
-		tag.putDouble("z1", z1);
-		tag.putDouble("x2", x2);
-		tag.putDouble("y2", y2);
-		tag.putDouble("z2", z2);
-	}
-
-	@Override
-	public void loadFromNBT(CompoundTag tag)
-	{
-		super.loadFromNBT(tag);
-		isRelative = tag.getBoolean("isRelative");
-		if (tag.contains("x1", 99)) x1 = tag.getDouble("x1");
-		else x1 = -10;
-		if (tag.contains("y1", 99)) y1 = tag.getDouble("y1");
-		else y1 = -10;
-		if (tag.contains("z1", 99)) z1 = tag.getDouble("z1");
-		else z1 = -10;
-		if (tag.contains("x2", 99)) x2 = tag.getDouble("x2");
-		else x2 = 10;
-		if (tag.contains("y2", 99)) y2 = tag.getDouble("y2");
-		else y2 = 10;
-		if (tag.contains("z2", 99)) z2 = tag.getDouble("z2");
-		else z2 = 10;
-	}
-
-	@Override
-	public void saveToBuffer(FriendlyByteBuf buf)
-	{
-		super.saveToBuffer(buf);
-		buf.writeBoolean(isRelative);
-		buf.writeDouble(x1);
-		buf.writeDouble(y1);
-		buf.writeDouble(z1);
-		buf.writeDouble(x2);
-		buf.writeDouble(y2);
-		buf.writeDouble(z2);
-	}
-
-	@Override
-	public void loadFromBuffer(FriendlyByteBuf buf)
-	{
-		super.loadFromBuffer(buf);
-		isRelative = buf.readBoolean();
-		x1 = buf.readDouble();
-		y1 = buf.readDouble();
-		z1 = buf.readDouble();
-		x2 = buf.readDouble();
-		y2 = buf.readDouble();
-		z2 = buf.readDouble();
+		return new AABB(x1 + x, y1 + y, z1 + z, x2 + x, y2 + y, z2 + z);
 	}
 
 	@Override
@@ -154,53 +133,26 @@ public class BoundingShapeBoxPositions extends BoundingShapeBounded implements I
 	{
 		int offX = (width - 200) >> 1;
 		final DoubleField
-		posX1 = new DoubleField(font, offX, 20, 67, 20, x1, new TranslatableComponent("fecore.shapesgui.position.1.x"), (DoubleConsumer) (val -> x1 = val)),
-		posY1 = new DoubleField(font, offX + 67, 20, 66, 20, y1, new TranslatableComponent("fecore.shapesgui.position.1.y"), (DoubleConsumer) (val -> y1 = val)),
-		posZ1 = new DoubleField(font, offX + 133, 20, 67, 20, z1, new TranslatableComponent("fecore.shapesgui.position.1.z"), (DoubleConsumer) (val -> z1 = val)),
-		posX2 = new DoubleField(font, offX, 60, 67, 20, x2, new TranslatableComponent("fecore.shapesgui.position.2.x"), (DoubleConsumer) (val -> x2 = val)),
-		posY2 = new DoubleField(font, offX + 67, 60, 66, 20, y2, new TranslatableComponent("fecore.shapesgui.position.2.y"), (DoubleConsumer) (val -> y2 = val)),
-		posZ2 = new DoubleField(font, offX + 133, 60, 67, 20, z2, new TranslatableComponent("fecore.shapesgui.position.2.z"), (DoubleConsumer) (val -> z2 = val));
-		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, Translator.translate("fecore.shapesgui.position.1")));
-		addElement.accept(new Button(offX + 100, 0, 100, 20, new TranslatableComponent(isRelative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
-			if (isRelative)
-			{
-				isRelative = false;
-				x1 += pos.x;
-				y1 += pos.y;
-				z1 += pos.z;
-				x2 += pos.x;
-				y2 += pos.y;
-				z2 += pos.z;
-				posX1.setDouble(x1);
-				posY1.setDouble(y1);
-				posZ1.setDouble(z1);
-				posX2.setDouble(x2);
-				posY2.setDouble(y2);
-				posZ2.setDouble(z2);
-				button.displayString = new TranslatableComponent("fecore.shapesgui.operator.absolute");
-			}
-			else
-			{
-				isRelative = true;
-				x1 -= pos.x;
-				y1 -= pos.y;
-				z1 -= pos.z;
-				x2 -= pos.x;
-				y2 -= pos.y;
-				z2 -= pos.z;
-				posX1.setDouble(x1);
-				posY1.setDouble(y1);
-				posZ1.setDouble(z1);
-				posX2.setDouble(x2);
-				posY2.setDouble(y2);
-				posZ2.setDouble(z2);
-				button.displayString = new TranslatableComponent("fecore.shapesgui.operator.relative");
-			}
+		posX1 = new DoubleField(font, offX, 20, 67, 20, x1, Component.translatable("fecore.shapesgui.position.1.x"), (DoubleConsumer) (val -> x1 = val)),
+		posY1 = new DoubleField(font, offX + 67, 20, 66, 20, y1, Component.translatable("fecore.shapesgui.position.1.y"), (DoubleConsumer) (val -> y1 = val)),
+		posZ1 = new DoubleField(font, offX + 133, 20, 67, 20, z1, Component.translatable("fecore.shapesgui.position.1.z"), (DoubleConsumer) (val -> z1 = val)),
+		posX2 = new DoubleField(font, offX, 60, 67, 20, x2, Component.translatable("fecore.shapesgui.position.2.x"), (DoubleConsumer) (val -> x2 = val)),
+		posY2 = new DoubleField(font, offX + 67, 60, 66, 20, y2, Component.translatable("fecore.shapesgui.position.2.y"), (DoubleConsumer) (val -> y2 = val)),
+		posZ2 = new DoubleField(font, offX + 133, 60, 67, 20, z2, Component.translatable("fecore.shapesgui.position.2.z"), (DoubleConsumer) (val -> z2 = val));
+		addElement.accept(new FloatingText(offX, 0, offX + 100, 20, font, I18n.get("fecore.shapesgui.position.1")));
+		addElement.accept(new Button(offX + 100, 0, 100, 20, Component.translatable(isRelative ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute"), null).setAction(button -> () -> {
+			button.displayString = Component.translatable(toggleRelative(pos) ? "fecore.shapesgui.operator.relative" : "fecore.shapesgui.operator.absolute");
+			posX1.setDouble(x1);
+			posY1.setDouble(y1);
+			posZ1.setDouble(z1);
+			posX2.setDouble(x2);
+			posY2.setDouble(y2);
+			posZ2.setDouble(z2);
 		}));
 		addElement.accept(posX1);
 		addElement.accept(posY1);
 		addElement.accept(posZ1);
-		addElement.accept(new FloatingText(offX, 40, offX + 200, 60, font, Translator.translate("fecore.shapesgui.position.2")));
+		addElement.accept(new FloatingText(offX, 40, offX + 200, 60, font, I18n.get("fecore.shapesgui.position.2")));
 		addElement.accept(posX2);
 		addElement.accept(posY2);
 		addElement.accept(posZ2);
@@ -209,23 +161,13 @@ public class BoundingShapeBoxPositions extends BoundingShapeBounded implements I
 	@Override
 	public int addPosition(Player player, BlockPos blockPos, int num)
 	{
-		if (isRelative)
-		{
-			isRelative = false;
-			x1 += player.position().x;
-			y1 += player.position().y;
-			z1 += player.position().z;
-			x2 += player.position().x;
-			y2 += player.position().y;
-			z2 += player.position().z;
-		}
+		setRelative(false, player.position());
 		if (num == 0)
 		{
 			x1 = blockPos.getX() + .5;
 			y1 = blockPos.getY() + .5;
 			z1 = blockPos.getZ() + .5;
-			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.1.set", new Vec3(x1, y1, z1).toString()), Util.NIL_UUID);
-			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.2.selected"), Util.NIL_UUID);
+			sendMessage(player, Component.translatable("fecore.shapetool.position.2.selected"));
 			return 1;
 		}
 		else
@@ -233,8 +175,8 @@ public class BoundingShapeBoxPositions extends BoundingShapeBounded implements I
 			x2 = blockPos.getX() + .5;
 			y2 = blockPos.getY() + .5;
 			z2 = blockPos.getZ() + .5;
-			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.2.set", new Vec3(x2, y2, z2).toString()), Util.NIL_UUID);
-			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.1.selected"), Util.NIL_UUID);
+			sendMessage(player, Component.translatable("fecore.shapetool.position.2.set", new Vec3(x2, y2, z2).toString()));
+			sendMessage(player, Component.translatable("fecore.shapetool.position.1.selected"));
 			return 0;
 		}
 	}
@@ -244,48 +186,95 @@ public class BoundingShapeBoxPositions extends BoundingShapeBounded implements I
 	{
 		if (num == 0)
 		{
-			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.2.selected"), Util.NIL_UUID);
+			sendMessage(player, Component.translatable("fecore.shapetool.position.2.selected"));
 			return 1;
 		}
 		else
 		{
-			player.sendMessage(new TranslatableComponent("fecore.shapetool.position.1.selected"), Util.NIL_UUID);
+			sendMessage(player, Component.translatable("fecore.shapetool.position.1.selected"));
 			return 0;
 		}
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
+	public void addInformation(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
 	{
-		tooltip.add(new TranslatableComponent(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.position.1", new Vec3(x1, y1, z1)));
-		tooltip.add(new TranslatableComponent("fecore.shapetool.tooltip.position.2", new Vec3(x2, y2, z2)));
+		tooltipComponents.add(Component.translatable(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
+		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position.1", x1, y1, z1));
+		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position.2", x2, y2, z2));
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick)
+	public void renderIntoWorld(PoseStack pose, double x, double y, double z, DeltaTracker delta)
 	{
-		float x1, y1, z1, x2, y2, z2;
-		if (this.isRelative)
-		{
-			x1 = (float) (this.x1 + pos.x);
-			y1 = (float) (this.y1 + pos.y);
-			z1 = (float) (this.z1 + pos.z);
-			x2 = (float) (this.x2 + pos.x);
-			y2 = (float) (this.y2 + pos.y);
-			z2 = (float) (this.z2 + pos.z);
+		IRenderableBoundingShape.renderCube(pose.last().pose(), x1 + x, y1 + y, z1 + z, x2 + x, y2 + y, z2 + z, .5f, .5f, 1f, .5f);
+	}
+
+	@Override
+	public int hashCode() {
+		double sizeX = x2 - x1;
+		double sizeY = y2 - y1;
+		double sizeZ = z2 - z1;
+		return
+				((((int) x1   ) & 0b111111) << 00) | //x = 6 @ 0
+				((((int) y1   ) & 0b011111) << 06) | //y = 5 @ 6
+				((((int) z1   ) & 0b111111) << 11) | //z = 6 @ 11
+				((((int) sizeX) & 0b011111) << 17) | //sx = 5 @ 17
+				((((int) sizeY) & 0b011111) << 22) | //sy = 5 @ 22
+				((((int) sizeZ) & 0b011111) << 27);  //sz = 5 @ 27
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) return false;
+		else if (o == this) return true;
+		else if (o.getClass() != this.getClass()) return false;
+		else {
+			BoundingShapeBoxPositions box = (BoundingShapeBoxPositions) o;
+			return
+					box.isRelative == isRelative &&
+					box.x1 == x1 &&
+					box.y1 == y1 &&
+					box.z1 == z1 &&
+					box.x2 == x2 &&
+					box.y2 == y2 &&
+					box.z2 == z2;
 		}
-		else
-		{
-			x1 = (float) this.x1;
-			y1 = (float) this.y1;
-			z1 = (float) this.z1;
-			x2 = (float) this.x2;
-			y2 = (float) this.y2;
-			z2 = (float) this.z2;
+	}
+
+	@Override
+	public BoundingShapeBoxPositions clone() {
+		return new BoundingShapeBoxPositions(x1, y1, z1, x2, y2, z2, isRelative);
+	}
+
+	@Override
+	public BoundingShapeDefinition<BoundingShapeBoxPositions> definition() {
+		return FECoreBoundingShapes.BOX_POSITIONS.get();
+	}
+
+	@Override
+	public void getPropertiesFrom(BoundingShape other) {
+		if (other instanceof BoundingShapeShaped shaped) {
+			this.isRelative = shaped.isRelative;
+			AABB bounds = shaped.getLocalBounds();
+			this.x1 = bounds.minX;
+			this.y1 = bounds.minY;
+			this.z1 = bounds.minZ;
+			this.x2 = bounds.maxX;
+			this.y2 = bounds.maxY;
+			this.z2 = bounds.maxZ;
 		}
-		IRenderableBoundingShape.renderCube(pose.last().pose(), pose.last().normal(), x1, y1, z1, x2, y2, z2, .5f, .5f, 1f, .5f);
+	}
+
+	@Override
+	public void offset(double x, double y, double z) {
+		x1 += x;
+		y1 += y;
+		z1 += z;
+		x2 += x;
+		y2 += y;
+		z2 += z;
 	}
 }

@@ -1,15 +1,14 @@
 package com.firemerald.fecore.client.gui.components.scrolling;
 
 import com.firemerald.fecore.client.gui.components.ComponentPane;
-import com.firemerald.fecore.client.gui.components.IInteractableComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.GuiGraphics;
 
 public class FullyScrollableComponentPane extends ComponentPane implements IHorizontalScrollable, IVerticalScrollable
 {
-	public double width = 0, height = 0;
+	public int width = 0, height = 0;
 	protected double scrollX = 0, scrollY = 0;
-	protected double scrollSizeX = 0, scrollSizeY = 0;
-	public double w = 0, h = 0;
+	protected int scrollSizeX = 0, scrollSizeY = 0;
 	public HorizontalScrollBar horizontalScrollBar = null;
 	public VerticalScrollBar verticalScrollBar = null;
 
@@ -40,8 +39,6 @@ public class FullyScrollableComponentPane extends ComponentPane implements IHori
 	public void setSize(int x1, int y1, int x2, int y2)
 	{
 		super.setSize(x1, y1, x2, y2);
-		w = x2 - x1;
-		h = y2 - y1;
 		updateScrollSize();
 	}
 
@@ -58,22 +55,22 @@ public class FullyScrollableComponentPane extends ComponentPane implements IHori
 
 	public void updateScrollSize()
 	{
-		scrollSizeX = width - w;
+		scrollSizeX = width - getWidth();
 		if (scrollSizeX < 0) scrollX = scrollSizeX = 0;
 		else if (scrollX > scrollSizeX) scrollX = scrollSizeX;
 		if (horizontalScrollBar != null) horizontalScrollBar.setMaxScroll();
-		scrollSizeY = height - h;
+		scrollSizeY = height - getHeight();
 		if (scrollSizeY < 0) scrollY = scrollSizeY = 0;
 		else if (scrollY > scrollSizeY) scrollY = scrollSizeY;
 		if (verticalScrollBar != null) verticalScrollBar.setMaxScroll();
 	}
 
 	@Override
-	public void preRender(PoseStack pose)
+	public void preRender(GuiGraphics guiGraphics)
 	{
-		this.setScissor(margin, margin, (x2 - x1) - (margin << 1), (y2 - y1) - (margin << 1));
-		pose.pushPose();
-		pose.translate(ex1 - scrollX, ey1 - scrollY, 0);
+		guiGraphics.enableScissor(ex1, ey1, ex2, ey2);
+		guiGraphics.pose().pushPose();
+		guiGraphics.pose().translate(ex1 - scrollX, ey1 - scrollY, 0);
 	}
 
 	@Override
@@ -89,37 +86,35 @@ public class FullyScrollableComponentPane extends ComponentPane implements IHori
 	}
 
 	@Override
-	public double getWidth()
-	{
-		return w;
+	public int getHeight() {
+		return super.getHeight();
 	}
 
 	@Override
-	public double getHeight()
-	{
-		return h;
+	public int getWidth() {
+		return super.getWidth();
 	}
 
 	@Override
-	public double getFullWidth()
+	public int getFullWidth()
 	{
 		return width;
 	}
 
 	@Override
-	public double getFullHeight()
+	public int getFullHeight()
 	{
 		return height;
 	}
 
 	@Override
-	public double getMaxHorizontalScroll()
+	public int getMaxHorizontalScroll()
 	{
 		return scrollSizeX;
 	}
 
 	@Override
-	public double getMaxVerticalScroll()
+	public int getMaxVerticalScroll()
 	{
 		return scrollSizeY;
 	}
@@ -149,15 +144,15 @@ public class FullyScrollableComponentPane extends ComponentPane implements IHori
 	}
 
 	@Override
-	public int getComponentOffsetX()
+	public int getHolderOffsetX()
 	{
-		return super.getComponentOffsetX() - (int) Math.floor(scrollX);
+		return super.getHolderOffsetX() - (int) Math.floor(scrollX);
 	}
 
 	@Override
-	public int getComponentOffsetY()
+	public int getHolderOffsetY()
 	{
-		return super.getComponentOffsetY() - (int) Math.floor(scrollY);
+		return super.getHolderOffsetY() - (int) Math.floor(scrollY);
 	}
 
 	@Override
@@ -173,13 +168,11 @@ public class FullyScrollableComponentPane extends ComponentPane implements IHori
 	}
 
 	@Override
-	public void ensureInView(IInteractableComponent component)
+	public void ensureInView(int minX, int minY, int maxX, int maxY)
 	{
-		//double prevScrollX = scrollX, prevScrollY = scrollY;
-		if (component.getX2() > w + scrollX) scrollX = component.getX2() - w;
-		if (component.getX1() < scrollX) scrollX = component.getX1();
-		if (component.getY2() > h + scrollY) scrollY = component.getY2() - h;
-		if (component.getY1() < scrollY) scrollY = component.getY1();
-		//if (prevScrollX != scrollX || prevScrollY != scrollY)
+		if (minX < scrollX) scrollX = minX;
+		else if (maxX > getWidth() + scrollX) scrollX = maxX - getWidth();
+		if (minY < scrollY) scrollY = minY;
+		else if (maxY > getHeight() + scrollY) scrollY = maxY - getHeight();
 	}
 }

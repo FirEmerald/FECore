@@ -2,7 +2,17 @@ package com.firemerald.fecore.client.gui;
 
 public interface IComponentHolder
 {
-	public abstract int getComponentOffsetX();
+	public int getHolderOffsetX();
 
-	public abstract int getComponentOffsetY();
+	public int getHolderOffsetY();
+
+	public default double adjX(double x)
+	{
+		return x;
+	}
+
+	public default double adjY(double y)
+	{
+		return y;
+	}
 }

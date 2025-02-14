@@ -1,139 +1,52 @@
 package com.firemerald.fecore.boundingshapes;
 
-import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.tuple.Pair;
-
-import com.firemerald.fecore.client.Translator;
 import com.firemerald.fecore.client.gui.components.IComponent;
+import com.firemerald.fecore.init.FECoreRegistries;
+import com.mojang.serialization.Codec;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
-public abstract class BoundingShape
-{
-	private static final Map<String, Supplier<? extends BoundingShape>> SUPPLIERS = new LinkedHashMap<>();
-	private static final Map<Class<? extends BoundingShape>, String> CLASSES = new HashMap<>();
-	private static final List<Pair<Class<? extends BoundingShape>, Supplier<? extends BoundingShape>>> FORLIST = new ArrayList<>();
-	private static final List<Pair<Class<? extends BoundingShape>, Supplier<? extends BoundingShape>>> CONFIGURABLES = new ArrayList<>();
+public abstract class BoundingShape {
+    public static final Codec<BoundingShape> CODEC = FECoreRegistries.BOUNDING_SHAPE_DEFINITIONS.byNameCodec().dispatch("id", BoundingShape::definition, definition -> definition.codec);
+    public static final Codec<List<BoundingShape>> LIST_CODEC = CODEC.listOf();
+    public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShape> STREAM_CODEC = ByteBufCodecs.registry(FECoreRegistries.Keys.BOUNDING_SHAPE_DEFINITIONS).dispatch(BoundingShape::definition, definition -> definition.streamCodec);
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<BoundingShape>> STREAM_LIST_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
 
-	static
-	{
-		register("all", BoundingShapeAll.class, BoundingShapeAll::new);
-		registerConfigurable("boxOffsets", BoundingShapeBoxOffsets.class, BoundingShapeBoxOffsets::new, () -> {
-			BoundingShapeBoxOffsets box = new BoundingShapeBoxOffsets();
-			box.isRelative = false;
-			return box;
-		});
-		registerConfigurable("boxPositions", BoundingShapeBoxPositions.class, BoundingShapeBoxPositions::new, () -> {
-			BoundingShapeBoxPositions box = new BoundingShapeBoxPositions();
-			box.isRelative = false;
-			return box;
-		});
-		registerConfigurable("sphere", BoundingShapeSphere.class, BoundingShapeSphere::new, () -> {
-			BoundingShapeSphere sphere = new BoundingShapeSphere();
-			sphere.isRelative = false;
-			return sphere;
-		});
-		registerConfigurable("cylinder", BoundingShapeCylinder.class, BoundingShapeCylinder::new, () -> {
-			BoundingShapeCylinder cylinder = new BoundingShapeCylinder();
-			cylinder.isRelative = false;
-			return cylinder;
-		});
-		registerConfigurable("polygon", BoundingShapePolygon.class, BoundingShapePolygon::new, () -> {
-			BoundingShapePolygon polygon = new BoundingShapePolygon();
-			polygon.isRelative = false;
-			return polygon;
-		});
-		register("addition", BoundingShapeAddition.class, BoundingShapeAddition::new);
-		register("intersection", BoundingShapeIntersection.class, BoundingShapeIntersection::new);
-		register("inversion", BoundingShapeInversion.class, BoundingShapeInversion::new);
+    public static Stream<BoundingShapeDefinition<?>> getShapeDefinitions() {
+    	return FECoreRegistries.BOUNDING_SHAPE_DEFINITIONS.stream();
+    }
 
-	}
+    public static Stream<BoundingShapeDefinition<?>> getConfigurableShapeDefinitions() {
+    	return getShapeDefinitions().filter(def -> def.configurable);
+    }
 
-	private static <T extends BoundingShape> boolean register(String id, Class<T> clazz, Supplier<T> supplier)
-	{
-		if (SUPPLIERS.containsKey(id) || CLASSES.containsKey(clazz)) return false;
-		else
-		{
-			SUPPLIERS.put(id, supplier);
-			CLASSES.put(clazz, id);
-			FORLIST.add(Pair.of(clazz, supplier));
-			return true;
-		}
-	}
-
-	private static <T extends BoundingShape> boolean registerConfigurable(String id, Class<T> clazz, Supplier<T> supplier, Supplier<T> supplierConfigurable)
-	{
-		if (SUPPLIERS.containsKey(id) || CLASSES.containsKey(clazz)) return false;
-		else
-		{
-			SUPPLIERS.put(id, supplier);
-			CLASSES.put(clazz, id);
-			FORLIST.add(Pair.of(clazz, supplier));
-			CONFIGURABLES.add(Pair.of(clazz, supplier));
-			return true;
-		}
-	}
-
-	public static <T extends BoundingShape> boolean register(ResourceLocation id, Class<T> clazz, Supplier<T> supplier)
-	{
-		return register(id.getNamespace() + "." + id.getPath(), clazz, supplier);
-	}
-
-	public static <T extends BoundingShape> boolean registerConfigurable(ResourceLocation id, Class<T> clazz, Supplier<T> supplier, Supplier<T> supplierConfigurable)
-	{
-		return register(id.getNamespace() + "." + id.getPath(), clazz, supplier);
-	}
-
-	public static String getId(Class<? extends BoundingShape> clazz)
-	{
-		return CLASSES.get(clazz);
-	}
-
-	public static String getId(BoundingShape shape)
-	{
-		return getId(shape.getClass());
-	}
-
-	public static BoundingShape construct(String id)
-	{
-		Supplier<? extends BoundingShape> sup = SUPPLIERS.get(id);
-		return sup == null ? null : sup.get();
-	}
-
-	public static List<BoundingShape> getShapeList(BoundingShape existing)
-	{
-		return FORLIST.stream().map(pair -> (existing == null || existing.getClass() != pair.getLeft() ? pair.getRight().get() : existing)).collect(Collectors.toList());
-	}
-
-	public static List<BoundingShape> getConfigurableShapeList(BoundingShape existing)
-	{
-		return CONFIGURABLES.stream().map(pair -> (existing == null || existing.getClass() != pair.getLeft() ? pair.getRight().get() : existing)).collect(Collectors.toList());
-	}
-
+	// TODO make this always based on the key
 	public abstract String getUnlocalizedName();
 
 	@OnlyIn(Dist.CLIENT)
-	public String getLocalizedName()
-	{
-		return Translator.translate(getUnlocalizedName());
+	public String getLocalizedName() {
+		return I18n.get(getUnlocalizedName());
 	}
 
 	public abstract boolean isWithin(@Nullable Entity entity, double posX, double posY, double posZ, double testerX, double testerY, double testerZ);
@@ -142,71 +55,40 @@ public abstract class BoundingShape
 
 	public abstract <T extends Entity> Stream<T> getEntities(LevelAccessor level, EntityTypeTest<Entity, T> typeTest, Predicate<? super T> filter, double testerX, double testerY, double testerZ);
 
-	public <T extends Entity> Stream<T> getEntitiesOfClass(LevelAccessor level, Class<T> clazz, double testerX, double testerY, double testerZ)
-	{
+	public <T extends Entity> Stream<T> getEntitiesOfClass(LevelAccessor level, Class<T> clazz, double testerX, double testerY, double testerZ) {
 		return this.getEntitiesOfClass(level, clazz, EntitySelector.NO_SPECTATORS, testerX, testerY, testerZ);
 	}
 
-	public Stream<Entity> getEntities(LevelAccessor level, @Nullable Entity entity, double testerX, double testerY, double testerZ)
-	{
+	public Stream<Entity> getEntities(LevelAccessor level, @Nullable Entity entity, double testerX, double testerY, double testerZ) {
 		return this.getEntities(level, entity, EntitySelector.NO_SPECTATORS, testerX, testerY, testerZ);
 	}
 
-	public <T extends Entity> Stream<T> getEntitiesOfClass(LevelAccessor level, Class<T> clazz, Predicate<? super T> filter, double testerX, double testerY, double testerZ)
-	{
+	public <T extends Entity> Stream<T> getEntitiesOfClass(LevelAccessor level, Class<T> clazz, Predicate<? super T> filter, double testerX, double testerY, double testerZ) {
 		return this.getEntities(level, EntityTypeTest.forClass(clazz), filter, testerX, testerY, testerZ);
 	}
 
-	public void saveToNBT(CompoundTag tag)
-	{
-		tag.putString("id", BoundingShape.getId(this));
-	}
-
-	public static BoundingShape constructFromNBT(CompoundTag tag)
-	{
-		BoundingShape shape = BoundingShape.construct(tag.getString("id"));
-		if (shape == null) shape = new BoundingShapeSphere();
-		else shape.loadFromNBT(tag);
-		return shape;
-	}
-
-	public static BoundingShape constructFromNBTOptional(CompoundTag tag)
-	{
-		if (tag.contains("id", 8))
-		{
-			BoundingShape shape = BoundingShape.construct(tag.getString("id"));
-			if (shape != null)
-			{
-				shape.loadFromNBT(tag);
-				return shape;
-			}
-		}
-		return null;
-	}
-
-	public void loadFromNBT(CompoundTag tag) {}
-
-	public void saveToBuffer(FriendlyByteBuf buf)
-	{
-		buf.writeUtf(getId(this));
-	}
-
-	public static BoundingShape constructFromBuffer(FriendlyByteBuf buf)
-	{
-		BoundingShape shape = BoundingShape.construct(buf.readUtf());
-		shape.loadFromBuffer(buf);
-		return shape;
-	}
-
-	public void loadFromBuffer(FriendlyByteBuf buf) {}
+	@Override
+	public abstract BoundingShape clone();
 
 	@OnlyIn(Dist.CLIENT)
 	public abstract void addGuiElements(Vec3 pos, IShapeGui gui, Font font, Consumer<IComponent> addElement, int width);
 
-	public static BoundingShape copy(BoundingShape shape)
-	{
-		CompoundTag tag = new CompoundTag();
-		shape.saveToNBT(tag);
-		return constructFromNBT(tag);
+	public void sendMessage(Player player, Component message) {
+		if (player instanceof ServerPlayer serverPlayer) serverPlayer.sendSystemMessage(message);
 	}
+
+	public abstract BoundingShapeDefinition<? extends BoundingShape> definition();
+
+	@Override
+	public abstract int hashCode();
+
+	@Override
+	public abstract boolean equals(Object o);
+
+	public abstract void getPropertiesFrom(BoundingShape other);
+
+	//MAY OR MAY NOT RETURN A NEW SHAPE! ONLY GUARANTEES NO CHANGE TO THE CURRENT SHAPE!
+	public abstract BoundingShape asAbsolute(Vec3 testerPos);
+
+	public abstract boolean isAbsolute();
 }

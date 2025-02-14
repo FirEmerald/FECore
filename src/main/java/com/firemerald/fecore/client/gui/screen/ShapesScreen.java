@@ -7,39 +7,32 @@ import java.util.function.Consumer;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.firemerald.fecore.FECoreMod;
 import com.firemerald.fecore.boundingshapes.BoundingShape;
 import com.firemerald.fecore.boundingshapes.IShapeGui;
-import com.firemerald.fecore.capabilities.IShapeHolder;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.ButtonShape;
 import com.firemerald.fecore.client.gui.components.IComponent;
 import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollBar;
 import com.firemerald.fecore.client.gui.components.scrolling.VerticalScrollableComponentPane;
-import com.firemerald.fecore.networking.server.ShapeToolSetPacket;
+import com.firemerald.fecore.init.FECoreDataComponents;
+import com.firemerald.fecore.network.serverbound.ShapeToolSetPacket;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class ShapesScreen extends PopupScreen implements IShapeGui
-{
+public class ShapesScreen extends PopupScreen implements IShapeGui {
     public final Stack<Pair<BoundingShape, Consumer<BoundingShape>>> prevShapes = new Stack<>();
     public Consumer<BoundingShape> onAccept;
     public final ButtonShape currentShape;
-    public final ShapeToolButton fromToolMain, toToolMain, fromToolOffhand, toToolOffhand;
+    public final ShapeToolButton fromToolMain, toToolMain, toToolMainAbsolute, fromToolOffhand, toToolOffhand, toToolOffhandAbsolute;
     public final Button okay, cancel;
     public final VerticalScrollableComponentPane entityButtons;
     public final VerticalScrollBar entityButtonsScroll;
@@ -47,22 +40,20 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
     public final Vec3 pos;
     public final Player player;
 
-    public static class ShapeToolButton extends Button
-    {
+    public static class ShapeToolButton extends Button {
     	public final ShapesScreen gui;
     	public final Player player;
     	public final InteractionHand hand;
+    	private boolean enabled;
 
-    	public ShapeToolButton(int x, int y, Component buttonText, ShapesScreen gui, Player player, InteractionHand hand, Runnable onClick)
-    	{
+    	public ShapeToolButton(int x, int y, Component buttonText, ShapesScreen gui, Player player, InteractionHand hand, Runnable onClick) {
     		super(x, y, buttonText, onClick);
     		this.gui = gui;
     		this.player = player;
     		this.hand = hand;
     	}
 
-    	public ShapeToolButton(int x, int y, int widthIn, int heightIn, Component buttonText, ShapesScreen gui, Player player, InteractionHand hand, Runnable onClick)
-    	{
+    	public ShapeToolButton(int x, int y, int widthIn, int heightIn, Component buttonText, ShapesScreen gui, Player player, InteractionHand hand, Runnable onClick) {
     		super(x, y, widthIn, heightIn, buttonText, onClick);
     		this.gui = gui;
     		this.player = player;
@@ -70,63 +61,62 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
     	}
 
     	@Override
-    	public void tick()
-    	{
+    	public void tick() {
     		ItemStack held = player.getItemInHand(hand);
-			this.enabled = !held.isEmpty() && IShapeHolder.get(held).filter(holder -> holder.canAcceptShape(gui.currentShape.shape)).isPresent();
+			this.enabled = !held.isEmpty() && held.has(FECoreDataComponents.HELD_SHAPE);
+    	}
+
+    	@Override
+    	public boolean isActive() {
+    		return this.enabled;
     	}
     }
 
 	@SuppressWarnings("resource")
-	public ShapesScreen(Vec3 pos, BoundingShape shape, Consumer<BoundingShape> onAccept)
-	{
-		super(new TranslatableComponent("fecore.shapesgui"));
+	public ShapesScreen(Vec3 pos, BoundingShape shape, Consumer<BoundingShape> onAccept) {
+		super(Component.translatable("fecore.shapesgui"));
 		this.pos = pos;
 		this.font = Minecraft.getInstance().font;
 		this.onAccept = onAccept;
 		int y = 0;
 		if ((player = Minecraft.getInstance().player) != null)
 		{
-			y += 20;
-			y += 20;
-			currentShape = new ButtonShape(100, y, 200, 20, shape, (s) -> updateGuiButtonsList());
-			y -= 20;
-			addRenderableWidget(fromToolMain = new ShapeToolButton(0, 0, 200, 20, new TranslatableComponent("fecore.shapesgui.mainhand.from"), this, player, InteractionHand.MAIN_HAND, () -> {
+			currentShape = new ButtonShape(100, y + 40, 200, 20, shape, (s) -> updateGuiButtonsList());
+			addRenderableWidget(fromToolMain = new ShapeToolButton(0, 0, 100, 20, Component.translatable("fecore.shapesgui.mainhand.from"), this, player, InteractionHand.MAIN_HAND, () -> {
 	    		ItemStack held = player.getItemInHand(InteractionHand.MAIN_HAND);
-	    		if (!held.isEmpty())
+	    		if (!held.isEmpty() && held.has(FECoreDataComponents.HELD_SHAPE))
 	    		{
-	    			IShapeHolder.get(held).lazyMap(IShapeHolder::getShape).ifPresent(s -> {
-		    			this.currentShape.setShape(s);
-		    			this.updateGuiButtonsList();
-	    			});
+	    			this.currentShape.setShape(held.get(FECoreDataComponents.HELD_SHAPE));
+	    			this.updateGuiButtonsList();
 	    		}
 			}));
-			addRenderableWidget(fromToolOffhand = new ShapeToolButton(200, 0, 200, 20, new TranslatableComponent("fecore.shapesgui.offhand.from"), this, player, InteractionHand.OFF_HAND, () -> {
+			addRenderableWidget(toToolMain = new ShapeToolButton(100, 0, 100, 20, Component.translatable("fecore.shapesgui.mainhand.to"), this, player, InteractionHand.MAIN_HAND, () -> new ShapeToolSetPacket<>(InteractionHand.MAIN_HAND, this.currentShape.shape).sendToServer()));
+			addRenderableWidget(fromToolOffhand = new ShapeToolButton(200, 0, 100, 20, Component.translatable("fecore.shapesgui.offhand.from"), this, player, InteractionHand.OFF_HAND, () -> {
 	    		ItemStack held = player.getItemInHand(InteractionHand.OFF_HAND);
-	    		if (!held.isEmpty())
+	    		if (!held.isEmpty() && held.has(FECoreDataComponents.HELD_SHAPE))
 	    		{
-	    			IShapeHolder.get(held).lazyMap(IShapeHolder::getShape).ifPresent(s -> {
-		    			this.currentShape.setShape(s);
-		    			this.updateGuiButtonsList();
-	    			});
+	    			this.currentShape.setShape(held.get(FECoreDataComponents.HELD_SHAPE));
+	    			this.updateGuiButtonsList();
 	    		}
 			}));
+			addRenderableWidget(toToolOffhand = new ShapeToolButton(300, 0, 100, 20, Component.translatable("fecore.shapesgui.offhand.to"), this, player, InteractionHand.OFF_HAND, () -> new ShapeToolSetPacket<>(InteractionHand.OFF_HAND, this.currentShape.shape).sendToServer()));
 			y += 20;
-			addRenderableWidget(toToolMain = new ShapeToolButton(0, 0, 200, 20, new TranslatableComponent("fecore.shapesgui.mainhand.to"), this, player, InteractionHand.MAIN_HAND, () -> FECoreMod.NETWORK.sendToServer(new ShapeToolSetPacket(InteractionHand.MAIN_HAND, this.currentShape.shape))));
-			addRenderableWidget(toToolOffhand = new ShapeToolButton(200, 0, 200, 20, new TranslatableComponent("fecore.shapesgui.offhand.to"), this, player, InteractionHand.OFF_HAND, () -> FECoreMod.NETWORK.sendToServer(new ShapeToolSetPacket(InteractionHand.OFF_HAND, this.currentShape.shape))));
-			addRenderableWidget(currentShape);
+			addRenderableWidget(toToolMainAbsolute = new ShapeToolButton(0, 0, 200, 20, Component.translatable("fecore.shapesgui.mainhand.to_absolute"), this, player, InteractionHand.MAIN_HAND, () -> new ShapeToolSetPacket<>(InteractionHand.MAIN_HAND, this.currentShape.shape.asAbsolute(pos)).sendToServer()));
+			addRenderableWidget(toToolOffhandAbsolute = new ShapeToolButton(200, 0, 200, 20, Component.translatable("fecore.shapesgui.offhand.to_absolute"), this, player, InteractionHand.OFF_HAND, () -> new ShapeToolSetPacket<>(InteractionHand.OFF_HAND, this.currentShape.shape.asAbsolute(pos)).sendToServer()));
+			y += 20;
 		}
 		else
 		{
-			fromToolMain = fromToolOffhand = toToolMain = toToolOffhand = null;
-			addRenderableWidget(currentShape = new ButtonShape(100, y, 200, 20, shape, (s) -> updateGuiButtonsList()));
+			fromToolMain = fromToolOffhand = toToolMain = toToolOffhand = toToolMainAbsolute = toToolOffhandAbsolute = null;
+			currentShape = new ButtonShape(100, y, 200, 20, shape, (s) -> updateGuiButtonsList());
 		}
+		addRenderableWidget(currentShape);
 		y += 20;
 		addRenderableWidget(entityButtons = new VerticalScrollableComponentPane(0, y, 390, y + 100));
 		addRenderableWidget(entityButtonsScroll = new VerticalScrollBar(390, y, 400, y + 100, entityButtons));
 		entityButtons.setScrollBar(entityButtonsScroll);
 		y += 100;
-		addRenderableWidget(okay = new Button(0, y, 200, 20, new TranslatableComponent("fecore.gui.done"), () -> {
+		addRenderableWidget(okay = new Button(0, y, 200, 20, Component.translatable("fecore.gui.done"), () -> {
 			this.onAccept.accept(currentShape.shape);
 			if (prevShapes.isEmpty()) this.deactivate();
 			else
@@ -137,7 +127,7 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
 				updateGuiButtonsList();
 			}
 		}));
-		addRenderableWidget(cancel = new Button(200, y, 400, 20, new TranslatableComponent("fecore.gui.cancel"), () -> {
+		addRenderableWidget(cancel = new Button(200, y, 400, 20, Component.translatable("fecore.gui.cancel"), () -> {
 			if (prevShapes.isEmpty()) this.deactivate();
 			else
 			{
@@ -151,17 +141,18 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
 	}
 
 	@Override
-	public void init()
-	{
+	public void init() {
 		int offX = (width - 400) >> 1;
 		int y = 0;
-		if (fromToolMain != null)
+		if (player != null)
 		{
-			fromToolMain.setSize(offX, y, offX + 200, y + 20);
-			fromToolOffhand.setSize(offX + 200, y, offX + 400, y + 20);
+			fromToolMain.setSize(offX, y, offX + 100, y + 20);
+			toToolMain.setSize(offX + 100, y, offX + 200, y + 20);
+			fromToolOffhand.setSize(offX + 200, y, offX + 300, y + 20);
+			toToolOffhand.setSize(offX + 300, y, offX + 400, y + 20);
 			y += 20;
-			toToolMain.setSize(offX, y, offX + 200, y + 20);
-			toToolOffhand.setSize(offX + 200, y, offX + 400, y + 20);
+			toToolMainAbsolute.setSize(offX, y, offX + 200, y + 20);
+			toToolOffhandAbsolute.setSize(offX + 200, y, offX + 400, y + 20);
 			y += 20;
 		}
 		currentShape.setSize(offX + 95, y, offX + 295, y + 20);
@@ -173,15 +164,13 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
 		if (player != null)
 		{
 			addRenderableWidget(fromToolMain);
-			addRenderableWidget(fromToolOffhand);
 			addRenderableWidget(toToolMain);
+			addRenderableWidget(fromToolOffhand);
 			addRenderableWidget(toToolOffhand);
-			addRenderableWidget(currentShape);
+			addRenderableWidget(toToolMainAbsolute);
+			addRenderableWidget(toToolOffhandAbsolute);
 		}
-		else
-		{
-			addRenderableWidget(currentShape);
-		}
+		addRenderableWidget(currentShape);
 		addRenderableWidget(entityButtons);
 		addRenderableWidget(entityButtonsScroll);
 		addRenderableWidget(okay);
@@ -190,10 +179,8 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
 	}
 
 	@Override
-	public boolean keyPressed(int key, int scancode, int mods)
-    {
-        if (key == InputConstants.KEY_ESCAPE)
-        {
+	public boolean keyPressed(int key, int scancode, int mods) {
+        if (key == InputConstants.KEY_ESCAPE) {
         	cancel.onClick.run();
         	return true;
         }
@@ -201,48 +188,23 @@ public class ShapesScreen extends PopupScreen implements IShapeGui
     }
 
 	@Override
-	public boolean shouldCloseOnEsc()
-	{
+	public boolean shouldCloseOnEsc() {
 		return false;
 	}
 
 	@Override
-	public void updateGuiButtonsList()
-	{
+	public void updateGuiButtonsList() {
 		addedElements.forEach(entityButtons::removeComponent);
-		this.currentShape.shape.addGuiElements(pos, this, font, ((Consumer<IComponent>) entityButtons::addComponent).andThen(addedElements::add), entityButtons.x2 - entityButtons.x1);
+		this.currentShape.shape.addGuiElements(pos, this, font, ((Consumer<IComponent>) entityButtons::addComponent).andThen(addedElements::add), entityButtons.getWidth());
 		entityButtons.updateComponentSize();
 		entityButtons.updateScrollSize();
 	}
 
 	@Override
-	public void openShape(BoundingShape shape, Consumer<BoundingShape> onAccepted)
-	{
+	public void openShape(BoundingShape shape, Consumer<BoundingShape> onAccepted) {
 		this.prevShapes.push(Pair.of(this.currentShape.shape, this.onAccept));
 		this.onAccept = onAccepted;
 		this.currentShape.setShape(shape);
 		updateGuiButtonsList();
-	}
-
-	@Override
-	public void renderBackground(PoseStack pose, int mx, int my, float partialTicks, boolean canHover)
-	{
-        //this.fillGradient(pose, 0, 0, this.width, this.height, -1072689136, -804253680);
-
-		RenderSystem.setShader(GameRenderer::getPositionColorShader);
-		Matrix4f mat = pose.last().pose();
-		RenderSystem.disableTexture();
-		RenderSystem.enableBlend();
-		Tesselator t = Tesselator.getInstance();
-		BufferBuilder b = t.getBuilder();
-		b.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-		b.vertex(mat, 0    , height, 0).color(0, 0, 0, .5f).endVertex();
-		b.vertex(mat, width, height, 0).color(0, 0, 0, .5f).endVertex();
-		b.vertex(mat, width, 0     , 0).color(0, 0, 0, .5f).endVertex();
-		b.vertex(mat, 0    , 0     , 0).color(0, 0, 0, .5f).endVertex();
-		t.end();
-		RenderSystem.disableBlend();
-		RenderSystem.enableTexture();
-
 	}
 }

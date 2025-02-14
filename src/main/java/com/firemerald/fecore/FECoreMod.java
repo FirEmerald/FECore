@@ -1,75 +1,33 @@
 package com.firemerald.fecore;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.firemerald.fecore.capabilities.IShapeHolder;
-import com.firemerald.fecore.capabilities.IShapeTool;
-import com.firemerald.fecore.client.ConfigClient;
-import com.firemerald.fecore.client.gui.screen.ModConfigScreen;
-import com.firemerald.fecore.init.FECoreItems;
-import com.firemerald.fecore.init.registry.DeferredObjectRegistry;
-import com.firemerald.fecore.networking.SimpleNetwork;
-import com.firemerald.fecore.networking.client.BlockEntityGUIPacket;
-import com.firemerald.fecore.networking.client.EntityGUIPacket;
-import com.firemerald.fecore.networking.client.ShapeToolScreenPacket;
-import com.firemerald.fecore.networking.server.BlockEntityGUIClosedPacket;
-import com.firemerald.fecore.networking.server.EntityGUIClosedPacket;
-import com.firemerald.fecore.networking.server.ShapeToolClickedPacket;
-import com.firemerald.fecore.networking.server.ShapeToolSetPacket;
+import com.firemerald.fecore.config.ClientConfig;
+import com.firemerald.fecore.init.FECoreBoundingShapes;
+import com.firemerald.fecore.init.FECoreDataComponents;
+import com.firemerald.fecore.init.FECoreObjects;
+import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ConfigGuiHandler.ConfigGuiFactory;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 
 @Mod(FECoreMod.MOD_ID)
 public class FECoreMod
 {
-	public static final String MOD_ID = "fecore";
-    public static final Logger LOGGER = LoggerFactory.getLogger("FECore");
-    public static final SimpleNetwork NETWORK = new SimpleNetwork(new ResourceLocation(MOD_ID, "main"), "2");
+    public static final String MOD_ID = "fecore";
+    public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final DeferredObjectRegistry REGISTRY = new DeferredObjectRegistry(MOD_ID);
-
-    public FECoreMod()
-    {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerCaps);
-        new ConfigClient(ModLoadingContext.get());
-        FECoreItems.init();
-        if (FMLEnvironment.dist.isClient()) doClientStuff();
-        REGISTRY.register(FMLJavaModLoadingContext.get().getModEventBus());
+    public FECoreMod(IEventBus modEventBus, ModContainer modContainer) {
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+		FECoreObjects.init(modEventBus);
+		FECoreBoundingShapes.init(modEventBus);
+		FECoreDataComponents.init(modEventBus);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public void doClientStuff()
-    {
-    	ModLoadingContext.get().registerExtensionPoint(ConfigGuiFactory.class, () -> new ConfigGuiFactory((mc, prev) -> {
-    		return new ModConfigScreen(prev);
-    	}));
-    }
-
-    private void setup(final FMLCommonSetupEvent event)
-    {
-    	NETWORK.registerServerPacket(BlockEntityGUIClosedPacket.class, BlockEntityGUIClosedPacket::new);
-    	NETWORK.registerServerPacket(EntityGUIClosedPacket.class, EntityGUIClosedPacket::new);
-    	NETWORK.registerClientPacket(ShapeToolScreenPacket.class, ShapeToolScreenPacket::new);
-    	NETWORK.registerClientPacket(BlockEntityGUIPacket.class, BlockEntityGUIPacket::new);
-    	NETWORK.registerClientPacket(EntityGUIPacket.class, EntityGUIPacket::new);
-    	NETWORK.registerServerPacket(ShapeToolSetPacket.class, ShapeToolSetPacket::new);
-    	NETWORK.registerServerPacket(ShapeToolClickedPacket.class, ShapeToolClickedPacket::new);
-    }
-
-	public void registerCaps(RegisterCapabilitiesEvent event)
-	{
-		event.register(IShapeHolder.class);
-		event.register(IShapeTool.class);
+    public static ResourceLocation id(String name) {
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
 	}
 }

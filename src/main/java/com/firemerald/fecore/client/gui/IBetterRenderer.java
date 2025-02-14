@@ -1,16 +1,15 @@
 package com.firemerald.fecore.client.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 
-import net.minecraft.client.gui.components.Widget;
-
-public interface IBetterRenderer extends Widget
+public interface IBetterRenderer extends Renderable
 {
-	public abstract void render(PoseStack pose, int mx, int my, float partialTick, boolean canHover);
+	public abstract void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, boolean canHover);
 
 	@Override
-	public default void render(PoseStack pose, int mx, int my, float partialTick)
+    public default void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
 	{
-		render(pose, mx, my, partialTick, true);
+		render(guiGraphics, mouseX, mouseY, partialTick, true);
 	}
 }

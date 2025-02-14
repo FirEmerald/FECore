@@ -3,22 +3,24 @@ package com.firemerald.fecore.client.gui;
 import com.mojang.blaze3d.platform.GlStateManager.LogicOp;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.util.Mth;
+import net.minecraft.util.ARGB;
 
 public enum ButtonState
 {
-	NONE(new RGB(1, 1, 1), false),
-	INVERT(new RGB(1, 1, 1), true),
-	HOVER(new RGB(.75f, .75f, 1), false),
-	PUSH(new RGB(.75f, .75f, .75f), true),
-	DISABLED(new RGB(.5f, .5f, .5f), false);
+	NONE(1, 1, 1, false),
+	INVERT(1, 1, 1, true),
+	HOVER(.75f, .75f, 1, false),
+	PUSH(.75f, .75f, .75f, true),
+	DISABLED(.5f, .5f, .5f, false);
 
-	public final RGB color;
+	public final float r, g, b;
 	public final boolean invert;
 
-	ButtonState(RGB color, boolean invert)
+	ButtonState(float r, float g, float b, boolean invert)
 	{
-		this.color = color;
+		this.r = r;
+		this.g = g;
+		this.b = b;
 		this.invert = invert;
 	}
 
@@ -40,39 +42,27 @@ public enum ButtonState
 		}
 	}
 
-	public RGB getColor(RGB c)
+	public int getColor(int r, int g, int b)
 	{
-		return getColor(c.r(), c.g(), c.b());
+		return getColor(r, g, b, 255);
 	}
 
-	public RGB getColor(float r, float g, float b)
+	public int getColor(int r, int g, int b, int a)
 	{
 		return invert ?
-				new RGB((1 - r) * color.r(), (1 - g) * color.g(), (1 - b) * color.b()) :
-					new RGB(r * color.r(), g * color.g(), b * color.b());
+				ARGB.color(a, (int) ((1 - this.r) * r), (int) ((1 - this.g) * g), (int) ((1 - this.b) * b)) :
+					ARGB.color(a, (int) (this.r * r), (int) (this.g * g), (int) (this.b * b));
 	}
 
-	public int getColorInt(RGB c)
+	public int getColorFromFloat(float r, float g, float b)
 	{
-		return getColorInt(c.r(), c.g(), c.b());
+		return getColorFromFloat(r, g, b, 1);
 	}
 
-	public int getColorInt(float r, float g, float b)
+	public int getColorFromFloat(float r, float g, float b, float a)
 	{
 		return invert ?
-				((int) Mth.clamp((1 - r) * color.r() * 255, 0, 255) << 16) | ((int) Mth.clamp((1 - g) * color.g() * 255, 0, 255) << 8) | ((int) Mth.clamp((1 - b) * color.b() * 255, 0, 255)) :
-					((int) Mth.clamp(r * color.r() * 255, 0, 255) << 16) | ((int) Mth.clamp(g * color.g() * 255, 0, 255) << 8) | ((int) Mth.clamp(b * color.b() * 255, 0, 255));
-	}
-
-	public int getColorInt(RGB c, float a)
-	{
-		return getColorInt(c.r(), c.g(), c.b(), a);
-	}
-
-	public int getColorInt(float r, float g, float b, float a)
-	{
-		return ((int) Mth.clamp(a * 255, 0, 255) <<   24) | (invert ?
-				((int) Mth.clamp((1 - r) * color.r() * 255, 0, 255) << 16) | ((int) Mth.clamp((1 - g) * color.g() * 255, 0, 255) << 8) | ((int) Mth.clamp((1 - b) * color.b() * 255, 0, 255)) :
-					((int) Mth.clamp(r * color.r() * 255, 0, 255) << 16) | ((int) Mth.clamp(g * color.g() * 255, 0, 255) << 8) | ((int) Mth.clamp(b * color.b() * 255, 0, 255)));
+				ARGB.colorFromFloat(a, (1 - this.r) * r, (1 - this.g) * g, (1 - this.b) * b) :
+					ARGB.colorFromFloat(a, this.r * r, this.g * g, this.b * b);
 	}
 }

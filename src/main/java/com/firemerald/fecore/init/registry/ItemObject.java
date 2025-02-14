@@ -1,20 +1,20 @@
 package com.firemerald.fecore.init.registry;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.registries.DeferredItem;
 
 public class ItemObject<I extends Item> implements ItemLike
 {
 	public final ResourceLocation id;
-	public final Supplier<I> item;
+	public final DeferredItem<I> item;
 
-	public ItemObject(ResourceLocation id, Supplier<I> item)
+	public ItemObject(ResourceLocation id, DeferredItem<I> item)
 	{
 		this.id = id;
 		this.item = item;

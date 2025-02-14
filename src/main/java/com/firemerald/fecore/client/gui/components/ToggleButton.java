@@ -44,20 +44,13 @@ public class ToggleButton extends Button
     	return setToggleAction(onClickFunction.apply(this));
     }
 
-    /**
-     * Returns 0 if the button is disabled, 1 if the mouse is NOT hovering over this button and 2 if it IS hovering over
-     * this button.
-     */
     @Override
-	protected int getHoverState(boolean mouseOver)
-    {
-    	return this.state ? super.getHoverState(mouseOver) : !mouseOver && this.focused ? 2 : 0;
+    public boolean renderAsActive(boolean hovered) {
+    	return super.renderAsActive(hovered) && this.state;
     }
 
     @Override
-    public int getTextColor(boolean isHovered)
-    {
-    	return (this.state || !this.focused) ? super.getTextColor(isHovered) :
-    		isHovered ? 0xFFFFA0 : 0xA0A0A0;
+    public boolean renderTextAsActive(boolean hovered) {
+    	return super.renderAsActive(hovered) && (this.state || this.renderTextAsFocused(hovered));
     }
 }
