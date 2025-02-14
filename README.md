@@ -7,8 +7,9 @@ Core dependency for FirEmerald's mods moving into Minecraft 1.18.2 and beyond
 Features:  
  - easy networking code  
  - easy BlockEntity GUI handling  
- - more dynamic GUI (including nested components and horizontally scrolling panes!)  
+ - more dynamic GUI (including nested components)  
  - configurable bounding shapes  
- - XML-based data loading wrapper  
- - Primitive compatability module system  
- - weighted distributions  
+ - primitive compatability module system  
+ - weighted distributions
+ - extra codec options
+ - number-keyed psuedomaps (for improved lookup performance and immutability)
