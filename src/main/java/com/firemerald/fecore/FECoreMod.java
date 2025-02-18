@@ -31,8 +31,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(FECoreMod.MOD_ID)
-public class FECoreMod
-{
+public class FECoreMod {
     public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final SimpleNetwork NETWORK = new SimpleNetwork(id("main"), "3");
