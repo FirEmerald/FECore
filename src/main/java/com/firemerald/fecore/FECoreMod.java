@@ -15,8 +15,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 
 @Mod(FECoreMod.MOD_ID)
-public class FECoreMod
-{
+public class FECoreMod {
     public static final String MOD_ID = "fecore";
     public static final Logger LOGGER = LogUtils.getLogger();
 
