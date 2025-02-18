@@ -64,12 +64,12 @@ public enum HorizontalAlignment {
 			return containerWidth - offset;
 		}
 	};
-	
+
 	public abstract int getLeft(int containerWidth, int itemWidth, int offset);
-	
+
 	public abstract int getRight(int containerWidth, int itemWidth, int offset);
-	
+
 	public abstract double getLeft(double containerWidth, double itemWidth, double offset);
-	
+
 	public abstract double getRight(double containerWidth, double itemWidth, double offset);
 }
