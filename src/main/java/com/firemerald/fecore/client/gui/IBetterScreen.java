@@ -7,6 +7,8 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 
 public interface IBetterScreen extends IBetterRenderer, ContainerEventHandler
 {
+	public abstract boolean mouseScrolledX(double mx, double my, double scroll);
+
 	public abstract <T extends GuiEventListener & Renderable & NarratableEntry, U extends GuiEventListener & NarratableEntry> T addRenderableWidgetBefore(T component, Renderable beforeRenderable, U beforeWidget);
 
 	public default <T extends GuiEventListener & Renderable & NarratableEntry, U extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidgetBefore(T component, U before)

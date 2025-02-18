@@ -34,11 +34,11 @@ public class DistributionCodec<S> implements Codec<IDistribution<S>> {
 	@Override
 	public <T> DataResult<Pair<IDistribution<S>, T>> decode(DynamicOps<T> ops, T input) {
 		DataResult<Pair<S, T>> singletonUnweightedResult = singletonUnweightedCodec.decode(ops, input);
-		if (singletonUnweightedResult.isSuccess()) return Codecs.mapResult(singletonUnweightedResult, SingletonUnweightedDistribution::new);
+		if (Codecs.isSuccess(singletonUnweightedResult)) return Codecs.mapResult(singletonUnweightedResult, SingletonUnweightedDistribution::new);
 		DataResult<Pair<List<S>, T>> listResult = listCodec.decode(ops, input);
-		if (listResult.isSuccess()) return Codecs.mapResult(listResult, DistributionUtil::get);
+		if (Codecs.isSuccess(listResult)) return Codecs.mapResult(listResult, DistributionUtil::get);
 		DataResult<Pair<Map<S, Float>, T>> mapResult = mapCodec.decode(ops, input);
-		if (mapResult.isSuccess()) return Codecs.mapResult(mapResult, DistributionUtil::get);
+		if (Codecs.isSuccess(mapResult)) return Codecs.mapResult(mapResult, DistributionUtil::get);
 		return DataResult.error(() -> "Could not parse distribution: Expected a String, List of Strings, or Map of Strings to Floats");
 	}
 }

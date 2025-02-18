@@ -14,7 +14,7 @@ public record MultiCodec<A>(Supplier<String> encodeError, Supplier<String> decod
 	public <T> DataResult<T> encode(A input, DynamicOps<T> ops, T prefix) {
 		for (Codec<A> codec : codecs) {
 			DataResult<T> result = codec.encode(input, ops, prefix);
-			if (result.isSuccess()) return result;
+			if (Codecs.isSuccess(result)) return result;
 		}
 		return DataResult.error(decodeError);
 	}
@@ -23,7 +23,7 @@ public record MultiCodec<A>(Supplier<String> encodeError, Supplier<String> decod
 	public <T> DataResult<Pair<A, T>> decode(DynamicOps<T> ops, T input) {
 		for (Codec<A> codec : codecs) {
 			DataResult<Pair<A, T>> result = codec.decode(ops, input);
-			if (result.isSuccess()) return result;
+			if (Codecs.isSuccess(result)) return result;
 		}
 		return DataResult.error(decodeError);
 	}

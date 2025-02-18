@@ -9,18 +9,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraftforge.registries.RegistryObject;
 
 public class FluidObject<S extends Fluid, F extends Fluid, B extends Block, I extends Item> extends BlockObject<B, I>
 {
 	public final TagKey<Fluid> localTag;
 	public final TagKey<Fluid> forgeTag;
-	public final DeferredHolder<Fluid, S> stillFluid;
-	public final DeferredHolder<Fluid, F> flowingFluid;
+	public final RegistryObject<S> stillFluid;
+	public final RegistryObject<F> flowingFluid;
 
-	public FluidObject(ResourceLocation id, String forgeName, DeferredHolder<Fluid, S> stillFluid, DeferredHolder<Fluid, F> flowingFluid, DeferredBlock<B> block, DeferredItem<I> item)
+	public FluidObject(ResourceLocation id, String forgeName, RegistryObject<S> stillFluid, RegistryObject<F> flowingFluid, RegistryObject<B> block, RegistryObject<I> item)
 	{
 		super(id, block, item);
 		this.localTag = FluidTags.create(id);

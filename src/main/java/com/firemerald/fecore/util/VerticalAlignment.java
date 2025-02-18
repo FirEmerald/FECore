@@ -64,12 +64,12 @@ public enum VerticalAlignment {
 			return containerHeight - offset;
 		}
 	};
-	
+
 	public abstract int getTop(int containerHeight, int itemHeight, int offset);
-	
+
 	public abstract int getBottom(int containerHeight, int itemHeight, int offset);
-	
+
 	public abstract double getTop(double containerHeight, double itemHeight, double offset);
-	
+
 	public abstract double getBottom(double containerHeight, double itemHeight, double offset);
 }

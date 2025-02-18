@@ -5,18 +5,17 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.serialization.MapCodec;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
 public class BoundingShapeIntersection extends BoundingShapeCompound
 {
 	public static final MapCodec<BoundingShapeIntersection> CODEC = makeCodec(BoundingShapeIntersection::new);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeIntersection> STREAM_CODEC = makeStreamCodec(BoundingShapeIntersection::new);
+	public static final StreamCodec<BoundingShapeIntersection> STREAM_CODEC = makeStreamCodec(BoundingShapeIntersection::new);
 
 	public BoundingShapeIntersection(Collection<BoundingShape> shapes) {
 		super(shapes);

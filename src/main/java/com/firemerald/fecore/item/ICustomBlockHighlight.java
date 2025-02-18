@@ -3,9 +3,9 @@ package com.firemerald.fecore.item;
 import com.firemerald.fecore.client.IBlockHighlight;
 
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.event.RenderHighlightEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.RenderHighlightEvent;
 
 public interface ICustomBlockHighlight
 {

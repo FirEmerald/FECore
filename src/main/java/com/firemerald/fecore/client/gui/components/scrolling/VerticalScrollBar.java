@@ -76,8 +76,8 @@ public class VerticalScrollBar extends InteractableComponent
 			double scrollY = (y1 + scrollHeight * scroll / max);
 			int scrollY1 = (int) scrollY;
 			int scrollY2 = (int) (scrollY + scrollBarSize);
-			guiGraphics.fill(x1, scrollY1, x2, scrollY2, state.getColorFromFloat(.5f, .5f, .5f));
-			guiGraphics.fill(x1 + 1, scrollY1 + 1, x2 - 1, scrollY2 - 1, state.getColorFromFloat(.9f, .9f, .9f));
+			guiGraphics.fill(x1, scrollY1, x2, scrollY2, 0xFF000000 | state.getColorInt(.5f, .5f, .5f));
+			guiGraphics.fill(x1 + 1, scrollY1 + 1, x2 - 1, scrollY2 - 1, 0xFF000000 | state.getColorInt(.9f, .9f, .9f));
 		}
 		else guiGraphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, 0xFF202020);
 	}

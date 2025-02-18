@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "com.firemerald.fecore.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"refmap": "mixins.fecore.refmap.json",
+	"mixins": [],
+	"client": [
+	    "MixinMouseHandler"
+	],
+	"minVersion": "0.8"
+}

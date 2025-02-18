@@ -5,17 +5,15 @@ import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.serialization.Codec;
-
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 
 public class SingletonUnweightedDistribution<T> implements ISingletonDistribution<T> {
 	public static <T> Codec<SingletonUnweightedDistribution<T>> getCodec(Codec<T> keyCodec) {
 		return keyCodec.xmap(SingletonUnweightedDistribution::new, SingletonUnweightedDistribution::getFirstValue);
 	}
 
-	public static <T> StreamCodec<ByteBuf, SingletonUnweightedDistribution<T>> getStreamCodec(StreamCodec<ByteBuf, T> keyCodec) {
+	public static <T> StreamCodec<SingletonUnweightedDistribution<T>> getStreamCodec(StreamCodec<T> keyCodec) {
 		return keyCodec.map(SingletonUnweightedDistribution::new, SingletonUnweightedDistribution::getFirstValue);
 	}
 

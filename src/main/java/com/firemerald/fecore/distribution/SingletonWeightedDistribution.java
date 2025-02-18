@@ -7,22 +7,19 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 
 import com.firemerald.fecore.codec.SingleEntryCodec;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class SingletonWeightedDistribution<T> implements ISingletonDistribution<T> {
 	public static <T> Codec<SingletonWeightedDistribution<T>> getCodec(Codec<T> keyCodec) {
 		return new SingleEntryCodec<>(keyCodec, Codec.FLOAT).xmap(SingletonWeightedDistribution::new, SingletonWeightedDistribution::asPair);
 	}
 
-	public static <T> StreamCodec<ByteBuf, SingletonWeightedDistribution<T>> getStreamCodec(StreamCodec<ByteBuf, T> keyCodec) {
+	public static <T> StreamCodec<SingletonWeightedDistribution<T>> getStreamCodec(StreamCodec<T> keyCodec) {
 		return StreamCodec.composite(
 				keyCodec, SingletonWeightedDistribution::getFirstValue,
-				ByteBufCodecs.FLOAT, SingletonWeightedDistribution::getFirstWeight,
+				StreamCodec.FLOAT, SingletonWeightedDistribution::getFirstWeight,
 				SingletonWeightedDistribution::new
 				);
 	}

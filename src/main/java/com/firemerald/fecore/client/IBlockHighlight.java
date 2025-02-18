@@ -7,14 +7,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Camera;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.RenderHighlightEvent;
+import net.minecraftforge.client.event.RenderHighlightEvent;
 
 @FunctionalInterface
 public interface IBlockHighlight
@@ -34,10 +33,10 @@ public interface IBlockHighlight
 	}
 
 	public default void render(Player player, RenderHighlightEvent.Block event) {
-		render(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.LINES), player, event.getTarget(), event.getCamera(), event.getDeltaTracker());
+		render(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.LINES), player, event.getTarget(), event.getCamera(), event.getPartialTick());
 	}
 
-	public default void render(PoseStack pose, VertexConsumer vertexConsumer, Player player, BlockHitResult result, Camera camera, DeltaTracker delta)
+	public default void render(PoseStack pose, VertexConsumer vertexConsumer, Player player, BlockHitResult result, Camera camera, float partialTick)
 	{
 		pose.pushPose();
 		BlockPos hit = result.getBlockPos();
@@ -68,9 +67,9 @@ public interface IBlockHighlight
 		Vec3 pos = camera.getPosition();
 		pose.translate(hitX - pos.x + .5, hitY - pos.y + .5, hitZ - pos.z + .5);
 		transform(pose, result.getDirection());
-		draw(pose, vertexConsumer, player, result, delta);
+		draw(pose, vertexConsumer, player, result, partialTick);
 		pose.popPose();
 	}
 
-	public void draw(PoseStack pose, VertexConsumer vertexConsumer, Player player, BlockHitResult result, DeltaTracker delta);
+	public void draw(PoseStack pose, VertexConsumer vertexConsumer, Player player, BlockHitResult result, float partialTick);
 }

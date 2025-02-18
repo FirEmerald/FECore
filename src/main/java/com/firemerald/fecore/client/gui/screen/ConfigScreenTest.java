@@ -20,8 +20,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ConfigScreenTest extends BetterScreen
@@ -137,7 +137,7 @@ public class ConfigScreenTest extends BetterScreen
 	@Override
 	public void render(GuiGraphics guiGraphics, int mx, int my, float partialTick, boolean canHover)
 	{
-		this.renderBackground(guiGraphics, mx, my, partialTick);
+		this.renderBackground(guiGraphics);
 		super.render(guiGraphics, mx, my, partialTick, canHover);
 	}
 }

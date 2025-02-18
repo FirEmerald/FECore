@@ -25,7 +25,7 @@ public record AdapterCodec<A>(Supplier<String> decodeError, Function<A, Encoder<
 	public <T> DataResult<Pair<A, T>> decode(DynamicOps<T> ops, T input) {
 		for (Decoder<A> decoder : decoders) {
 			DataResult<Pair<A, T>> result = decoder.decode(ops, input);
-			if (result.isSuccess()) return result;
+			if (Codecs.isSuccess(result)) return result;
 		}
 		return DataResult.error(decodeError);
 	}

@@ -2,19 +2,19 @@ package com.firemerald.fecore.config;
 
 import com.firemerald.fecore.FECoreMod;
 
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.ModConfigSpec.DoubleValue;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 @EventBusSubscriber(modid = FECoreMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class ClientConfig {
 	public static final DoubleValue SCROLL_SENSITIVITY;
-	public static final ModConfigSpec SPEC;
+	public static final ForgeConfigSpec SPEC;
 
 	static {
-		ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+		ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.comment("Client only settings").push("client");
         SCROLL_SENSITIVITY = builder
         		.comment("Modifies the sensitivity of scrolling for BetterGUI scrollables. Default: 10.0")

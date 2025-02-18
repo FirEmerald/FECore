@@ -1,8 +1,6 @@
 package com.firemerald.fecore.client.gui.components;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 public class SpriteButton extends Button {
@@ -52,7 +50,7 @@ public class SpriteButton extends Button {
     public void renderDecoration(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean hovered) {
         int spriteX = this.getX1() + (this.getWidth()  - this.spriteWidth) / 2;
         int spriteY = this.getY1() + (this.getHeight() - this.spriteHeight) / 2;
-        guiGraphics.blitSprite(RenderType::guiTextured, getTexture(sprites, hovered), spriteX, spriteY, this.spriteWidth, this.spriteHeight);
+        guiGraphics.blit(getTexture(sprites, hovered), spriteX, spriteY, 0, 0, this.spriteWidth, this.spriteHeight, this.spriteWidth, this.spriteHeight);
     	super.renderDecoration(guiGraphics, mx, my, partialTicks, hovered);
     }
 }

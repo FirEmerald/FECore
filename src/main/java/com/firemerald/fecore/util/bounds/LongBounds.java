@@ -1,65 +1,88 @@
 package com.firemerald.fecore.util.bounds;
 
-import java.util.Optional;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
+import com.firemerald.fecore.codec.CodedCodec;
+import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.util.GsonHelper;
 
-public record LongBounds(Optional<Long> min, Optional<Long> max, Optional<Long> minSq, Optional<Long> maxSq) implements MinMaxBounds<Long> {
-    public static final LongBounds ANY = new LongBounds(Optional.empty(), Optional.empty());
-    public static final Codec<LongBounds> CODEC = MinMaxBounds.<Long, LongBounds>createCodec(Codec.LONG, LongBounds::new);
+public class LongBounds extends MinMaxBounds<Long> {
+    public static final LongBounds ANY = new LongBounds((Long)null, (Long)null);
+    public static final Codec<LongBounds> CODEC = CodedCodec.ofJson(LongBounds::serializeToJson, LongBounds::fromJson);
+    @Nullable
+    private final Long minSq;
+    @Nullable
+    private final Long maxSq;
 
-    private LongBounds(Optional<Long> p_298243_, Optional<Long> p_299159_) {
-        this(p_298243_, p_299159_, squareOpt(p_298243_), squareOpt(p_299159_));
+    private static LongBounds create(StringReader p_154796_, @Nullable Long p_154797_, @Nullable Long p_154798_) throws CommandSyntaxException {
+       if (p_154797_ != null && p_154798_ != null && p_154797_ > p_154798_) {
+          throw ERROR_SWAPPED.createWithContext(p_154796_);
+       } else {
+          return new LongBounds(p_154797_, p_154798_);
+       }
     }
 
-    private static LongBounds create(StringReader reader, Optional<Long> min, Optional<Long> max) throws CommandSyntaxException {
-        if (min.isPresent() && max.isPresent() && min.get() > max.get()) {
-            throw ERROR_SWAPPED.createWithContext(reader);
-        } else {
-            return new LongBounds(min, max);
-        }
+    @Nullable
+    private static Long squareOpt(@Nullable Long pValue) {
+       return pValue == null ? null : pValue * pValue;
     }
 
-    private static Optional<Long> squareOpt(Optional<Long> value) {
-        return value.map(p_297908_ -> p_297908_ * p_297908_);
+    private LongBounds(@Nullable Long p_154784_, @Nullable Long p_154785_) {
+       super(p_154784_, p_154785_);
+       this.minSq = squareOpt(p_154784_);
+       this.maxSq = squareOpt(p_154785_);
     }
 
-    public static LongBounds exactly(Long value) {
-        return new LongBounds(Optional.of(value), Optional.of(value));
+    public static LongBounds exactly(Long pValue) {
+       return new LongBounds(pValue, pValue);
     }
 
-    public static LongBounds between(Long min, Long max) {
-        return new LongBounds(Optional.of(min), Optional.of(max));
+    public static LongBounds between(Long pMin, Long pMax) {
+       return new LongBounds(pMin, pMax);
     }
 
-    public static LongBounds atLeast(Long min) {
-        return new LongBounds(Optional.of(min), Optional.empty());
+    public static LongBounds atLeast(Long pMin) {
+       return new LongBounds(pMin, (Long)null);
     }
 
-    public static LongBounds atMost(Long max) {
-        return new LongBounds(Optional.empty(), Optional.of(max));
+    public static LongBounds atMost(Long pMax) {
+       return new LongBounds((Long)null, pMax);
     }
 
-    public boolean matches(Long value) {
-        return this.min.isPresent() && this.min.get() > value ? false : this.max.isEmpty() || !(this.max.get() < value);
+    public boolean matches(Long pValue) {
+       if (this.min != null && this.min > pValue) {
+          return false;
+       } else {
+          return this.max == null || !(this.max < pValue);
+       }
     }
 
-    public boolean matchesSqr(Long value) {
-        return this.minSq.isPresent() && this.minSq.get() > value ? false : this.maxSq.isEmpty() || !(this.maxSq.get() < value);
+    public boolean matchesSqr(Long pValue) {
+       if (this.minSq != null && this.minSq > pValue) {
+          return false;
+       } else {
+          return this.maxSq == null || !(this.maxSq < pValue);
+       }
     }
 
-    public static LongBounds fromReader(StringReader reader) throws CommandSyntaxException {
-        return fromReader(reader, p_154807_ -> p_154807_);
+    public static LongBounds fromJson(@Nullable JsonElement pJson) {
+       return fromJson(pJson, ANY, GsonHelper::convertToLong, LongBounds::new);
     }
 
-    public static LongBounds fromReader(StringReader reader, Function<Long, Long> formatter) throws CommandSyntaxException {
-        return MinMaxBounds.fromReader(
-            reader, LongBounds::create, Long::parseLong, CommandSyntaxException.BUILT_IN_EXCEPTIONS::readerInvalidLong, formatter
-        );
+    public static LongBounds fromReader(StringReader pReader) throws CommandSyntaxException {
+       return fromReader(pReader, (p_154807_) -> {
+          return p_154807_;
+       });
+    }
+
+    public static LongBounds fromReader(StringReader pReader, Function<Long, Long> pFormatter) throws CommandSyntaxException {
+       return fromReader(pReader, LongBounds::create, Long::parseLong, CommandSyntaxException.BUILT_IN_EXCEPTIONS::readerInvalidLong, pFormatter);
     }
 }

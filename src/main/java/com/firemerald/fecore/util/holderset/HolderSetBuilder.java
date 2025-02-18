@@ -34,7 +34,7 @@ public abstract class HolderSetBuilder<T> {
 		List<HolderSet<T>> sets = new ArrayList<>(this.holderSets);
 		if (!holders.isEmpty()) sets.add(combinedHolders(holders));
 		tags.stream().map(lookup::getOrThrow).forEach(sets::add);
-		if (sets.isEmpty()) return HolderSet.empty();
+		if (sets.isEmpty()) return EmptyHolderSet.get();
 		else if (sets.size() == 1) return sets.get(0);
 		else return combinedSets(sets);
 	}

@@ -11,7 +11,6 @@ import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -19,8 +18,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class BoundingShapeOriginShaped extends BoundingShapeShaped
 {
@@ -101,7 +100,7 @@ public abstract class BoundingShapeOriginShaped extends BoundingShapeShaped
 	//this will override IRenderableBoundingShape.renderIntoWorld(PoseStack, Vec3, float), and should be used by overriding renderIntoWorld(PoseStack, double, double, double, float) instead
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, Vec3 pos, DeltaTracker delta) {
+	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick) {
 		double x, y, z;
 		if (this.isRelative)
 		{
@@ -115,7 +114,7 @@ public abstract class BoundingShapeOriginShaped extends BoundingShapeShaped
 			y = this.y;
 			z = this.z;
 		}
-		renderIntoWorld(pose, x, y, z, delta);
+		renderIntoWorld(pose, x, y, z, partialTick);
 	}
 
 	@Override

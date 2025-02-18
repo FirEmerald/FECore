@@ -2,11 +2,10 @@ package com.firemerald.fecore.boundingshapes;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class BoundingShapeShaped extends BoundingShapeBounded
 {
@@ -33,7 +32,7 @@ public abstract class BoundingShapeShaped extends BoundingShapeBounded
 
 	//this will override IRenderableBoundingShape.renderIntoWorld(PoseStack, Vec3, float), and should be used by overriding renderIntoWorld(PoseStack, double, double, double, float) instead
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, Vec3 pos, DeltaTracker delta) {
+	public void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick) {
 		double x, y, z;
 		if (this.isRelative)
 		{
@@ -47,11 +46,11 @@ public abstract class BoundingShapeShaped extends BoundingShapeBounded
 			y = 0;
 			z = 0;
 		}
-		renderIntoWorld(pose, x, y, z, delta);
+		renderIntoWorld(pose, x, y, z, partialTick);
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, double x, double y, double z, DeltaTracker delta) {}
+	public void renderIntoWorld(PoseStack pose, double x, double y, double z, float partialTick) {}
 
 	public boolean toggleRelative(Vec3 testerPos) {
 		if (this.isRelative) {

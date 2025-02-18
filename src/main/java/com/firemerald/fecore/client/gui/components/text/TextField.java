@@ -65,7 +65,9 @@ public class TextField extends EditBox implements IInteractableComponent
 
 	public void setSize(int x1, int y1, int x2, int y2)
 	{
-		setRectangle(x2 - x1, y2 - y1, x1, y1);
+		this.setPosition(x1, y1);
+		this.setWidth(x2 - x1);
+		this.setHeight(y2 - y1);
 	}
 
 	@Override

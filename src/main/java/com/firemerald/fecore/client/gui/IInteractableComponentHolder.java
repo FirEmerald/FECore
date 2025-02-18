@@ -33,7 +33,8 @@ public interface IInteractableComponentHolder extends IComponentHolderComponent,
 
     @Override
     default boolean mouseClicked(double mouseX, double mouseY, int button) {
-    	return ContainerEventHandler.super.mouseClicked(this.adjX(mouseX), this.adjY(mouseY), button);
+    	if (!this.isMouseOver(mouseX, mouseY)) return false;
+    	else return ContainerEventHandler.super.mouseClicked(this.adjX(mouseX), this.adjY(mouseY), button);
     }
 
     @Override
@@ -47,8 +48,8 @@ public interface IInteractableComponentHolder extends IComponentHolderComponent,
     }
 
     @Override
-    default boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-    	return IInteractableComponent.super.mouseScrolled(this.adjX(mouseX), this.adjY(mouseY), scrollX, scrollY);
+    default boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
+    	return IInteractableComponent.super.mouseScrolled(this.adjX(mouseX), this.adjY(mouseY), scrollY);
     }
 
 	@Override

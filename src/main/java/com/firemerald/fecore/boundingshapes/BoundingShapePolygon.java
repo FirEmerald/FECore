@@ -16,6 +16,7 @@ import com.firemerald.fecore.client.gui.components.IComponent;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
 import com.firemerald.fecore.codec.Codecs;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.firemerald.fecore.util.Constants;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -23,24 +24,21 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BoundingShapePolygon extends BoundingShapeShaped implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
@@ -51,9 +49,9 @@ public class BoundingShapePolygon extends BoundingShapeShaped implements IRender
 				)
 		.apply(instance, BoundingShapePolygon::new)
 	);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapePolygon> STREAM_CODEC = StreamCodec.composite(
-			Codecs.VECTOR3D_ARRAY_STREAM, polygon -> polygon.positions,
-			ByteBufCodecs.BOOL, polygon -> polygon.isRelative,
+	public static final StreamCodec<BoundingShapePolygon> STREAM_CODEC = StreamCodec.composite(
+			StreamCodec.VECTOR3D.asArray(Vector3d[]::new), polygon -> polygon.positions,
+			StreamCodec.BOOL, polygon -> polygon.isRelative,
 			BoundingShapePolygon::new
 			);
 
@@ -315,13 +313,13 @@ public class BoundingShapePolygon extends BoundingShapeShaped implements IRender
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+	public void addInformation(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
 	{
 		tooltipComponents.add(Component.translatable(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
 		if (positions.length > 0) {
 			tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position.limits.y", y1, y2));
 			tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position.coordinates"));
-			if (tooltipFlag.hasControlDown()) {
+			if (Screen.hasControlDown()) {
 				for (Vector3d pos : positions) tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position.coordinate", pos.x(), pos.z()));
 			} else {
 				tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.ctrl_for_positions"));
@@ -331,7 +329,7 @@ public class BoundingShapePolygon extends BoundingShapeShaped implements IRender
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, double x, double y, double z, DeltaTracker delta)
+	public void renderIntoWorld(PoseStack pose, double x, double y, double z, float partialTick)
 	{
 		IRenderableBoundingShape.renderPolygon(pose.last().pose(), y1 + y, y2 + y, x, z, positions, .5f, .5f, 1f, .5f);
 	}

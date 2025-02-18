@@ -8,15 +8,14 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 import com.firemerald.fecore.client.gui.components.IComponent;
-import com.firemerald.fecore.init.FECoreRegistries;
+import com.firemerald.fecore.codec.Codecs;
+import com.firemerald.fecore.codec.stream.StreamCodec;
+import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
@@ -24,17 +23,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class BoundingShape {
-    public static final Codec<BoundingShape> CODEC = FECoreRegistries.BOUNDING_SHAPE_DEFINITIONS.byNameCodec().dispatch("id", BoundingShape::definition, definition -> definition.codec);
+    public static final Codec<BoundingShape> CODEC = Codecs.byNameCodec(FECoreBoundingShapes.REGISTRY).dispatch("id", BoundingShape::definition, definition -> definition.codec.codec());
     public static final Codec<List<BoundingShape>> LIST_CODEC = CODEC.listOf();
-    public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShape> STREAM_CODEC = ByteBufCodecs.registry(FECoreRegistries.Keys.BOUNDING_SHAPE_DEFINITIONS).dispatch(BoundingShape::definition, definition -> definition.streamCodec);
-    public static final StreamCodec<RegistryFriendlyByteBuf, List<BoundingShape>> STREAM_LIST_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
+    public static final StreamCodec<BoundingShape> STREAM_CODEC = StreamCodec.registry(FECoreBoundingShapes.REGISTRY).dispatch(BoundingShape::definition, definition -> definition.streamCodec);
+    public static final StreamCodec<List<BoundingShape>> STREAM_LIST_CODEC = STREAM_CODEC.asList();
 
     public static Stream<BoundingShapeDefinition<?>> getShapeDefinitions() {
-    	return FECoreRegistries.BOUNDING_SHAPE_DEFINITIONS.stream();
+    	return FECoreBoundingShapes.REGISTRY.get().getValues().stream();
     }
 
     public static Stream<BoundingShapeDefinition<?>> getConfigurableShapeDefinitions() {

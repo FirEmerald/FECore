@@ -20,14 +20,14 @@ public record SingleEntryCodec<K, V>(Codec<K> keyCodec, Codec<V> elementCodec) i
     	final MutableObject<DataResult<Pair<K, V>>> result = new MutableObject<>();
     	input.entries().forEach(pair -> {
     		if (result.getValue() == null) {
-    			keyCodec().parse(ops, pair.getFirst()).ifSuccess(key -> {
-    				elementCodec().parse(ops, pair.getSecond()).ifSuccess(value -> {
+    			keyCodec().parse(ops, pair.getFirst()).get().ifLeft(key -> {
+    				elementCodec().parse(ops, pair.getSecond()).get().ifLeft(value -> {
                     	result.setValue(DataResult.success(Pair.of(key, value)));
-    				}).ifError(error -> {
-                    	result.setValue(DataResult.error(error.messageSupplier()));
+    				}).ifRight(error -> {
+                    	result.setValue(DataResult.error(error::message));
     				});
-    			}).ifError(error -> {
-                	result.setValue(DataResult.error(error.messageSupplier()));
+    			}).ifRight(error -> {
+                	result.setValue(DataResult.error(error::message));
     			});
     		} else {
     			result.setValue(DataResult.error(() -> "Expected a single key-value pair"));

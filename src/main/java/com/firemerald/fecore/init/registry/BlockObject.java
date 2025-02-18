@@ -6,14 +6,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraftforge.registries.RegistryObject;
 
 public class BlockObject<B extends Block, I extends Item> extends ItemObject<I>
 {
-	public final DeferredBlock<B> block;
+	public final RegistryObject<B> block;
 
-	public BlockObject(ResourceLocation id, DeferredBlock<B> block, DeferredItem<I> item)
+	public BlockObject(ResourceLocation id, RegistryObject<B> block, RegistryObject<I> item)
 	{
 		super(id, item);
 		this.block = block;

@@ -8,13 +8,10 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.util.CollectionUtils;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
-
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class UnweightedDistribution<T> implements IUnweightedDistribution<T> {
 	public static <T> Codec<UnweightedDistribution<T>> getCodec(Codec<T> keyCodec) {
@@ -25,11 +22,11 @@ public class UnweightedDistribution<T> implements IUnweightedDistribution<T> {
 		return keyCodec.xmap(UnweightedDistribution::new, UnweightedDistribution::getUnweightedValues);
 	}
 
-	public static <T> StreamCodec<ByteBuf, UnweightedDistribution<T>> getStreamCodec(StreamCodec<ByteBuf, T> keyCodec) {
-		return getStreamCodecFromList(keyCodec.apply(ByteBufCodecs.list()));
+	public static <T> StreamCodec<UnweightedDistribution<T>> getStreamCodec(StreamCodec<T> keyCodec) {
+		return getStreamCodecFromList(keyCodec.asList());
 	}
 
-	public static <T> StreamCodec<ByteBuf, UnweightedDistribution<T>> getStreamCodecFromList(StreamCodec<ByteBuf, List<T>> keyCodec) {
+	public static <T> StreamCodec<UnweightedDistribution<T>> getStreamCodecFromList(StreamCodec<List<T>> keyCodec) {
 		return keyCodec.map(UnweightedDistribution::new, UnweightedDistribution::getUnweightedValues);
 	}
 

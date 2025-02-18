@@ -1,6 +1,5 @@
 package com.firemerald.fecore.client.gui.components;
 
-import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.resources.ResourceLocation;
@@ -8,10 +7,9 @@ import net.minecraft.resources.ResourceLocation;
 public interface IInteractableComponent extends GuiEventListener, IComponent
 {
 	@Override
-	public default boolean mouseScrolled(double mx, double my, double scrollX, double scrollY) {
-		double remainingX = mouseScrolledX(mx, my, scrollX);
+	public default boolean mouseScrolled(double mx, double my, double scrollY) {
 		double remainingY = mouseScrolledY(mx, my, scrollY);
-		return remainingX != scrollX || remainingY != scrollY;
+		return remainingY != scrollY;
 	}
 
 	/**

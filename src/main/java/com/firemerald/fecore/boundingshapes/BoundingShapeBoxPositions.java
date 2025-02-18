@@ -10,29 +10,26 @@ import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.IComponent;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BoundingShapeBoxPositions extends BoundingShapeShaped implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
@@ -48,14 +45,14 @@ public class BoundingShapeBoxPositions extends BoundingShapeShaped implements IR
 				)
 		.apply(instance, BoundingShapeBoxPositions::new)
 	);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeBoxPositions> STREAM_CODEC = StreamCodec.composite(
-			ByteBufCodecs.DOUBLE, box -> box.x1,
-			ByteBufCodecs.DOUBLE, box -> box.y1,
-			ByteBufCodecs.DOUBLE, box -> box.z1,
-			ByteBufCodecs.DOUBLE, box -> box.x2,
-			ByteBufCodecs.DOUBLE, box -> box.y2,
-			ByteBufCodecs.DOUBLE, box -> box.z2,
-			ByteBufCodecs.BOOL, box -> box.isRelative,
+	public static final StreamCodec<BoundingShapeBoxPositions> STREAM_CODEC = StreamCodec.composite(
+			StreamCodec.DOUBLE, box -> box.x1,
+			StreamCodec.DOUBLE, box -> box.y1,
+			StreamCodec.DOUBLE, box -> box.z1,
+			StreamCodec.DOUBLE, box -> box.x2,
+			StreamCodec.DOUBLE, box -> box.y2,
+			StreamCodec.DOUBLE, box -> box.z2,
+			StreamCodec.BOOL, box -> box.isRelative,
 			BoundingShapeBoxPositions::new
 			);
 
@@ -198,7 +195,7 @@ public class BoundingShapeBoxPositions extends BoundingShapeShaped implements IR
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+	public void addInformation(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
 	{
 		tooltipComponents.add(Component.translatable(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
 		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position.1", x1, y1, z1));
@@ -207,7 +204,7 @@ public class BoundingShapeBoxPositions extends BoundingShapeShaped implements IR
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, double x, double y, double z, DeltaTracker delta)
+	public void renderIntoWorld(PoseStack pose, double x, double y, double z, float partialTick)
 	{
 		IRenderableBoundingShape.renderCube(pose.last().pose(), x1 + x, y1 + y, z1 + z, x2 + x, y2 + y, z2 + z, .5f, .5f, 1f, .5f);
 	}

@@ -3,8 +3,8 @@ package com.firemerald.fecore.client.gui.components;
 import com.firemerald.fecore.client.gui.IComponentHolder;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ComponentPane extends ComponentHolder

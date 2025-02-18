@@ -6,13 +6,12 @@ import javax.annotation.Nonnull;
 
 import com.firemerald.fecore.client.gui.components.ButtonConfigureShape;
 import com.firemerald.fecore.client.gui.components.IComponent;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
@@ -23,7 +22,7 @@ public class BoundingShapeInversion extends BoundingShapeUnbounded
 			.group(BoundingShape.CODEC.fieldOf("shape").forGetter(inversion -> inversion.shape))
 			.apply(builder, BoundingShapeInversion::new)
 			);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeInversion> STREAM_CODEC = StreamCodec.composite(
+	public static final StreamCodec<BoundingShapeInversion> STREAM_CODEC = StreamCodec.composite(
 			BoundingShape.STREAM_CODEC, inversion -> inversion.shape,
 			BoundingShapeInversion::new
 			);

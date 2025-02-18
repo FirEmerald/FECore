@@ -13,16 +13,15 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.serialization.Codec;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.RandomSource;
 
 public class EmptyDistribution<T> implements IDistribution<T> {
 	public static final EmptyDistribution<?> INSTANCE = new EmptyDistribution<>();
 	public static final Codec<EmptyDistribution<?>> CODEC = Codec.unit(INSTANCE);
-	public static final StreamCodec<ByteBuf, EmptyDistribution<?>> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+	public static final StreamCodec<EmptyDistribution<?>> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
 	@SuppressWarnings("unchecked")
 	public static <T> EmptyDistribution<T> get() {

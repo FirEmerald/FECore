@@ -15,59 +15,65 @@ import com.firemerald.fecore.boundingshapes.BoundingShapeInversion;
 import com.firemerald.fecore.boundingshapes.BoundingShapePolygon;
 import com.firemerald.fecore.boundingshapes.BoundingShapeSphere;
 import com.firemerald.fecore.boundingshapes.IConfigurableBoundingShape;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.serialization.MapCodec;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.RegistryObject;
 
 public class FECoreBoundingShapes {
-	private static DeferredRegister<BoundingShapeDefinition<?>> registry = DeferredRegister.create(FECoreRegistries.Keys.BOUNDING_SHAPE_DEFINITIONS, FECoreMod.MOD_ID);
+    public static final ResourceKey<Registry<BoundingShapeDefinition<?>>> REGISTRY_KEY = ResourceKey.createRegistryKey(FECoreMod.id("bounding_shape_definitions"));
 
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeAll>> ALL = register("all",
+	private static DeferredRegister<BoundingShapeDefinition<?>> registry = DeferredRegister.create(REGISTRY_KEY, FECoreMod.MOD_ID);
+
+	public static final Supplier<IForgeRegistry<BoundingShapeDefinition<?>>> REGISTRY = registry.makeRegistry(() -> RegistryBuilder.of(REGISTRY_KEY.location()));
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeAll>> ALL = register("all",
 			BoundingShapeAll.CODEC,
 			BoundingShapeAll.STREAM_CODEC,
 			() -> BoundingShapeAll.INSTANCE);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeBoxOffsets>> BOX_OFFSETS = registerConfigurable("boxoffsets",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeBoxOffsets>> BOX_OFFSETS = registerConfigurable("boxoffsets",
 			BoundingShapeBoxOffsets.CODEC,
 			BoundingShapeBoxOffsets.STREAM_CODEC,
 			BoundingShapeBoxOffsets::new);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeBoxPositions>> BOX_POSITIONS = registerConfigurable("boxpositions",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeBoxPositions>> BOX_POSITIONS = registerConfigurable("boxpositions",
 			BoundingShapeBoxPositions.CODEC,
 			BoundingShapeBoxPositions.STREAM_CODEC,
 			BoundingShapeBoxPositions::new);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeCylinder>> CYLINDER = registerConfigurable("cylinder",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeCylinder>> CYLINDER = registerConfigurable("cylinder",
 			BoundingShapeCylinder.CODEC,
 			BoundingShapeCylinder.STREAM_CODEC,
 			BoundingShapeCylinder::new);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeSphere>> SPHERE = registerConfigurable("sphere",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeSphere>> SPHERE = registerConfigurable("sphere",
 			BoundingShapeSphere.CODEC,
 			BoundingShapeSphere.STREAM_CODEC,
 			BoundingShapeSphere::new);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapePolygon>> POLYGON = registerConfigurable("polygon",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapePolygon>> POLYGON = registerConfigurable("polygon",
 			BoundingShapePolygon.CODEC,
 			BoundingShapePolygon.STREAM_CODEC,
 			BoundingShapePolygon::new);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeAddition>> ADDITION = register("addition",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeAddition>> ADDITION = register("addition",
 			BoundingShapeAddition.CODEC,
 			BoundingShapeAddition.STREAM_CODEC,
 			BoundingShapeAddition::new);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeIntersection>> INTERSECTION = register("intersection",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeIntersection>> INTERSECTION = register("intersection",
 			BoundingShapeIntersection.CODEC,
 			BoundingShapeIntersection.STREAM_CODEC,
 			BoundingShapeIntersection::new);
-	public static final DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<BoundingShapeInversion>> INVERSION = register("inversion",
+	public static final RegistryObject<BoundingShapeDefinition<BoundingShapeInversion>> INVERSION = register("inversion",
 			BoundingShapeInversion.CODEC,
 			BoundingShapeInversion.STREAM_CODEC,
 			BoundingShapeInversion::new);
 
-	private static <T extends BoundingShape> DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<T>> register(String name, MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec, Supplier<T> constructor) {
+	private static <T extends BoundingShape> RegistryObject<BoundingShapeDefinition<T>> register(String name, MapCodec<T> codec, StreamCodec<T> streamCodec, Supplier<T> constructor) {
 		return registry.register(name, () -> BoundingShapeDefinition.of(codec, streamCodec, constructor));
 	}
 
-	private static <T extends BoundingShape & IConfigurableBoundingShape> DeferredHolder<BoundingShapeDefinition<?>, BoundingShapeDefinition<T>> registerConfigurable(String name, MapCodec<T> codec, StreamCodec<RegistryFriendlyByteBuf, T> streamCodec, Supplier<T> constructor) {
+	private static <T extends BoundingShape & IConfigurableBoundingShape> RegistryObject<BoundingShapeDefinition<T>> registerConfigurable(String name, MapCodec<T> codec, StreamCodec<T> streamCodec, Supplier<T> constructor) {
 		return registry.register(name, () -> BoundingShapeDefinition.ofConfigurable(codec, streamCodec, constructor));
 	}
 

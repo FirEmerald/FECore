@@ -5,12 +5,11 @@ import com.firemerald.fecore.client.gui.IComponentHolder;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.util.Mth;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class Component implements IComponent
@@ -22,7 +21,6 @@ public abstract class Component implements IComponent
 	private IComponentHolder holder;
 	private boolean visible = true;
 	private boolean hovered = false;
-    private final WidgetTooltipHolder tooltip = new WidgetTooltipHolder();
 
 	public Component(int x1, int y1, int x2, int y2)
 	{
@@ -125,7 +123,6 @@ public abstract class Component implements IComponent
     @Override
     public final void updateNarration(NarrationElementOutput narrationElementOutput) {
         this.updateWidgetNarration(narrationElementOutput);
-        this.tooltip.updateNarration(narrationElementOutput);
     }
 
     protected abstract void updateWidgetNarration(NarrationElementOutput narrationElementOutput);

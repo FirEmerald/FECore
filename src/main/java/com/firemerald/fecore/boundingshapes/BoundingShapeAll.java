@@ -5,12 +5,11 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 import com.firemerald.fecore.client.gui.components.IComponent;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
@@ -18,7 +17,7 @@ public class BoundingShapeAll extends BoundingShapeUnbounded
 {
 	public static final BoundingShapeAll INSTANCE = new BoundingShapeAll();
 	public static final MapCodec<BoundingShapeAll> CODEC = MapCodec.unit(INSTANCE);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeAll> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+	public static final StreamCodec<BoundingShapeAll> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
 	private BoundingShapeAll() {}
 

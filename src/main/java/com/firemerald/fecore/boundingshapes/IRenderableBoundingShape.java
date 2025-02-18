@@ -7,24 +7,22 @@ import org.joml.Vector3f;
 import com.firemerald.fecore.util.Constants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public interface IRenderableBoundingShape
 {
 	@OnlyIn(Dist.CLIENT)
-	public abstract void renderIntoWorld(PoseStack pose, Vec3 pos, DeltaTracker delta);
+	public abstract void renderIntoWorld(PoseStack pose, Vec3 pos, float partialTick);
 
 	@OnlyIn(Dist.CLIENT)
 	public static void renderCube(Matrix4f m, double x1d, double y1d, double z1d, double x2d, double y2d, double z2d, float r, float g, float b, float a)
@@ -51,77 +49,78 @@ public interface IRenderableBoundingShape
 			z1 = (float) z1d;
 			z2 = (float) z2d;
 		}
-		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder builder = tesselator.begin(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		BufferBuilder builder = tesselator.getBuilder();
+		builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
-		builder.addVertex(m, x1, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z1).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z2).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y1, z2).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x2, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z1).setColor(r, g, b, a);
+		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z1).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z2).setColor(r, g, b, a);
+		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
 
 
-		builder.addVertex(m, x1, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z1).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z2).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z1).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x2, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z2).setColor(r, g, b, a);
+		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y1, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y1, z2).setColor(r, g, b, a);
+		builder.vertex(m, x1, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y1, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y1, z2).color(r, g, b, a).endVertex();
 
-		builder.addVertex(m, x1, y2, z1).setColor(r, g, b, a);
-		builder.addVertex(m, x1, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z2).setColor(r, g, b, a);
-		builder.addVertex(m, x2, y2, z1).setColor(r, g, b, a);
+		builder.vertex(m, x1, y2, z1).color(r, g, b, a).endVertex();
+		builder.vertex(m, x1, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z2).color(r, g, b, a).endVertex();
+		builder.vertex(m, x2, y2, z1).color(r, g, b, a).endVertex();
 
-        BufferUploader.drawWithShader(builder.buildOrThrow());
+        tesselator.end();
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static VertexConsumer addVertex(VertexConsumer builder, Matrix4f m, double x, double y, double z) {
-		return builder.addVertex(m, (float) x, (float) y, (float) z);
+	public static VertexConsumer vertex(VertexConsumer builder, Matrix4f m, double x, double y, double z) {
+		return builder.vertex(m, (float) x, (float) y, (float) z);
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -135,84 +134,86 @@ public interface IRenderableBoundingShape
 			h = -h;
 		}
 		else y2 = y + h;
-		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y, z).setColor(r, g, b, a);
+		BufferBuilder builder = tesselator.getBuilder();
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y, z).color(r, g, b, a).endVertex();
 		for (int i = Constants.CIRCLE_MESH_CACHE.length - 1; i >= 0; --i)
 		{
 			Vec2 v = Constants.CIRCLE_MESH_CACHE[i];
 			double curX = x + rad * v.x;
 			double curZ = z + rad * v.y;
-			addVertex(builder, m, curX, y, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
-		builder = tesselator.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+		tesselator.end();
+		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			double curX = x + rad * v.x;
 			double curZ = z + rad * v.y;
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
-			addVertex(builder, m, curX, y, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
+			vertex(builder, m, curX, y, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y2, z).setColor(r, g, b, a);
+		tesselator.end();
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y2, z).color(r, g, b, a).endVertex();
 		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			double curX = x + rad * v.x;
 			double curZ = z + rad * v.y;
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y, z).setColor(r, g, b, a);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y, z).color(r, g, b, a).endVertex();
 		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			double curX = x + rad * v.x;
 			double curZ = z + rad * v.y;
-			addVertex(builder, m, curX, y, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
-		builder = tesselator.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+		tesselator.end();
+		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		for (Vec2 v : Constants.CIRCLE_MESH_CACHE) {
 			double curX = x + rad * v.x;
 			double curZ = z + rad * v.y;
-			addVertex(builder, m, curX, y, curZ).setColor(r, g, b, a);
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y, curZ).color(r, g, b, a).endVertex();
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y2, z).setColor(r, g, b, a);
+		tesselator.end();
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y2, z).color(r, g, b, a).endVertex();
 		for (int i = Constants.CIRCLE_MESH_CACHE.length - 1; i >= 0; --i)
 		{
 			Vec2 v = Constants.CIRCLE_MESH_CACHE[i];
 			double curX = x + rad * v.x;
 			double curZ = z + rad * v.y;
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public static void renderSphere(Matrix4f m, double x, double y, double z, double rad, float r, float g, float b, float a)
 	{
-		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder builder = tesselator.getBuilder();
 		Vector3f[] cache1 = Constants.SPHERE_MESH_CACHE[0];
-		BufferBuilder builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y - rad, z).setColor(r, g, b, a);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y - rad, z).color(r, g, b, a).endVertex();
 		for (int i = cache1.length - 1; i >= 0; --i)
 		{
 			Vector3f v = cache1[i];
 			double curX = x + rad * v.x();
 			double curY = y + rad * v.y();
 			double curZ = z + rad * v.z();
-			addVertex(builder, m, curX, curY, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, curY, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 		for (int j = 1; j < Constants.SPHERE_MESH_CACHE.length; j++)
 		{
 			Vector3f[] cache2 = Constants.SPHERE_MESH_CACHE[j];
-			builder = tesselator.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+			builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 			for (int i = 0; i < cache1.length; ++i)
 			{
 				Vector3f v1 = cache1[i];
@@ -223,37 +224,37 @@ public interface IRenderableBoundingShape
 				double curX2 = x + rad * v2.x();
 				double curY2 = y + rad * v2.y();
 				double curZ2 = z + rad * v2.z();
-				addVertex(builder, m, curX2, curY2, curZ2).setColor(r, g, b, a);
-				addVertex(builder, m, curX1, curY1, curZ1).setColor(r, g, b, a);
+				vertex(builder, m, curX2, curY2, curZ2).color(r, g, b, a).endVertex();
+				vertex(builder, m, curX1, curY1, curZ1).color(r, g, b, a).endVertex();
 			}
-			BufferUploader.drawWithShader(builder.buildOrThrow());
+			tesselator.end();
 			cache1 = cache2;
 		}
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y + rad, z).setColor(r, g, b, a);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y + rad, z).color(r, g, b, a).endVertex();
 		for (Vector3f v : cache1) {
 			double curX = x + rad * v.x();
 			double curY = y + rad * v.y();
 			double curZ = z + rad * v.z();
-			addVertex(builder, m, curX, curY, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, curY, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 
 
 		cache1 = Constants.SPHERE_MESH_CACHE[0];
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y - rad, z).setColor(r, g, b, a);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y - rad, z).color(r, g, b, a).endVertex();
 		for (Vector3f v : cache1) {
 			double curX = x + rad * v.x();
 			double curY = y + rad * v.y();
 			double curZ = z + rad * v.z();
-			addVertex(builder, m, curX, curY, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, curY, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 		for (int j = 1; j < Constants.SPHERE_MESH_CACHE.length; j++)
 		{
 			Vector3f[] cache2 = Constants.SPHERE_MESH_CACHE[j];
-			builder = tesselator.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+			builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 			for (int i = 0; i < cache1.length; ++i)
 			{
 				Vector3f v1 = cache1[i];
@@ -264,23 +265,23 @@ public interface IRenderableBoundingShape
 				double curX2 = x + rad * v2.x();
 				double curY2 = y + rad * v2.y();
 				double curZ2 = z + rad * v2.z();
-				addVertex(builder, m, curX1, curY1, curZ1).setColor(r, g, b, a);
-				addVertex(builder, m, curX2, curY2, curZ2).setColor(r, g, b, a);
+				vertex(builder, m, curX1, curY1, curZ1).color(r, g, b, a).endVertex();
+				vertex(builder, m, curX2, curY2, curZ2).color(r, g, b, a).endVertex();
 			}
-			BufferUploader.drawWithShader(builder.buildOrThrow());
+			tesselator.end();
 			cache1 = cache2;
 		}
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-		addVertex(builder, m, x, y + rad, z).setColor(r, g, b, a);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		vertex(builder, m, x, y + rad, z).color(r, g, b, a).endVertex();
 		for (int i = cache1.length - 1; i >= 0; --i)
 		{
 			Vector3f v = cache1[i];
 			double curX = x + rad * v.x();
 			double curY = y + rad * v.y();
 			double curZ = z + rad * v.z();
-			addVertex(builder, m, curX, curY, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, curY, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -293,95 +294,95 @@ public interface IRenderableBoundingShape
 			y1 = y2;
 			y2 = t;
 		}
-		RenderSystem.setShader(CoreShaders.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		Tesselator tesselator = Tesselator.getInstance();
+		BufferBuilder builder = tesselator.getBuilder();
 
 		Vector3d v;
 		double curX, curZ;
-		BufferBuilder builder;
 		/*
-		builder = tesselator.begin(Mode.LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+		builder.begin(Mode.LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		for (int i = 0; i < points.length; ++i) {
 			v = points[i];
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, 1);
+			vertex(builder, m, curX, y1, curZ).setColor(r, g, b, 1);
 		}
 		{
 			v = points[0];
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, 1);
+			vertex(builder, m, curX, y1, curZ).setColor(r, g, b, 1);
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 		*/
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		for (int i = points.length - 1; i >= 0; --i)
 		{
 			v = points[i];
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y1, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 
-		builder = tesselator.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		v = points[points.length - 1];
 		curX = x + v.x();
 		curZ = z + v.z();
-		addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
-		addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, a);
+		vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
+		vertex(builder, m, curX, y1, curZ).color(r, g, b, a).endVertex();
 		for (Vector3d point : points) {
 			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
-			addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
+			vertex(builder, m, curX, y1, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		for (Vector3d point : points) {
 			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 
 
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		for (Vector3d point : points) {
 			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y1, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 
-		builder = tesselator.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+		builder.begin(Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 		v = points[points.length - 1];
 		curX = x + v.x();
 		curZ = z + v.z();
-		addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, a);
-		addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
+		vertex(builder, m, curX, y1, curZ).color(r, g, b, a).endVertex();
+		vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		for (Vector3d point : points) {
 			v = point;
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y1, curZ).setColor(r, g, b, a);
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y1, curZ).color(r, g, b, a).endVertex();
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 
-		builder = tesselator.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+		builder.begin(Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 		for (int i = points.length - 1; i >= 0; --i)
 		{
 			v = points[i];
 			curX = x + v.x();
 			curZ = z + v.z();
-			addVertex(builder, m, curX, y2, curZ).setColor(r, g, b, a);
+			vertex(builder, m, curX, y2, curZ).color(r, g, b, a).endVertex();
 		}
-		BufferUploader.drawWithShader(builder.buildOrThrow());
+		tesselator.end();
 	}
 }

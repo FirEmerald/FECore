@@ -76,8 +76,8 @@ public class HorizontalScrollBar extends InteractableComponent
 			double scrollX = (x1 + scrollWidth * scroll / max);
 			int scrollX1 = (int) scrollX;
 			int scrollX2 = (int) (scrollX + scrollBarSize);
-			guiGraphics.fill(scrollX1, y1, scrollX2, y2, state.getColorFromFloat(.5f, .5f, .5f));
-			guiGraphics.fill(scrollX1 + 1, y1 + 1, scrollX2 - 1, y2 - 1, state.getColorFromFloat(.9f, .9f, .9f));
+			guiGraphics.fill(scrollX1, y1, scrollX2, y2, 0xFF000000 | state.getColorInt(.5f, .5f, .5f));
+			guiGraphics.fill(scrollX1 + 1, y1 + 1, scrollX2 - 1, y2 - 1, 0xFF000000 | state.getColorInt(.9f, .9f, .9f));
 		}
 		else guiGraphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, 0xFF202020);
 	}

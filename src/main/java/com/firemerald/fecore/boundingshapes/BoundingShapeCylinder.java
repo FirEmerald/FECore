@@ -9,29 +9,26 @@ import javax.annotation.Nullable;
 import com.firemerald.fecore.client.gui.components.IComponent;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BoundingShapeCylinder extends BoundingShapeOriginShaped implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
@@ -46,13 +43,13 @@ public class BoundingShapeCylinder extends BoundingShapeOriginShaped implements 
 				)
 		.apply(instance, BoundingShapeCylinder::new)
 	);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeCylinder> STREAM_CODEC = StreamCodec.composite(
-			ByteBufCodecs.DOUBLE, cylinder -> cylinder.x,
-			ByteBufCodecs.DOUBLE, cylinder -> cylinder.y,
-			ByteBufCodecs.DOUBLE, cylinder -> cylinder.z,
-			ByteBufCodecs.DOUBLE, cylinder -> cylinder.r,
-			ByteBufCodecs.DOUBLE, cylinder -> cylinder.h,
-			ByteBufCodecs.BOOL, cylinder -> cylinder.isRelative,
+	public static final StreamCodec<BoundingShapeCylinder> STREAM_CODEC = StreamCodec.composite(
+			StreamCodec.DOUBLE, cylinder -> cylinder.x,
+			StreamCodec.DOUBLE, cylinder -> cylinder.y,
+			StreamCodec.DOUBLE, cylinder -> cylinder.z,
+			StreamCodec.DOUBLE, cylinder -> cylinder.r,
+			StreamCodec.DOUBLE, cylinder -> cylinder.h,
+			StreamCodec.BOOL, cylinder -> cylinder.isRelative,
 			BoundingShapeCylinder::new
 			);
 
@@ -157,7 +154,7 @@ public class BoundingShapeCylinder extends BoundingShapeOriginShaped implements 
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+	public void addInformation(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
 	{
 		tooltipComponents.add(Component.translatable(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
 		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position", x, y, z));
@@ -167,7 +164,7 @@ public class BoundingShapeCylinder extends BoundingShapeOriginShaped implements 
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, double x, double y, double z, DeltaTracker delta)
+	public void renderIntoWorld(PoseStack pose, double x, double y, double z, float partialTick)
 	{
 		IRenderableBoundingShape.renderCylinder(pose.last().pose(), x, y, z, r, h, .5f, .5f, 1f, .5f);
 	}
@@ -228,7 +225,7 @@ public class BoundingShapeCylinder extends BoundingShapeOriginShaped implements 
 		}  else if (other instanceof BoundingShapeShaped shaped) {
 			isRelative = shaped.isRelative;
 			AABB box = shaped.getLocalBounds();
-			Vec3 center = box.getBottomCenter();
+			Vec3 center = new Vec3((box.minX + box.maxX) * 0.5, box.minY, (box.minZ + box.maxZ) * 0.5);
 			x = center.x;
 			y = center.y;
 			z = center.z;

@@ -9,29 +9,26 @@ import javax.annotation.Nullable;
 import com.firemerald.fecore.client.gui.components.IComponent;
 import com.firemerald.fecore.client.gui.components.decoration.FloatingText;
 import com.firemerald.fecore.client.gui.components.text.DoubleField;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class BoundingShapeSphere extends BoundingShapeOriginShaped implements IRenderableBoundingShape, IConfigurableBoundingShape
 {
@@ -45,12 +42,12 @@ public class BoundingShapeSphere extends BoundingShapeOriginShaped implements IR
 				)
 		.apply(instance, BoundingShapeSphere::new)
 	);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeSphere> STREAM_CODEC = StreamCodec.composite(
-			ByteBufCodecs.DOUBLE, sphere -> sphere.x,
-			ByteBufCodecs.DOUBLE, sphere -> sphere.y,
-			ByteBufCodecs.DOUBLE, sphere -> sphere.z,
-			ByteBufCodecs.DOUBLE, sphere -> sphere.r,
-			ByteBufCodecs.BOOL, sphere -> sphere.isRelative,
+	public static final StreamCodec<BoundingShapeSphere> STREAM_CODEC = StreamCodec.composite(
+			StreamCodec.DOUBLE, sphere -> sphere.x,
+			StreamCodec.DOUBLE, sphere -> sphere.y,
+			StreamCodec.DOUBLE, sphere -> sphere.z,
+			StreamCodec.DOUBLE, sphere -> sphere.r,
+			StreamCodec.BOOL, sphere -> sphere.isRelative,
 			BoundingShapeSphere::new
 			);
 
@@ -140,7 +137,7 @@ public class BoundingShapeSphere extends BoundingShapeOriginShaped implements IR
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
+	public void addInformation(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag)
 	{
 		tooltipComponents.add(Component.translatable(isRelative ? "fecore.shapetool.tooltip.relative" : "fecore.shapetool.tooltip.absolute"));
 		tooltipComponents.add(Component.translatable("fecore.shapetool.tooltip.position", x, y, z));
@@ -149,7 +146,7 @@ public class BoundingShapeSphere extends BoundingShapeOriginShaped implements IR
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void renderIntoWorld(PoseStack pose, double x, double y, double z, DeltaTracker delta)
+	public void renderIntoWorld(PoseStack pose, double x, double y, double z, float partialTick)
 	{
 		IRenderableBoundingShape.renderSphere(pose.last().pose(), x, y, z, r, .5f, .5f, 1f, .5f);
 	}

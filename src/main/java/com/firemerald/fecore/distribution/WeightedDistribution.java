@@ -1,7 +1,6 @@
 package com.firemerald.fecore.distribution;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -10,21 +9,18 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.util.SimpleCollector;
 import com.firemerald.fecore.util.psuedomap.FloatIndexedCollection;
 import com.mojang.serialization.Codec;
-
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class WeightedDistribution<T> implements IWeightedDistribution<T> {
 	public static <T> Codec<WeightedDistribution<T>> getCodec(Codec<T> keyCodec) {
 		return Codec.unboundedMap(keyCodec, Codec.FLOAT).xmap(WeightedDistribution::new, WeightedDistribution::getWeightedValues);
 	}
 
-	public static <T> StreamCodec<ByteBuf, WeightedDistribution<T>> getStreamCodecFromList(StreamCodec<ByteBuf, T> keyCodec) {
-		return ByteBufCodecs.map(size -> (Map<T, Float>) new HashMap<T, Float>(size), keyCodec, ByteBufCodecs.FLOAT).map(WeightedDistribution::new, WeightedDistribution::getWeightedValues);
+	public static <T> StreamCodec<WeightedDistribution<T>> getStreamCodecFromList(StreamCodec<T> keyCodec) {
+		return StreamCodec.mapOf(keyCodec, StreamCodec.FLOAT).map(WeightedDistribution::new, WeightedDistribution::getWeightedValues);
 	}
 
 	private final Map<T, Float> weights;

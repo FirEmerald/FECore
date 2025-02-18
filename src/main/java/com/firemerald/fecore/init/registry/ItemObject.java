@@ -7,14 +7,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraftforge.registries.RegistryObject;
 
 public class ItemObject<I extends Item> implements ItemLike
 {
 	public final ResourceLocation id;
-	public final DeferredItem<I> item;
+	public final RegistryObject<I> item;
 
-	public ItemObject(ResourceLocation id, DeferredItem<I> item)
+	public ItemObject(ResourceLocation id, RegistryObject<I> item)
 	{
 		this.id = id;
 		this.item = item;

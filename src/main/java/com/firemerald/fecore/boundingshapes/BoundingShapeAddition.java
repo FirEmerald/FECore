@@ -5,18 +5,17 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.firemerald.fecore.init.FECoreBoundingShapes;
 import com.mojang.serialization.MapCodec;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 
 public class BoundingShapeAddition extends BoundingShapeCompound
 {
 	public static final MapCodec<BoundingShapeAddition> CODEC = makeCodec(BoundingShapeAddition::new);
-	public static final StreamCodec<RegistryFriendlyByteBuf, BoundingShapeAddition> STREAM_CODEC = makeStreamCodec(BoundingShapeAddition::new);
+	public static final StreamCodec<BoundingShapeAddition> STREAM_CODEC = makeStreamCodec(BoundingShapeAddition::new);
 
 	public BoundingShapeAddition(Collection<BoundingShape> shapes) {
 		super(shapes);

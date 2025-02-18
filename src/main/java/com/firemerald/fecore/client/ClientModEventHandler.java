@@ -1,17 +1,16 @@
 package com.firemerald.fecore.client;
 
 import com.firemerald.fecore.FECoreMod;
-import com.firemerald.fecore.common.CommonModEventHandler;
-import com.firemerald.fecore.datagen.FECoreModelProvider;
+import com.firemerald.fecore.datagen.FECoreItemModelProvider;
 import com.firemerald.fecore.init.FECoreObjects;
 
 import net.minecraft.data.DataProvider;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = FECoreMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class ClientModEventHandler {
@@ -23,9 +22,8 @@ public class ClientModEventHandler {
 	}
 
 	@SubscribeEvent
-	public static void gatherClientData(GatherDataEvent.Client event)
+	public static void gatherClientData(GatherDataEvent event)
 	{
-		event.getGenerator().addProvider(true, (DataProvider.Factory<FECoreModelProvider>) FECoreModelProvider::new);
-		CommonModEventHandler.gatherData(event);
+		event.getGenerator().addProvider(true, (DataProvider.Factory<FECoreItemModelProvider>) output -> new FECoreItemModelProvider(output, event.getExistingFileHelper()));
 	}
 }

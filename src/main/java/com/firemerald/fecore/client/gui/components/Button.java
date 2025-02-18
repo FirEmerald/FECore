@@ -5,10 +5,9 @@ import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -17,6 +16,11 @@ import net.minecraft.sounds.SoundEvents;
 
 public class Button extends InteractableComponent
 {
+    public static final WidgetSprites SPRITES = new WidgetSprites(
+            new ResourceLocation("minecraft", "widget/button"),
+            new ResourceLocation("minecraft", "widget/button_disabled"),
+            new ResourceLocation("minecraft", "widget/button_highlighted")
+        );
     /** The string displayed on this control. */
     public net.minecraft.network.chat.Component displayString;
     public int packedFGColour; //FML
@@ -52,15 +56,14 @@ public class Button extends InteractableComponent
 	public void doRender(GuiGraphics guiGraphics, int mx, int my, float partialTicks, boolean canHover)
     {
         boolean hovered = canHover && this.isMouseOver(mx, my);
-        guiGraphics.blitSprite(
-            RenderType::guiTextured,
-            getButtonTexture(hovered),
-            getX1(),
-            getY1(),
-            getWidth(),
-            getHeight(),
-            0xFFFFFFFF
-        );
+        guiGraphics.blitNineSliced(
+        		AbstractWidget.WIDGETS_LOCATION,
+        		this.getX1(),
+        		this.getY1(),
+        		this.getWidth(),
+        		this.getHeight(),
+        		20, 4, 200, 20, 0,
+        		this.getTextureY(hovered));
         renderDecoration(guiGraphics, mx, my, partialTicks, hovered);
     }
 
@@ -69,8 +72,14 @@ public class Button extends InteractableComponent
         renderString(guiGraphics, minecraft.font, getTextColor(hovered));
     }
 
-    public ResourceLocation getButtonTexture(boolean hovered) {
-        return getTexture(AbstractButton.SPRITES, hovered);
+    protected int getTextureY(boolean hovered) {
+       int i = 1;
+       if (!this.renderAsActive(hovered)) {
+          i = 0;
+       } else if (this.renderAsFocused(hovered)) {
+          i = 2;
+       }
+       return 46 + i * 20;
     }
 
     public void renderString(GuiGraphics guiGraphics, Font font, int color) {

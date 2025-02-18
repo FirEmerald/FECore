@@ -1,10 +1,12 @@
 package com.firemerald.fecore.block;
 
-import com.firemerald.fecore.network.clientbound.BlockEntityGUIPacket;
+import com.firemerald.fecore.FECoreMod;
+import com.firemerald.fecore.network.client.BlockEntityGUIPacket;
 import com.firemerald.fecore.util.INetworkedGUIEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -24,7 +26,7 @@ public abstract class BlockEntityGUIBlock extends BaseEntityBlock
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos blockPos, Player player, BlockHitResult hitResult)
+	public InteractionResult use(BlockState state, Level level, BlockPos blockPos, Player player, InteractionHand hand, BlockHitResult hitResult)
     {
     	if (!canOpenGUI(state, level, blockPos, player, hitResult)) return InteractionResult.PASS;
     	else {
@@ -32,7 +34,7 @@ public abstract class BlockEntityGUIBlock extends BaseEntityBlock
     		if (blockEntity instanceof INetworkedGUIEntity) {
     			if (level.isClientSide) return InteractionResult.SUCCESS;
     	    	else {
-    	    		if (player instanceof ServerPlayer serverPlayer) new BlockEntityGUIPacket(blockEntity).sendToClient(serverPlayer);
+    	    		if (player instanceof ServerPlayer serverPlayer) FECoreMod.NETWORK.sendTo(new BlockEntityGUIPacket(blockEntity), serverPlayer);
     	    		return InteractionResult.CONSUME;
     	    	}
     		} else return InteractionResult.FAIL;

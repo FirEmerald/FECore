@@ -1,65 +1,88 @@
 package com.firemerald.fecore.util.bounds;
 
-import java.util.Optional;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
+import com.firemerald.fecore.codec.CodedCodec;
+import com.google.gson.JsonElement;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.util.GsonHelper;
 
-public record FloatBounds(Optional<Float> min, Optional<Float> max, Optional<Float> minSq, Optional<Float> maxSq) implements MinMaxBounds<Float> {
-    public static final FloatBounds ANY = new FloatBounds(Optional.empty(), Optional.empty());
-    public static final Codec<FloatBounds> CODEC = MinMaxBounds.<Float, FloatBounds>createCodec(Codec.FLOAT, FloatBounds::new);
+public class FloatBounds extends MinMaxBounds<Float> {
+    public static final FloatBounds ANY = new FloatBounds((Float)null, (Float)null);
+    public static final Codec<FloatBounds> CODEC = CodedCodec.ofJson(FloatBounds::serializeToJson, FloatBounds::fromJson);
+    @Nullable
+    private final Float minSq;
+    @Nullable
+    private final Float maxSq;
 
-    private FloatBounds(Optional<Float> p_298243_, Optional<Float> p_299159_) {
-        this(p_298243_, p_299159_, squareOpt(p_298243_), squareOpt(p_299159_));
+    private static FloatBounds create(StringReader p_154796_, @Nullable Float p_154797_, @Nullable Float p_154798_) throws CommandSyntaxException {
+       if (p_154797_ != null && p_154798_ != null && p_154797_ > p_154798_) {
+          throw ERROR_SWAPPED.createWithContext(p_154796_);
+       } else {
+          return new FloatBounds(p_154797_, p_154798_);
+       }
     }
 
-    private static FloatBounds create(StringReader reader, Optional<Float> min, Optional<Float> max) throws CommandSyntaxException {
-        if (min.isPresent() && max.isPresent() && min.get() > max.get()) {
-            throw ERROR_SWAPPED.createWithContext(reader);
-        } else {
-            return new FloatBounds(min, max);
-        }
+    @Nullable
+    private static Float squareOpt(@Nullable Float pValue) {
+       return pValue == null ? null : pValue * pValue;
     }
 
-    private static Optional<Float> squareOpt(Optional<Float> value) {
-        return value.map(p_297908_ -> p_297908_ * p_297908_);
+    private FloatBounds(@Nullable Float p_154784_, @Nullable Float p_154785_) {
+       super(p_154784_, p_154785_);
+       this.minSq = squareOpt(p_154784_);
+       this.maxSq = squareOpt(p_154785_);
     }
 
-    public static FloatBounds exactly(Float value) {
-        return new FloatBounds(Optional.of(value), Optional.of(value));
+    public static FloatBounds exactly(Float pValue) {
+       return new FloatBounds(pValue, pValue);
     }
 
-    public static FloatBounds between(Float min, Float max) {
-        return new FloatBounds(Optional.of(min), Optional.of(max));
+    public static FloatBounds between(Float pMin, Float pMax) {
+       return new FloatBounds(pMin, pMax);
     }
 
-    public static FloatBounds atLeast(Float min) {
-        return new FloatBounds(Optional.of(min), Optional.empty());
+    public static FloatBounds atLeast(Float pMin) {
+       return new FloatBounds(pMin, (Float)null);
     }
 
-    public static FloatBounds atMost(Float max) {
-        return new FloatBounds(Optional.empty(), Optional.of(max));
+    public static FloatBounds atMost(Float pMax) {
+       return new FloatBounds((Float)null, pMax);
     }
 
-    public boolean matches(Float value) {
-        return this.min.isPresent() && this.min.get() > value ? false : this.max.isEmpty() || !(this.max.get() < value);
+    public boolean matches(Float pValue) {
+       if (this.min != null && this.min > pValue) {
+          return false;
+       } else {
+          return this.max == null || !(this.max < pValue);
+       }
     }
 
-    public boolean matchesSqr(Float value) {
-        return this.minSq.isPresent() && this.minSq.get() > value ? false : this.maxSq.isEmpty() || !(this.maxSq.get() < value);
+    public boolean matchesSqr(Float pValue) {
+       if (this.minSq != null && this.minSq > pValue) {
+          return false;
+       } else {
+          return this.maxSq == null || !(this.maxSq < pValue);
+       }
     }
 
-    public static FloatBounds fromReader(StringReader reader) throws CommandSyntaxException {
-        return fromReader(reader, p_154807_ -> p_154807_);
+    public static FloatBounds fromJson(@Nullable JsonElement pJson) {
+       return fromJson(pJson, ANY, GsonHelper::convertToFloat, FloatBounds::new);
     }
 
-    public static FloatBounds fromReader(StringReader reader, Function<Float, Float> formatter) throws CommandSyntaxException {
-        return MinMaxBounds.fromReader(
-            reader, FloatBounds::create, Float::parseFloat, CommandSyntaxException.BUILT_IN_EXCEPTIONS::readerInvalidFloat, formatter
-        );
+    public static FloatBounds fromReader(StringReader pReader) throws CommandSyntaxException {
+       return fromReader(pReader, (p_154807_) -> {
+          return p_154807_;
+       });
+    }
+
+    public static FloatBounds fromReader(StringReader pReader, Function<Float, Float> pFormatter) throws CommandSyntaxException {
+       return fromReader(pReader, FloatBounds::create, Float::parseFloat, CommandSyntaxException.BUILT_IN_EXCEPTIONS::readerInvalidFloat, pFormatter);
     }
 }

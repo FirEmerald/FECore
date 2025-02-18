@@ -10,7 +10,7 @@ public interface IScrollableBase
 	{
 		if (scrollAmount != 0)
 		{
-			final double scrollSensitivity = ClientConfig.SCROLL_SENSITIVITY.getAsDouble();
+			final double scrollSensitivity = ClientConfig.SCROLL_SENSITIVITY.get();
 			double toScroll;
 			if (scrollAmount > 0)
 			{

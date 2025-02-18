@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.firemerald.fecore.client.gui.IBetterRenderer;
 import com.firemerald.fecore.client.gui.IBetterScreen;
 import com.firemerald.fecore.client.gui.components.IComponent;
+import com.firemerald.fecore.client.gui.components.IInteractableComponent;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
@@ -41,6 +42,14 @@ public class BetterScreen extends Screen implements IBetterScreen
 	{
 		this.setDragging(false);
 		return this.getFocused() != null && this.getFocused().mouseReleased(mx, my, button);
+	}
+
+	@Override
+	public boolean mouseScrolledX(double mx, double my, double scroll)
+	{
+		return this.getChildAt(mx, my).filter(c -> {
+			return c instanceof IInteractableComponent interactable && interactable.mouseScrolledX(mx, my, scroll) != scroll;
+		}).isPresent();
 	}
 
 	@Override

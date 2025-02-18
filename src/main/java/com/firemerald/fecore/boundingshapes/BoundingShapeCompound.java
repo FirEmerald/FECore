@@ -13,13 +13,12 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import com.firemerald.fecore.client.gui.components.Button;
 import com.firemerald.fecore.client.gui.components.ButtonConfigureShape;
 import com.firemerald.fecore.client.gui.components.IComponent;
+import com.firemerald.fecore.codec.stream.StreamCodec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.entity.EntityTypeTest;
@@ -34,7 +33,7 @@ public abstract class BoundingShapeCompound extends BoundingShapeBounded impleme
 				.group(LIST_CODEC.fieldOf("shapes").forGetter(compound -> compound.shapes))
 				.apply(builder, transform));
 	}
-	public static <T extends BoundingShapeCompound> StreamCodec<RegistryFriendlyByteBuf, T> makeStreamCodec(Function<List<BoundingShape>, T> transform) {
+	public static <T extends BoundingShapeCompound> StreamCodec<T> makeStreamCodec(Function<List<BoundingShape>, T> transform) {
 		return StreamCodec.composite(
 				STREAM_LIST_CODEC, compound -> compound.shapes,
 				transform
