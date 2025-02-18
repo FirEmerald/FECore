@@ -70,7 +70,7 @@ public class DeferredObjectRegistry {
 			bucketSup = itemRegistry.register(name, () -> bucket.apply(stillReg));
 			properties.bucket(bucketSup);
 		} else bucketSup = null;
-		return new FluidObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), forgeName, stillReg, flowingReg, blockSup, bucketSup);
+		return new FluidObject<>(new ResourceLocation(modId, name), forgeName, stillReg, flowingReg, blockSup, bucketSup);
 	}
 
 	public <S extends Source, F extends Flowing, B extends LiquidBlock, I extends Item> FluidObject<S, F, B, I> registerFluid(String name, BiFunction<Supplier<S>, Supplier<F>, Properties> fluidProperties, Function<Properties, S> still, Function<Properties, F> flowing, Function<Supplier<S>, B> block, Function<Supplier<S>, I> bucket) {
@@ -203,7 +203,7 @@ public class DeferredObjectRegistry {
 		if (item != null) itemSup = itemRegistry.register(name, () -> item.apply(blockReg));
 		else itemSup = null;
 		RegistryObject<BlockEntityType<E>> blockEntityReg = blockEntityRegistry.register(name, () -> new BlockEntityType<>(blockEntity, Set.of(blockReg.get()), null));
-		return new BlockEntityObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), blockEntityReg, blockReg, itemSup);
+		return new BlockEntityObject<>(new ResourceLocation(modId, name), blockEntityReg, blockReg, itemSup);
 	}
 
 	public <E extends BlockEntity, B extends Block> BlockEntityObject<E, B, BlockItem> registerBlockEntity(String name, Supplier<B> block, Item.Properties itemProperties, BlockEntitySupplier<E> blockEntity) {
@@ -223,7 +223,7 @@ public class DeferredObjectRegistry {
 		RegistryObject<I> itemSup;
 		if (item != null) itemSup = itemRegistry.register(name, () -> item.apply(blockReg));
 		else itemSup = null;
-		return new BlockObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), blockReg, itemSup);
+		return new BlockObject<>(new ResourceLocation(modId, name), blockReg, itemSup);
 	}
 
 	public <B extends Block> BlockObject<B, BlockItem> registerBlock(String name, Supplier<B> block, Item.Properties itemProperties) {
@@ -264,7 +264,7 @@ public class DeferredObjectRegistry {
 
 	public <I extends Item> ItemObject<I> registerItem(String name, Supplier<I> item) {
 		RegistryObject<I> itemSup = itemRegistry.register(name, item);
-		return new ItemObject<>(ResourceLocation.fromNamespaceAndPath(modId, name), itemSup);
+		return new ItemObject<>(new ResourceLocation(modId, name), itemSup);
 	}
 
 	public <I extends Item> ItemObject<I> registerBasicItem(String name, Function<Item.Properties, I> item, int stackSize) {

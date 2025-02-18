@@ -22,7 +22,7 @@ public class FluidObject<S extends Fluid, F extends Fluid, B extends Block, I ex
 	{
 		super(id, block, item);
 		this.localTag = FluidTags.create(id);
-		this.forgeTag = FluidTags.create(ResourceLocation.fromNamespaceAndPath("forge", forgeName));
+		this.forgeTag = FluidTags.create(new ResourceLocation("forge", forgeName));
 		this.stillFluid = stillFluid;
 		this.flowingFluid = flowingFluid;
 	}

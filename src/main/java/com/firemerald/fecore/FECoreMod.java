@@ -37,7 +37,7 @@ public class FECoreMod {
     public static final SimpleNetwork NETWORK = new SimpleNetwork(id("main"), "3");
 
     public static ResourceLocation id(String name) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+		return new ResourceLocation(MOD_ID, name);
 	}
 
     public FECoreMod(FMLJavaModLoadingContext loadingContext) {
